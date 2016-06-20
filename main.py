@@ -1,5 +1,5 @@
 
-from PyQt4 import QtGui 
+from PyQt4 import QtGui, QtCore 
 from planet import Planet
 from ruleset import Ruleset
 
@@ -18,14 +18,21 @@ class Stars(QtGui.QMainWindow, stars.Ui_GUI):
 def main():
     app = QtGui.QApplication(sys.argv)  # A new instance of QApplication
     form = Stars()                      # Define the form 'Stars'
-    
-    MyBox = QtGui.QSpinBox() 
+
+    RadarRange = QtGui.QSpinBox()
+    RadarRange.setSuffix( '%' )
+    RadarRange.setRange( 10, 100 )
+    RadarRange.setValue( 100 )
+    RadarRange.setSingleStep( 10 )
+    RadarRange.setAlignment( QtCore.Qt.AlignRight )
+    form.PlanetInfo.addWidget( RadarRange )
+
 
     scene = QtGui.QGraphicsScene()
     scene.addText( 'Hallo Hinderk' )
 
     form.Universe.setScene( scene )
-    form.PlanetInfo.addWidget( MyBox )
+    
 
 
     Rules = Ruleset()

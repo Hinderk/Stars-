@@ -488,6 +488,10 @@
   <property name="windowTitle">
    <string>My Stars!</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="stars.qrc">
+    <normaloff>:/Icons/Stars</normaloff>:/Icons/Stars</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="enabled">
     <bool>true</bool>
@@ -927,12 +931,8 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QCheckBox" name="checkBox">
-      <property name="text">
-       <string>CheckBox</string>
-      </property>
-     </widget>
+    <item row="0" column="1">
+     <widget class="QGraphicsView" name="Universe"/>
     </item>
     <item row="1" column="1">
      <widget class="QGraphicsView" name="Inspector">
@@ -950,8 +950,12 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QGraphicsView" name="Universe"/>
+    <item row="0" column="0">
+     <widget class="QCheckBox" name="checkBox">
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

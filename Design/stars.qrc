@@ -32,4 +32,7 @@
     <file alias="OpenGame">Images/Menu/open.png</file>
     <file alias="SaveGame">Images/Menu/save.png</file>
   </qresource>
+  <qresource prefix="Icons">
+    <file alias="Stars">Images/Icons/stars.ico</file>
+  </qresource>
 </RCC>
