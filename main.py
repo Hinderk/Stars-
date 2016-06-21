@@ -23,7 +23,7 @@ def main():
     Info = SpaceInfo( form )
 
 
-
+    Info.UpdateFriendlyDesigns( [ 'A', 'B', 'C' ] )
 
 
     RadarRange = QtGui.QSpinBox()

@@ -55,79 +55,73 @@ class SpaceInfo( stars.Ui_GUI ) :
         Idle.setIcon( Icon )
         form.SpaceInfo.addWidget( Idle )
     ##
-        FriendFilter = QtGui.QMenu()
-        self.AllFriends = FriendFilter.addAction( 'All Designs' )
-        self.InvertFriends = FriendFilter.addAction( 'Invert Filter' )
-        self.NoFriends = FriendFilter.addAction( 'No Designs' )
-        FriendFilter.addSeparator()
-
-########
-        
-## Friendly Designs will go here !
-        
-########
-        
+        self.FriendFilter = QtGui.QMenu()
+        self.FriendlyDesigns = dict()
         Friends = QtGui.QToolButton()
         Friends.setCheckable( True )
         Friends.setPopupMode( Friends.DelayedPopup )
         Icon = QtGui.QIcon( ':/Toolbar/Friendlies' )
         Friends.setIcon( Icon )
-        Friends.setMenu( FriendFilter )
+        Friends.setMenu( self.FriendFilter )
         form.SpaceInfo.addWidget( Friends )
     ##
-        FoeFilter = QtGui.QMenu()
-        self.AllFoes = FoeFilter.addAction( 'All Designs' )
-        self.InvertFoes = FoeFilter.addAction( 'Invert Filter' )
-        self.NoFoes = FoeFilter.addAction( 'No Designs' )
-        FoeFilter.addSeparator()
-        self.ColonyShips = FoeFilter.addAction( 'Colony Ships' )
-        self.Freighters = FoeFilter.addAction( 'Freighters' )
-        self.Scouts = FoeFilter.addAction( 'Scouts' )
-        self.Warships = FoeFilter.addAction( 'Warships' )
-        self.UtilityShips = FoeFilter.addAction( 'Utility Ships' )
-        self.Bombers = FoeFilter.addAction( 'Bombers' )
-        self.MiningShips = FoeFilter.addAction( 'Mining Ships' )
-        self.Tankers = FoeFilter.addAction( 'Fuel Transports' )
-        self.ColonyShips.setCheckable( True ) 
-        self.Freighters.setCheckable( True )
-        self.Scouts.setCheckable( True )
-        self.Warships.setCheckable( True )
-        self.UtilityShips.setCheckable( True )
-        self.Bombers.setCheckable( True )
-        self.MiningShips.setCheckable( True )
-        self.Tankers.setCheckable( True )
+        self.FoeFilter = QtGui.QMenu()
+        self.EnemyDesigns = dict()
+        self.UpdateEnemyDesigns( [ 'Colony Ships', 'Freighters', 'Scouts', 'Warships', 'Utility Ships', 'Bombers', 'Mining Ships', 'Fuel Transports' ] )
         Foes = QtGui.QToolButton()
         Foes.setCheckable( True )
         Foes.setPopupMode( Foes.DelayedPopup )
         Icon = QtGui.QIcon( ':/Toolbar/Foes' )
         Foes.setIcon( Icon )
-        Foes.setMenu( FoeFilter )
+        Foes.setMenu( self.FoeFilter )
         form.SpaceInfo.addWidget( Foes )
     ##
-        ZoomLevel = QtGui.QMenu()
-        self.Zoom25 = ZoomLevel.addAction( '25%' )
-        self.Zoom38 = ZoomLevel.addAction( '38%' )
-        self.Zoom50 = ZoomLevel.addAction( '50%' )
-        self.Zoom75 = ZoomLevel.addAction( '75%' )
-        self.Zoom100 = ZoomLevel.addAction( '100%' )
-        self.Zoom125 = ZoomLevel.addAction( '125%' )
-        self.Zoom150 = ZoomLevel.addAction( '150%' )
-        self.Zoom200 = ZoomLevel.addAction( '200%' )
-        self.Zoom400 = ZoomLevel.addAction( '400%' )
-        self.Zoom25.setCheckable( True )
-        self.Zoom38.setCheckable( True )
-        self.Zoom50.setCheckable( True )
-        self.Zoom75.setCheckable( True )
-        self.Zoom100.setCheckable( True )
-        self.Zoom125.setCheckable( True )
-        self.Zoom150.setCheckable( True )
-        self.Zoom200.setCheckable( True )
-        self.Zoom400.setCheckable( True )
-        Zoom = QtGui.QToolButton()
-        Zoom.setCheckable( False )
-        Zoom.setPopupMode( Zoom.InstantPopup )
+        self.ZoomLevel = QtGui.QMenu()
+        self.Zoom = dict()
+        self.DefineZoomLevel( [ '25', '38', '50', '75', '100', '125', '150', '200', '400' ] )
+        ChangeZoom = QtGui.QToolButton()
+        ChangeZoom.setCheckable( False )
+        ChangeZoom.setPopupMode( ChangeZoom.InstantPopup )
         Icon = QtGui.QIcon( ':/Toolbar/Zoomlevel' )
-        Zoom.setIcon( Icon )
-        Zoom.setMenu( ZoomLevel )
-        form.SpaceInfo.addWidget( Zoom )               
-        
+        ChangeZoom.setIcon( Icon )
+        ChangeZoom.setMenu( self.ZoomLevel )
+        form.SpaceInfo.addWidget( ChangeZoom )
+
+
+    def UpdateFriendlyDesigns( self, DesignData ) :
+
+        self.FriendFilter.clear()
+        self.AllFriends = self.FriendFilter.addAction( 'All Designs' )
+        self.InvertFriends = self.FriendFilter.addAction( 'Invert Filter' )
+        self.NoFriends = self.FriendFilter.addAction( 'No Designs' )
+        self.FriendFilter.addSeparator()
+        self.FriendlyDesigns.clear()
+        for NewDesign in DesignData :
+            NewAction = self.FriendFilter.addAction( NewDesign )
+            NewAction.setCheckable( True )
+            self.FriendlyDesigns[ NewDesign ] = NewAction
+
+
+    def UpdateEnemyDesigns( self, DesignData ) :
+
+        self.FriendFilter.clear()
+        self.AllFoes = self.FoeFilter.addAction( 'All Designs' )
+        self.InvertFoes = self.FoeFilter.addAction( 'Invert Filter' )
+        self.NoFoes = self.FoeFilter.addAction( 'No Designs' )
+        self.FoeFilter.addSeparator()
+        self.EnemyDesigns.clear()
+        for NewDesign in DesignData :
+            NewAction = self.FoeFilter.addAction( NewDesign )
+            NewAction.setCheckable( True )
+            self.EnemyDesigns[ NewDesign ] = NewAction
+
+
+    def DefineZoomLevel( self, Level ) :
+
+        self.ZoomLevel.clear()
+        self.Zoom.clear()
+        for NewLevel in Level :
+            NewAction = self.ZoomLevel.addAction( NewLevel + '%' )
+            NewAction.setCheckable( True )
+            self.Zoom[ NewLevel ] = NewAction
+
