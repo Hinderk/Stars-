@@ -1039,32 +1039,6 @@
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="PlanetInfo">
    <property name="windowTitle">
-    <string>PlanetInfo</string>
-   </property>
-   <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
-   </property>
-   <property name="autoFillBackground">
-    <bool>true</bool>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionViewNormal"/>
-   <addaction name="actionViewSurfaceMinerals"/>
-   <addaction name="actionViewConcentration"/>
-   <addaction name="actionViewPlanetValue"/>
-   <addaction name="actionViewPopulation"/>
-   <addaction name="actionViewNoPlayerInfo"/>
-   <addaction name="separator"/>
-   <addaction name="actionAddWaypoints"/>
-   <addaction name="actionScannerCoverage"/>
-  </widget>
-  <widget class="QToolBar" name="SpaceInfo">
-   <property name="windowTitle">
     <string>SpaceInfo</string>
    </property>
    <property name="autoFillBackground">
@@ -1074,6 +1048,20 @@
     <enum>Qt::ToolButtonFollowStyle</enum>
    </property>
    <property name="floatable">
+    <bool>true</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QToolBar" name="SpaceInfo">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="autoFillBackground">
     <bool>true</bool>
    </property>
    <attribute name="toolBarArea">
@@ -1274,110 +1262,6 @@
    </property>
    <property name="text">
     <string>400%</string>
-   </property>
-  </action>
-  <action name="actionViewNormal">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="stars.qrc">
-     <normaloff>:/Toolbar/Default</normaloff>:/Toolbar/Default</iconset>
-   </property>
-   <property name="text">
-    <string>Normal View</string>
-   </property>
-   <property name="toolTip">
-    <string>Normal View</string>
-   </property>
-  </action>
-  <action name="actionViewSurfaceMinerals">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="stars.qrc">
-     <normaloff>:/Toolbar/Surface</normaloff>:/Toolbar/Surface</iconset>
-   </property>
-   <property name="text">
-    <string>Surface Mineral View</string>
-   </property>
-  </action>
-  <action name="actionViewConcentration">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="stars.qrc">
-     <normaloff>:/Toolbar/Minerals</normaloff>:/Toolbar/Minerals</iconset>
-   </property>
-   <property name="text">
-    <string>Mineral Concentration View</string>
-   </property>
-  </action>
-  <action name="actionViewPlanetValue">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="stars.qrc">
-     <normaloff>:/Toolbar/Percent</normaloff>:/Toolbar/Percent</iconset>
-   </property>
-   <property name="text">
-    <string>Planet Value View</string>
-   </property>
-  </action>
-  <action name="actionViewPopulation">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="stars.qrc">
-     <normaloff>:/Toolbar/People</normaloff>:/Toolbar/People</iconset>
-   </property>
-   <property name="text">
-    <string>Population View</string>
-   </property>
-   <property name="font">
-    <font>
-     <stylestrategy>PreferAntialias</stylestrategy>
-    </font>
-   </property>
-  </action>
-  <action name="actionViewNoPlayerInfo">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="stars.qrc">
-     <normaloff>:/Toolbar/Cancel</normaloff>:/Toolbar/Cancel</iconset>
-   </property>
-   <property name="text">
-    <string>No Player Information</string>
-   </property>
-  </action>
-  <action name="actionAddWaypoints">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="stars.qrc">
-     <normaloff>:/Toolbar/Waypoint</normaloff>:/Toolbar/Waypoint</iconset>
-   </property>
-   <property name="text">
-    <string>Add Waypoints</string>
-   </property>
-  </action>
-  <action name="actionScannerCoverage">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="stars.qrc">
-     <normaloff>:/Toolbar/Scanner</normaloff>:/Toolbar/Scanner</iconset>
-   </property>
-   <property name="text">
-    <string>Scanner Coverage Overlay</string>
    </property>
   </action>
  </widget>

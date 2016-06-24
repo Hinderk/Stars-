@@ -1,17 +1,17 @@
 
 from PyQt4 import QtGui, QtCore
+from stars import Stars
 
 import sys
 import os
-import stars
 
 
 
-class SpaceInfo( stars.Ui_GUI ) :
+class SpaceInfo :
 
     def __init__( self, form ) :
 
-        MineFilter = QtGui.QMenu()
+        MineFilter = QtGui.QMenu( form.SpaceInfo )
         self.AllMines = MineFilter.addAction( 'All Mine Fields' )
         self.NoMines = MineFilter.addAction( 'No Mine Fields' )
         MineFilter.addSeparator()
@@ -23,7 +23,8 @@ class SpaceInfo( stars.Ui_GUI ) :
         self.FriendlyMines.setCheckable( True )
         self.NeutralMines.setCheckable( True )
         self.EnemyMines.setCheckable( True )
-        Mines = QtGui.QToolButton()
+        Mines = QtGui.QToolButton( form.SpaceInfo )
+        Mines.setToolTip( 'Show Minefields' )
         Mines.setCheckable( True )
         Mines.setPopupMode( Mines.DelayedPopup )
         Icon = QtGui.QIcon( ':/Toolbar/Mine' )
@@ -31,33 +32,37 @@ class SpaceInfo( stars.Ui_GUI ) :
         Mines.setMenu( MineFilter )
         form.SpaceInfo.addWidget( Mines )
     ##
-        Paths = QtGui.QToolButton()
-        Paths.setCheckable( True )
+        self.Paths = QtGui.QAction( form )
+        self.Paths.setText( 'Set Waypoints' )
+        self.Paths.setCheckable( True )
         Icon = QtGui.QIcon( ':/Toolbar/Paths' )
-        Paths.setIcon( Icon )
-        form.SpaceInfo.addWidget( Paths )
+        self.Paths.setIcon( Icon )
+        form.SpaceInfo.addAction( self.Paths )
     ##
-        Names = QtGui.QToolButton()
-        Names.setCheckable( True )
+        self.Names = QtGui.QAction( form )
+        self.Names.setText( 'Show Names' )
+        self.Names.setCheckable( True )
         Icon = QtGui.QIcon( ':/Toolbar/Names' )
-        Names.setIcon( Icon )
-        form.SpaceInfo.addWidget( Names )
+        self.Names.setIcon( Icon )
+        form.SpaceInfo.addAction( self.Names )
     ##
-        Orbit = QtGui.QToolButton()
-        Orbit.setCheckable( True )
+        self.Orbit = QtGui.QAction( form )
+        self.Orbit.setText( 'Count Ships' )
+        self.Orbit.setCheckable( True )
         Icon = QtGui.QIcon( ':/Toolbar/Orbiting' )
-        Orbit.setIcon( Icon )
-        form.SpaceInfo.addWidget( Orbit )
+        self.Orbit.setIcon( Icon )
+        form.SpaceInfo.addAction( self.Orbit )
     ##
-        Idle = QtGui.QToolButton()
-        Idle.setCheckable( True )
+        self.Idle = QtGui.QAction( form )
+        self.Idle.setText( 'Show Idle Fleets' )
+        self.Idle.setCheckable( True )
         Icon = QtGui.QIcon( ':/Toolbar/Waiting' )
-        Idle.setIcon( Icon )
-        form.SpaceInfo.addWidget( Idle )
+        self.Idle.setIcon( Icon )
+        form.SpaceInfo.addAction( self.Idle )
     ##
-        self.FriendFilter = QtGui.QMenu()
+        self.FriendFilter = QtGui.QMenu( form.SpaceInfo )
         self.FriendlyDesigns = dict()
-        Friends = QtGui.QToolButton()
+        Friends = QtGui.QToolButton( form.SpaceInfo )
         Friends.setCheckable( True )
         Friends.setPopupMode( Friends.DelayedPopup )
         Icon = QtGui.QIcon( ':/Toolbar/Friendlies' )
@@ -65,10 +70,10 @@ class SpaceInfo( stars.Ui_GUI ) :
         Friends.setMenu( self.FriendFilter )
         form.SpaceInfo.addWidget( Friends )
     ##
-        self.FoeFilter = QtGui.QMenu()
+        self.FoeFilter = QtGui.QMenu( form.SpaceInfo )
         self.EnemyDesigns = dict()
         self.UpdateEnemyDesigns( [ 'Colony Ships', 'Freighters', 'Scouts', 'Warships', 'Utility Ships', 'Bombers', 'Mining Ships', 'Fuel Transports' ] )
-        Foes = QtGui.QToolButton()
+        Foes = QtGui.QToolButton( form.SpaceInfo )
         Foes.setCheckable( True )
         Foes.setPopupMode( Foes.DelayedPopup )
         Icon = QtGui.QIcon( ':/Toolbar/Foes' )
@@ -76,10 +81,10 @@ class SpaceInfo( stars.Ui_GUI ) :
         Foes.setMenu( self.FoeFilter )
         form.SpaceInfo.addWidget( Foes )
     ##
-        self.ZoomLevel = QtGui.QMenu()
+        self.ZoomLevel = QtGui.QMenu( form.SpaceInfo )
         self.Zoom = dict()
         self.DefineZoomLevel( [ '25', '38', '50', '75', '100', '125', '150', '200', '400' ] )
-        ChangeZoom = QtGui.QToolButton()
+        ChangeZoom = QtGui.QToolButton( form.SpaceInfo )
         ChangeZoom.setCheckable( False )
         ChangeZoom.setPopupMode( ChangeZoom.InstantPopup )
         Icon = QtGui.QIcon( ':/Toolbar/Zoomlevel' )
