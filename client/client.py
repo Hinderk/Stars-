@@ -1,7 +1,8 @@
 
 import sys
 
-from display import Display, DisplayControls
+from display import Display
+from displaycontrols import DisplayControls
 
 from PyQt5 import QtCore
 
@@ -35,10 +36,10 @@ class Client(QMainWindow):
         self.createMenubar()
         self.Statusbar = self.statusBar()
         self.Statusbar.showMessage('Initializing the Client ...')
-        self.CentralWidget = QWidget(self)
+        self.CentralWidget = QWidget()
         self.setCentralWidget(self.CentralWidget)
         self.Layout = QHBoxLayout(self.CentralWidget)
- 
+
       #  Area = InteractiveArea()
         self.PpI = Display()
         self.Controls = DisplayControls()
@@ -50,7 +51,7 @@ class Client(QMainWindow):
         self.Layout.addWidget(self.PpI)
         self.Layout.addWidget(self.Controls)
     #
-        QtCore.QMetaObject.connectSlotsByName(self.CentralWidget)
+    #    QtCore.QMetaObject.connectSlotsByName(self.CentralWidget)
        
 
     def center(self):

@@ -4,7 +4,6 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 from client import Client
-from displaycontrols import DisplayControls
 
 
 if __name__ == '__main__':

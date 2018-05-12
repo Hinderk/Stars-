@@ -3,13 +3,10 @@ import sys
 
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QToolBox
 from PyQt5.QtWidgets import QAction
-from PyQt5.QtWidgets import QPushButton
 
 from PyQt5.QtGui import QFont, QPen
 from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QIcon
 from PyQt5.QtGui import QPainter
 from PyQt5.QtGui import QPaintEvent
 
@@ -40,7 +37,6 @@ class Display(QWidget):
 
     def paintEvent(self, event):
         """Paint the contents of the plan position indicator"""
-        print("paint event triggered!")
         self.PPIpainter.begin(self)
         self.PPIpainter.setBrush(self.SpaceColor)
         self.PPIpainter.drawRect(event.rect())
