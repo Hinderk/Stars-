@@ -32,7 +32,8 @@ class ControlArea(QWidget):
     def initControlArea(self):
         """Initialise the game control panel."""
         self.Layout = QVBoxLayout(self)
-        self.Layout.setContentsMargins(20, 10, 0, 10)
+        self.Layout.setContentsMargins(0, 0, 0, 0)
+        self.Layout.setSpacing(0)
         self.setLayout(self.Layout)
         self.setMinimumWidth(40)
         self.AreaPainter = QPainter()

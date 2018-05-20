@@ -29,6 +29,7 @@ class Display(QWidget):
         """Initialise the plan position indicator."""
         self.Layout = QVBoxLayout(self)
         self.Layout.setContentsMargins(0, 0, 0, 0)
+        self.Layout.setSpacing(0)
         self.setLayout(self.Layout)
         self.PPIpainter = QPainter()
         self.setMinimumHeight(600)

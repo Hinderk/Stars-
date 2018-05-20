@@ -32,6 +32,7 @@ class DisplayControls(QWidget):
         Layout.addWidget(ZoomOut)
         Layout.addWidget(Center)
         Layout.addStretch(1)
-        Layout.setContentsMargins(2, 10, 8, 0)
+        Layout.setContentsMargins(5, 10, 5, 0)
+        Layout.setSpacing(0)
         self.setMaximumWidth(70)
         self.setLayout(Layout)

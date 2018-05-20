@@ -43,6 +43,7 @@ class Client(QMainWindow):
         self.Layout = QHBoxLayout(self.CentralWidget)
         self.Layout.setObjectName('MainHorizontalLayout')
         self.Layout.setContentsMargins(0, 0, 0, 0)
+        self.Layout.setSpacing(0)
         self.Area = ControlArea()
         self.PpI = Display()
         self.Controls = DisplayControls()
@@ -58,7 +59,7 @@ class Client(QMainWindow):
     def resizeEvent(self, event):
         """Recompute spacings to keep the plan position indicator square"""
         TotalHeight = self.CentralWidget.height()
-        TotalWidth = self.CentralWidget.width() - self.Controls.width() - 10
+        TotalWidth = self.CentralWidget.width() - self.Controls.width()
         self.Layout.setStretch(0,TotalWidth-TotalHeight)
         self.Layout.setStretch(1,TotalHeight)
 

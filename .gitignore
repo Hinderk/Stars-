@@ -7,3 +7,5 @@ rulebook/TAOE-regel-DE.pdf
 rulebook/TAOE-fernspiel-regel-DE.pdf
 stars.code-workspace
 client/.vscode/settings.json
+client/__pycache__/controlarea.cpython-37.pyc
+client/__pycache__/square.cpython-37.pyc
