@@ -3,6 +3,8 @@ import sys
 
 from display import Display
 from displaycontrols import DisplayControls
+from controlarea import ControlArea
+from square import Square
 
 from PyQt5 import QtCore
 
@@ -36,23 +38,30 @@ class Client(QMainWindow):
         self.createMenubar()
         self.Statusbar = self.statusBar()
         self.Statusbar.showMessage('Initializing the Client ...')
-        self.CentralWidget = QWidget()
-        self.setCentralWidget(self.CentralWidget)
+        self.CentralWidget = QWidget(self)
+        self.CentralWidget.setObjectName('CentralWidget')
         self.Layout = QHBoxLayout(self.CentralWidget)
-
-      #  Area = InteractiveArea()
+        self.Layout.setObjectName('MainHorizontalLayout')
+        self.Layout.setContentsMargins(0, 0, 0, 0)
+        self.Area = ControlArea()
         self.PpI = Display()
         self.Controls = DisplayControls()
-    #
-        lbl1 = QLabel('Interactive Area', self) 
-        self.Layout.addWidget(lbl1)
-    #
-        self.Layout.addStretch(1)          
+        self.Layout.addWidget(self.Area)      
         self.Layout.addWidget(self.PpI)
         self.Layout.addWidget(self.Controls)
+        self.setCentralWidget(self.CentralWidget)
     #
     #    QtCore.QMetaObject.connectSlotsByName(self.CentralWidget)
-       
+
+
+
+    def resizeEvent(self, event):
+        """Recompute spacings to keep the plan position indicator square"""
+        TotalHeight = self.CentralWidget.height()
+        TotalWidth = self.CentralWidget.width() - self.Controls.width() - 10
+        self.Layout.setStretch(0,TotalWidth-TotalHeight)
+        self.Layout.setStretch(1,TotalHeight)
+
 
     def center(self):
         """Center the client widget on the desktop."""

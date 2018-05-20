@@ -23,7 +23,7 @@ class DisplayControls(QWidget):
         self.init()
 
     def init(self):
-        """Initialise the plan position indicator."""
+        """Initialise the control panel for the plan position indicator."""
         Layout = QVBoxLayout()
         ZoomIn = QPushButton("Zoom\nIn")
         ZoomOut = QPushButton("Zoom\nOut")
@@ -32,4 +32,6 @@ class DisplayControls(QWidget):
         Layout.addWidget(ZoomOut)
         Layout.addWidget(Center)
         Layout.addStretch(1)
+        Layout.setContentsMargins(2, 10, 8, 0)
+        self.setMaximumWidth(70)
         self.setLayout(Layout)
