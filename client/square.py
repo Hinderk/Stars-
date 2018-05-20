@@ -3,6 +3,7 @@ from PyQt5 import QtCore
 
 from PyQt5.QtWidgets import QBoxLayout
 from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QSpacerItem
 
 
 
