@@ -36,9 +36,6 @@ class Display(QWidget):
         self.setMinimumWidth(600)
         self.setObjectName("Universe")
 
-    #def sizeHint(self):
-    #    return QSize(self.height(),self.height())
-
 
     def paintEvent(self, event):
         """Paint the contents of the plan position indicator"""

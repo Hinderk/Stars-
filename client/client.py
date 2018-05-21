@@ -9,6 +9,7 @@ from square import Square
 from PyQt5 import QtCore
 
 from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QDesktopWidget
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QWidget
@@ -83,10 +84,32 @@ class Client(QMainWindow):
         loadAction.setStatusTip('Open a saved game file.')
         saveAction.setStatusTip('Save the current state of the game.')
         exitAction.setStatusTip("""Terminate the 'Stars!' client.""")
-        exitAction.triggered.connect(qApp.quit)
+        exitAction.triggered.connect(self.exitGame)
+        loadAction.triggered.connect(self.openFile)
+        saveAction.triggered.connect(self.saveFile)
         Menubar = self.menuBar()
         FileMenu = Menubar.addMenu('File')
         FileMenu.addAction(loadAction)
         FileMenu.addAction(saveAction)
         FileMenu.addSeparator()
         FileMenu.addAction(exitAction)
+
+
+    def exitGame(self,event):
+        qApp.quit()
+
+
+    def saveFile(self,event):
+        """Save the current state of the game in a file"""
+        fileFilter='Game Files (*.trn);;All Files (*.*)'
+        gameFile, _ = QFileDialog.getSaveFileName(self, 'Save Game', '', fileFilter)
+        print(gameFile)
+
+
+
+
+    def openFile(self, event):
+        """Load a new state for the game from a file"""
+        fileFilter='Game Files (*.trn);;All Files (*.*)'
+        newGame, _ = QFileDialog.getOpenFileName(self, 'Open Saved Game', '', fileFilter)
+        print(newGame)
