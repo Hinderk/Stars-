@@ -1,10 +1,11 @@
+"""The module creates the graphical user interface for the game client"""
 
 import sys
 
 from display import Display
 from displaycontrols import DisplayControls
 from controlarea import ControlArea
-from square import Square
+from starmap import Starmap
 
 from PyQt5 import QtCore
 
@@ -17,7 +18,7 @@ from PyQt5.QtWidgets import QAction, qApp
 
 from PyQt5.QtGui import QFont, QIcon
 
-from PyQt5.QtWidgets import QLabel
+#from PyQt5.QtWidgets import QLabel
 
 
 
@@ -45,8 +46,9 @@ class Client(QMainWindow):
         self.Layout.setObjectName('MainHorizontalLayout')
         self.Layout.setContentsMargins(0, 0, 0, 0)
         self.Layout.setSpacing(0)
+        self.Stars = Starmap()
         self.Area = ControlArea()
-        self.PpI = Display()
+        self.PpI = Display(self.Stars)
         self.Controls = DisplayControls()
         self.Layout.addWidget(self.Area)      
         self.Layout.addWidget(self.PpI)
@@ -96,6 +98,7 @@ class Client(QMainWindow):
 
 
     def exitGame(self,event):
+        """Terminate the game client"""
         qApp.quit()
 
 
