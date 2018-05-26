@@ -6,7 +6,7 @@ from planet import Planet
 
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QGraphicsView
+from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtWidgets import QGraphicsItem
 
 from PyQt5.QtGui import QFont, QPen, QBrush
@@ -22,7 +22,7 @@ from PyQt5.QtCore import QSizeF
 
 
 
-class Starmap(object):
+class Starmap(QGraphicsScene):
     """This class maintains a list of star systems."""
 
     def __init__(self):
@@ -35,32 +35,36 @@ class Starmap(object):
         """Populate the star map with various types of objects."""
         self.X0 = 0
         self.Y0 = 0
-        p0 = Planet('Earth')
-        p0.moveTo(200, 500)
+        p0 = Planet(200, 500, 'Earth')
         self.Star['Earth'] = p0
-        p1 = Planet('Alpha Centauri')
-        p1.moveTo(600, 1400)
+        p1 = Planet(600, 1400, 'Alpha Centauri')
         self.Star['Alpha Centauri'] = p1
-        p2 = Planet('Tau Ceti')
-        p2.moveTo(1200,750)
+        p2 = Planet(1200, 750, 'Tau Ceti')
         self.Star['Tau Ceti'] = p2
+        self.addItem(p0)
+        self.addItem(p1)
+        self.addItem(p2)
 
 
-    def createScene(self, PpiScene):
+    def renderPlanets(self):
         """Populate the universe with the stars in the map."""
         PlanetList = self.Star.values()
+        brush = QBrush(Planet.PlanetColor)
+        pen = QPen(Planet.PlanetColor)
         for p in PlanetList:
-            brush = QBrush(p.PlanetColor)
-            pen = QPen(p.PlanetColor)
-            size = QSizeF(50, 50)
-            loc = QPointF(p.x - self.X0, p.y - self.Y0)
-            pos = QRectF(loc, size)
-            PpiScene.addEllipse(pos, pen, brush)
-            Name = PpiScene.addSimpleText(p.Name)
-            Name.setBrush(brush)
-            Name.setPen(pen)
-            Name.setFont(p.PlanetFont)
-            bounds = Name.boundingRect()
-            Name.setX( size.width() / 2 + loc.x() - bounds.width() / 2 )
-            Name.setY( loc.y() + size.height() / 2 + 40 )
-            
+            p.setBrush(brush)
+            p.setPen(pen)
+            loc = QPointF(p.x, p.y)
+            name = self.addSimpleText(p.Name)
+            name.setBrush(brush)
+            name.setPen(pen)
+            name.setFont(p.PlanetFont)
+            bounds = name.boundingRect()
+            name.setX( loc.x() - bounds.width() / 2 )
+            name.setY( loc.y() + Planet.PlanetRadius + 20 )
+
+
+
+#    def mousePressEvent(self, event):
+#        """Intercept mouse klicks to select space objects."""
+#        print( 'Mouse klick on item: ', event.scenePos() )

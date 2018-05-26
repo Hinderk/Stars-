@@ -25,27 +25,26 @@ class Display(QWidget):
     """This class implements the plan position indicator."""
     SpaceColor = QColor(0, 0, 0, 240)
 
-    def __init__(self, Stars):
+    def __init__(self):
         super().__init__()
-        self.initPPI(Stars)
+        self.initPPI()
 
-    def initPPI(self, Stars):
+    def initPPI(self):
         """Initialise the plan position indicator."""
         self.ZoomLevel = 1
-        self.Universe = Stars
         self.Layout = QVBoxLayout(self)
         self.Layout.setContentsMargins(0, 0, 0, 0)
         self.Layout.setSpacing(0)
         self.setLayout(self.Layout)
         self.setMinimumHeight(600)
         self.setMinimumWidth(600)
-        self.Scene = QGraphicsScene()
+        self.Scene = Starmap()
         self.View = QGraphicsView(self.Scene)
         self.View.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.View.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.View.setRenderHint(QPainter.Antialiasing)
         self.Scene.setBackgroundBrush(self.SpaceColor)
-        self.Universe.createScene(self.Scene)
+        self.Scene.renderPlanets()
         self.Layout.addWidget(self.View)
         self.Scaling = 0.95 * self.View.width() / self.Scene.width()
         self.View.scale(self.Scaling, self.Scaling)
@@ -59,10 +58,9 @@ class Display(QWidget):
 
 
     def ZoomOut(self, event):
-        if self.ZoomLevel < 2:
-            return
-        self.ZoomLevel = self.ZoomLevel - 1
-        self.View.scale(0.8, 0.8)
+        if self.ZoomLevel > 1:
+            self.ZoomLevel = self.ZoomLevel - 1
+            self.View.scale(0.8, 0.8)
 
 
 

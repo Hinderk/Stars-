@@ -7,7 +7,7 @@ from planetdata import PlanetData
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QGraphicsView
-from PyQt5.QtWidgets import QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 from PyQt5.QtGui import QFont, QPen
 from PyQt5.QtGui import QColor
@@ -16,26 +16,34 @@ from PyQt5.QtGui import QPaintEvent
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QRectF
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSizeF
+from PyQt5.QtCore import QPointF
 
 
 
 
-class Planet(QGraphicsItem, PlanetData):
+class Planet(QGraphicsEllipseItem, PlanetData):
     """This class represents a star system as shown on the star map."""
     PlanetColor = QColor(255, 255, 255, 255)
     PlanetFont = QFont('Calibri', 32, 25, True)
+    PlanetRadius = 25
 
-    def __init__(self, starName):
-        super(QGraphicsItem, self).__init__()
-        self.initSystem(starName)
 
-    def initSystem(self, starName):
+    def __init__(self, x, y, starName):
+        super(QGraphicsEllipseItem, self).__init__()
+        d = 2 * Planet.PlanetRadius
+        self.setRect( x - Planet.PlanetRadius, y - Planet.PlanetRadius, d, d)
+        self.initSystem(x, y, starName)
+
+
+    def initSystem(self, x, y, starName):
         """Initialise the star system and name it."""
-        self.x = 0
-        self.y = 0
+        self.x = x
+        self.y = y
         self.Name = starName
 
-    def moveTo(self, xval, yval):
-        self.x = xval
-        self.y = yval
+
+
+    def mousePressEvent(self, event):
+        """Intercept mouse klicks to select a star system."""
+        print( 'Mouse klick on planet: ', self.Name, 'at:', event.scenePos() )
