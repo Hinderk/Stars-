@@ -54,6 +54,9 @@ class Client(QMainWindow):
         self.Layout.addWidget(self.PpI)
         self.Layout.addWidget(self.Controls)
         self.setCentralWidget(self.CentralWidget)
+        self.Controls.ZoomIn.clicked.connect(self.PpI.ZoomIn)
+        self.Controls.ZoomOut.clicked.connect(self.PpI.ZoomOut)
+        
     #
     #    QtCore.QMetaObject.connectSlotsByName(self.CentralWidget)
 

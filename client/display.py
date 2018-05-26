@@ -31,6 +31,7 @@ class Display(QWidget):
 
     def initPPI(self, Stars):
         """Initialise the plan position indicator."""
+        self.ZoomLevel = 1
         self.Universe = Stars
         self.Layout = QVBoxLayout(self)
         self.Layout.setContentsMargins(0, 0, 0, 0)
@@ -42,10 +43,35 @@ class Display(QWidget):
         self.View = QGraphicsView(self.Scene)
         self.View.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.View.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.View.setRenderHint(QPainter.Antialiasing)
         self.Scene.setBackgroundBrush(self.SpaceColor)
         self.Universe.createScene(self.Scene)
         self.Layout.addWidget(self.View)
+        self.Scaling = 0.95 * self.View.width() / self.Scene.width()
+        self.View.scale(self.Scaling, self.Scaling)
         self.setObjectName("Universe")
+
+
+
+    def ZoomIn(self, event):
+        self.ZoomLevel = self.ZoomLevel + 1
+        self.View.scale(1.25, 1.25)
+
+
+    def ZoomOut(self, event):
+        if self.ZoomLevel < 2:
+            return
+        self.ZoomLevel = self.ZoomLevel - 1
+        self.View.scale(0.8, 0.8)
+
+
+
+
+
+
+
+
+
 
 
     def paintEvent(self, event):
