@@ -24,6 +24,7 @@ from PyQt5.QtCore import QSize
 class Planet(QGraphicsItem, PlanetData):
     """This class represents a star system as shown on the star map."""
     PlanetColor = QColor(255, 255, 255, 255)
+    PlanetFont = QFont('Calibri', 32, 25, True)
 
     def __init__(self, starName):
         super(QGraphicsItem, self).__init__()

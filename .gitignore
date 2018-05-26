@@ -9,3 +9,6 @@ stars.code-workspace
 client/.vscode/settings.json
 client/__pycache__/controlarea.cpython-37.pyc
 client/__pycache__/square.cpython-37.pyc
+client/__pycache__/planet.cpython-37.pyc
+client/__pycache__/planetdata.cpython-37.pyc
+client/__pycache__/starmap.cpython-37.pyc

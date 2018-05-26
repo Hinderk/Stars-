@@ -16,7 +16,8 @@ from PyQt5.QtGui import QPaintEvent
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QRectF
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import QSizeF
 
 
 
@@ -51,7 +52,15 @@ class Starmap(object):
         for p in PlanetList:
             brush = QBrush(p.PlanetColor)
             pen = QPen(p.PlanetColor)
-            size = 20
-            pos = QRectF(p.x - self.X0, p.y - self.Y0, size, size)
+            size = QSizeF(50, 50)
+            loc = QPointF(p.x - self.X0, p.y - self.Y0)
+            pos = QRectF(loc, size)
             PpiScene.addEllipse(pos, pen, brush)
+            Name = PpiScene.addSimpleText(p.Name)
+            Name.setBrush(brush)
+            Name.setPen(pen)
+            Name.setFont(p.PlanetFont)
+            bounds = Name.boundingRect()
+            Name.setX( size.width() / 2 + loc.x() - bounds.width() / 2 )
+            Name.setY( loc.y() + size.height() / 2 + 40 )
             
