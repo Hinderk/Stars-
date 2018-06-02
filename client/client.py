@@ -1,6 +1,7 @@
 """The module creates the graphical user interface for the game client"""
 
 import sys
+import resources
 
 from display import Display
 from displaycontrols import DisplayControls
@@ -35,7 +36,7 @@ class Client(QMainWindow):
         """Initialise the graphical user interface."""
         self.resize(1600, 900)
         self.setWindowTitle('Stars!')
-        self.setWindowIcon(QIcon('resources/stars.png'))
+        self.setWindowIcon(QIcon(':icons/stars.png'))
         self.center()
         self.createMenubar()
         self.Statusbar = self.statusBar()
@@ -81,9 +82,9 @@ class Client(QMainWindow):
 
     def createMenubar(self):
         """Create the menubar of the client"""
-        loadAction = QAction(QIcon('resources/load.png'), '&Open', self)
-        saveAction = QAction(QIcon('resources/save.png'), '&Save', self)
-        exitAction = QAction(QIcon('resources/exit.png'), 'E&xit', self)
+        loadAction = QAction(QIcon(':icons/load.png'), '&Open', self)
+        saveAction = QAction(QIcon(':icons/save.png'), '&Save', self)
+        exitAction = QAction(QIcon(':icons/exit.png'), 'E&xit', self)
         loadAction.setShortcut('Ctrl+o')
         saveAction.setShortcut('Ctrl+s')
         exitAction.setShortcut('Ctrl+x')

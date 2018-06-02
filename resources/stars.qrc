@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>icons/exit.png</file>
+    <file>icons/load.png</file>
+    <file>icons/save.png</file>
+    <file>icons/stars.png</file>
+    <file>text/starnames.txt</file>
+</qresource>
+</RCC>
