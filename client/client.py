@@ -3,10 +3,11 @@
 import sys
 import resources
 
+from speciesdata import SpeciesData
+from starmap import Starmap
 from display import Display
 from displaycontrols import DisplayControls
 from controlarea import ControlArea
-from starmap import Starmap
 
 from PyQt5 import QtCore
 
@@ -47,10 +48,10 @@ class Client(QMainWindow):
         self.Layout.setObjectName('MainHorizontalLayout')
         self.Layout.setContentsMargins(0, 0, 0, 0)
         self.Layout.setSpacing(0)
-#        self.Stars = Starmap()
+        self.Stars = Starmap()
+        self.Species = SpeciesData()
         self.Area = ControlArea()
-#        self.PpI = Display(self.Stars)
-        self.PpI = Display()
+        self.PpI = Display(self.Stars, self.Species)
         self.Controls = DisplayControls()
         self.Layout.addWidget(self.Area)      
         self.Layout.addWidget(self.PpI)

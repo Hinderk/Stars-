@@ -2,6 +2,8 @@
 
 import sys
 
+from speciesdata import SpeciesData
+
 
 class PlanetData(object):
     """Collect & maintain all pertinent data for a star system."""
@@ -24,3 +26,20 @@ class PlanetData(object):
         self.Settlers = 0            # in Thousands
 
 
+    def PlanetValue(self, mySpecies):
+        """Compute the value of a star system for a given species"""
+        value = 1.0
+        if self.Temperature < mySpecies.minTemperature:
+            value = 1.0 - (mySpecies.minTemperature - self.Temperature) / 50.0
+        if mySpecies.maxTemperature < self.Temperature:
+            value = 1.0 - (self.Temperature - mySpecies.maxTemperature) / 50.0
+        if self.Radiation < mySpecies.minRadiation:
+            value = value - (mySpecies.minRadiation - self.Radiation) / 1000.0
+        if mySpecies.maxRadiation < self.Radiation:
+            value = value - (mySpecies.maxRadiation - self.Radiation) / 1000.0
+        return max( 0.0, value )
+
+
+    def CarryingCapacity(self, mySpecies):
+        """Compute the maximal number of settlers for a given species"""
+        return mySpecies.maxSettlers * self.PlanetValue(mySpecies)

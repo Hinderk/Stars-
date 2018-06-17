@@ -3,6 +3,8 @@
 import sys
 
 from starmap import Starmap
+from starmap import RenderMode
+from speciesdata import SpeciesData
 
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
@@ -25,31 +27,32 @@ class Display(QWidget):
     """This class implements the plan position indicator."""
     SpaceColor = QColor(0, 0, 0, 240)
 
-    def __init__(self):
+    def __init__(self, starScape, mySpecies):
         super().__init__()
-        self.initPPI()
+        self.initPPI(starScape, mySpecies)
 
-    def initPPI(self):
+    def initPPI(self, starScape, mySpecies):
         """Initialise the plan position indicator."""
+        self.renderMode = RenderMode.PlanetValue
         self.ZoomLevel = 1
+        self.Species = mySpecies ;
         self.Layout = QVBoxLayout(self)
         self.Layout.setContentsMargins(0, 0, 0, 0)
         self.Layout.setSpacing(0)
         self.setLayout(self.Layout)
         self.setMinimumHeight(600)
         self.setMinimumWidth(600)
-        self.Scene = Starmap()
+        self.Scene = starScape
         self.View = QGraphicsView(self.Scene)
         self.View.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.View.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.View.setRenderHint(QPainter.Antialiasing)
         self.Scene.setBackgroundBrush(self.SpaceColor)
-        self.Scene.renderPlanets()
+        self.Scene.renderPlanets(self.renderMode, self.Species)
         self.Layout.addWidget(self.View)
         self.Scaling = 0.95 * self.View.width() / self.Scene.width()
         self.View.scale(self.Scaling, self.Scaling)
         self.setObjectName("Universe")
-
 
 
     def ZoomIn(self, event):

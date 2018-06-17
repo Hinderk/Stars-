@@ -43,6 +43,24 @@ class Planet(QGraphicsEllipseItem, PlanetData):
         self.Name = starName
 
 
+    def setPlanetData(self, data):
+        """Asign planet parameters to an existing star system"""
+        self.Radius = data.Radius
+        self.Temperature = data.Temperature
+        self.Gravity = data.Gravity
+        self.Radiation = data.Radiation
+        self.Factories = data.Factories
+        self.Mines = data.Mines
+        self.Defenses = data.Defenses
+        self.TechLevel = data.TechLevel
+        self.Boranium = data.Boranium
+        self.Ironium = data.Ironium
+        self.Thoridium = data.Thoridium
+        self.totalBoranium = data.totalBoranium
+        self.totalIronium = data.totalIronium
+        self.totalThoridium = data.totalThoridium
+        self.Settlers = data.Settlers
+
 
     def mousePressEvent(self, event):
         """Intercept mouse klicks to select a star system."""
