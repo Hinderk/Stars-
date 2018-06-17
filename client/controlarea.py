@@ -1,20 +1,14 @@
-
-import sys
+"""This module implements the main control panel."""
 
 from PyQt5.QtWidgets import QVBoxLayout
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QAction
-from PyQt5.QtWidgets import QSizePolicy
-
 from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QWidget
 
-from PyQt5.QtGui import QFont, QPen
+from PyQt5.QtGui import QFont
 from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QPainter
-from PyQt5.QtGui import QPaintEvent
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QSize
 
 
 
@@ -30,7 +24,7 @@ class ControlArea(QWidget):
         self.initControlArea()
 
     def initControlArea(self):
-        """Initialise the game control panel."""
+        """Initialize the game control panel."""
         self.Layout = QVBoxLayout(self)
         self.Layout.setContentsMargins(0, 0, 0, 0)
         self.Layout.setSpacing(0)

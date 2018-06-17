@@ -20,8 +20,6 @@ from PyQt5.QtWidgets import QAction, qApp
 
 from PyQt5.QtGui import QFont, QIcon
 
-#from PyQt5.QtWidgets import QLabel
-
 
 
 
@@ -34,7 +32,7 @@ class Client(QMainWindow):
         self.initGUI()
 
     def initGUI(self):
-        """Initialise the graphical user interface."""
+        """Initialize the graphical user interface."""
         self.resize(1600, 900)
         self.setWindowTitle('Stars!')
         self.setWindowIcon(QIcon(':icons/stars.png'))

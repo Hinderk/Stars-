@@ -36,7 +36,11 @@ class PlanetData(object):
         if self.Radiation < mySpecies.minRadiation:
             value = value - (mySpecies.minRadiation - self.Radiation) / 1000.0
         if mySpecies.maxRadiation < self.Radiation:
-            value = value - (mySpecies.maxRadiation - self.Radiation) / 1000.0
+            value = value - (self.Radiation - mySpecies.maxRadiation) / 1000.0
+        if self.Gravity < mySpecies.minGravity:
+            value = value - (mySpecies.minGravity - self.Gravity) / 2.0
+        if mySpecies.maxGravity < self.Gravity:
+            value = value - (self.Gravity - mySpecies.maxGravity) / 2.0
         return max( 0.0, value )
 
 
