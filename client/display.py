@@ -3,8 +3,10 @@
 import sys
 
 from starmap import Starmap
-from starmap import RenderMode
 from speciesdata import SpeciesData
+from mapsettings import MapSettings
+from mapsettings import FleetFilter
+from mapsettings import RenderMode
 
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
@@ -33,7 +35,10 @@ class Display(QWidget):
 
     def initPPI(self, starScape, mySpecies):
         """Initialize the plan position indicator."""
-        self.renderMode = RenderMode.PlanetValue
+        self.Settings = MapSettings()
+        self.Settings.InOrbit = FleetFilter.Armed
+        self.Settings.Mode = RenderMode.Orbiting
+        
         self.ZoomLevel = 1
         self.Species = mySpecies ;
         self.Layout = QVBoxLayout(self)
@@ -48,7 +53,7 @@ class Display(QWidget):
         self.View.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.View.setRenderHint(QPainter.Antialiasing)
         self.Scene.setBackgroundBrush(self.SpaceColor)
-        self.Scene.renderPlanets(self.renderMode, self.Species)
+        self.Scene.renderPlanets(self.Settings, self.Species)
         self.Layout.addWidget(self.View)
         self.Scaling = 0.95 * self.View.width() / self.Scene.width()
         self.View.scale(self.Scaling, self.Scaling)
@@ -64,10 +69,6 @@ class Display(QWidget):
         if self.ZoomLevel > 1:
             self.ZoomLevel = self.ZoomLevel - 1
             self.View.scale(0.8, 0.8)
-
-
-
-
 
 
 

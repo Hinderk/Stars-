@@ -31,8 +31,6 @@ class Planet(QGraphicsEllipseItem, PlanetData):
 
     def __init__(self, x, y, starName):
         super(QGraphicsEllipseItem, self).__init__()
-        d = 2 * Planet.PlanetRadius
-        self.setRect( x - Planet.PlanetRadius, y - Planet.PlanetRadius, d, d)
         self.initSystem(x, y, starName)
 
 
@@ -41,6 +39,8 @@ class Planet(QGraphicsEllipseItem, PlanetData):
         self.x = x
         self.y = y
         self.Name = starName
+        self.Friendlies = 0
+        self.Foes = 0
 
 
     def setPlanetData(self, data):
