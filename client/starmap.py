@@ -24,6 +24,7 @@ from PyQt5.QtCore import QSizeF
 
 
 
+
 class RenderMode(Enum):
     """Possible options which information to display when rendering the star map"""
     Plain = 1
@@ -38,6 +39,16 @@ class RenderMode(Enum):
 
 class Starmap(QGraphicsScene):
     """This class maintains a list of star systems."""
+    
+    neutralbrush = QBrush(Planet.PlanetColor)
+    redbrush = QBrush(QColor(255,0,0))
+    yellowbrush = QBrush(QColor(255,255,0))
+    greenbrush = QBrush(QColor(0,255,0))
+    neutralpen = QPen(Planet.PlanetColor)
+    redpen = QPen(QColor(255,0,0))
+    yellowpen = QPen(QColor(255,255,0))
+    greenpen = QPen(QColor(0,255,0))
+
 
     def __init__(self):
         super().__init__()
@@ -74,45 +85,49 @@ class Starmap(QGraphicsScene):
         self.addItem(p2)
 
 
+
+    def SelectColorAndSize(self,value):
+        """Determine the size and the color of a system on the star map"""
+        if value < 0.0 :
+            self.pen = neutralpen
+            self.brush = neutralbrush
+            self.radius = 1.0
+        elif 3 * value < 1 :
+            self.brush = Starmap.redbrush
+            self.pen = Starmap.redpen
+            self.radius = 0.4 + 1.8 * value
+        elif 3 * value < 2 :
+            self.brush = Starmap.yellowbrush
+            self.pen = Starmap.yellowpen
+            self.radius = 1.8 * value - 0.2
+        else:
+            self.brush = Starmap.greenbrush
+            self.pen = Starmap.greenpen
+            self.radius = 1.8 * value - 0.8   
+        
+
+
     def renderPlanets(self, mode, species):
         """Populate the universe with the stars in the map."""
-        PlanetList = self.Star.values()
-        neutralbrush = QBrush(Planet.PlanetColor)
-        redbrush = QBrush(QColor(255,0,0))
-        yellowbrush = QBrush(QColor(255,255,0))
-        greenbrush = QBrush(QColor(0,255,0))
-        neutralpen = QPen(Planet.PlanetColor)
-        redpen = QPen(QColor(255,0,0))
-        yellowpen = QPen(QColor(255,255,0))
-        greenpen = QPen(QColor(0,255,0))
+        PlanetList = self.Star.values() 
         for p in PlanetList:
             if mode == RenderMode.PlanetValue:
                 value = p.PlanetValue(species)
-                if 3 * value < 1 :
-                    brush = redbrush
-                    pen = redpen
-                    radius = 0.4 + 1.8 * value
-                elif 3 * value < 2 :
-                    brush = yellowbrush
-                    pen = yellowpen
-                    radius = 1.8 * value - 0.2
-                else:
-                    brush = greenbrush
-                    pen = greenpen
-                    radius = 1.8 * value - 0.8 
-                radius = radius * p.PlanetRadius 
-                d = 2 * radius
-                p.setRect( p.x - radius, p.y - radius, d, d)
+            elif mode == RenderMode.Settlements:
+                value = p.PopulationLevel(species)    
             else:
-                pen = neutralpen
-                brush = neutralbrush
-            p.setBrush(brush)
-            p.setPen(pen)
+                value = -1.0
+            self.SelectColorAndSize(value)
+            r = self.radius * p.PlanetRadius 
+            d = 2 * r
+            p.setRect( p.x - r, p.y - r, d, d)
+            p.setBrush(self.brush)
+            p.setPen(self.pen)
             loc = QPointF(p.x, p.y)
             name = self.addSimpleText(p.Name)
-            name.setBrush(neutralbrush)
-            name.setPen(neutralpen)
+            name.setBrush(Starmap.neutralbrush)
+            name.setPen(Starmap.neutralpen)
             name.setFont(p.PlanetFont)
             bounds = name.boundingRect()
             name.setX( loc.x() - bounds.width() / 2 )
-            name.setY( loc.y() + Planet.PlanetRadius + 20 )
+            name.setY( loc.y() + r + 20 )

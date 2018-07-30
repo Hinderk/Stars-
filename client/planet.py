@@ -37,14 +37,14 @@ class Planet(QGraphicsEllipseItem, PlanetData):
 
 
     def initSystem(self, x, y, starName):
-        """Initialise the star system and name it."""
+        """Initialize the star system and name it."""
         self.x = x
         self.y = y
         self.Name = starName
 
 
     def setPlanetData(self, data):
-        """Asign planet parameters to an existing star system"""
+        """Assign planet parameters to an existing star system"""
         self.Radius = data.Radius
         self.Temperature = data.Temperature
         self.Gravity = data.Gravity
@@ -63,5 +63,5 @@ class Planet(QGraphicsEllipseItem, PlanetData):
 
 
     def mousePressEvent(self, event):
-        """Intercept mouse klicks to select a star system."""
-        print( 'Mouse klick on planet: ', self.Name, 'at:', event.scenePos() )
+        """Intercept mouse clicks to select a star system."""
+        print( 'Mouse click on planet: ', self.Name, 'at:', event.scenePos() )

@@ -1,10 +1,9 @@
-"""This module maintains the biological traits of spacefaring species"""
+"""This module maintains the biological traits of space-faring species"""
 
-import sys
 
 
 class SpeciesData(object):
-    """Maintain the biological parameters of a spacefaring species""" 
+    """Maintain the biological parameters of a space-faring species""" 
     
     def __init__(self):
         self.minTemperature = 240.0     # in Kelvin 

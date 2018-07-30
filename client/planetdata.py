@@ -1,8 +1,7 @@
 """This module maintains all star system data"""
 
-import sys
 
-from speciesdata import SpeciesData
+# from speciesdata import SpeciesData
 
 
 class PlanetData(object):
@@ -47,3 +46,8 @@ class PlanetData(object):
     def CarryingCapacity(self, mySpecies):
         """Compute the maximal number of settlers for a given species"""
         return mySpecies.maxSettlers * self.PlanetValue(mySpecies)
+    
+    
+    def PopulationLevel(self, mySpecies):
+        """Compute an indicator for the current size of the population"""
+        return self.Settlers / mySpecies.maxSettlers

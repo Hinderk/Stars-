@@ -1,4 +1,4 @@
-"""This module renders the plan position indicater"""
+"""This module renders the plan position indicator"""
 
 import sys
 
@@ -32,7 +32,7 @@ class Display(QWidget):
         self.initPPI(starScape, mySpecies)
 
     def initPPI(self, starScape, mySpecies):
-        """Initialise the plan position indicator."""
+        """Initialize the plan position indicator."""
         self.renderMode = RenderMode.PlanetValue
         self.ZoomLevel = 1
         self.Species = mySpecies ;
