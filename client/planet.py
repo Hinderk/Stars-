@@ -1,4 +1,4 @@
-"""This module implements a star system & its graphical representation"""
+"""This module implements a star system & its graphical representation."""
 
 import sys
 
@@ -24,8 +24,6 @@ from PyQt5.QtCore import QPointF
 
 class Planet(QGraphicsEllipseItem, PlanetData):
     """This class represents a star system as shown on the star map."""
-    PlanetColor = QColor(255, 255, 255, 255)
-    PlanetFont = QFont('Calibri', 32, 25, True)
     PlanetRadius = 25
 
 
@@ -44,7 +42,7 @@ class Planet(QGraphicsEllipseItem, PlanetData):
 
 
     def setPlanetData(self, data):
-        """Assign planet parameters to an existing star system"""
+        """Assign planet parameters to an existing star system."""
         self.Radius = data.Radius
         self.Temperature = data.Temperature
         self.Gravity = data.Gravity

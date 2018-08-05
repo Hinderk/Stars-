@@ -27,6 +27,13 @@ class FleetFilter(Enum):
     Armed = 8
 
 
+    
+class MineFieldFilter(Enum):
+    """Switch to decide which sorts of mine-fields to display"""
+    Friend = 1
+    Foe = 2
+    Neutral = 3
+    Off = 4
 
 
 class MapSettings(object):
@@ -35,3 +42,7 @@ class MapSettings(object):
     def __init__(self):
         self.Mode = RenderMode.Plain 
         self.InOrbit = FleetFilter.Friend
+        self.ShowMines = MineFieldFilter.Off
+        self.ShowFleets = True
+        self.ShowScanner = True
+        

@@ -5,6 +5,7 @@ import sys
 from enum import Enum
 
 from planet import Planet
+from starcolors import StarColors
 from planetdata import PlanetData
 from speciesdata import SpeciesData
 from mapsettings import RenderMode 
@@ -32,28 +33,14 @@ from PyQt5.QtCore import QSizeF
 
 class Starmap(QGraphicsScene):
     """This class maintains a list of star systems."""
-    
-    FleetFont = QFont('Cambria', 24, 25, False)
-    
-    bluebrush = QBrush(QColor(0,0,255))
-    neutralbrush = QBrush(QColor(255,255,255))
-    planetbrush = QBrush(Planet.PlanetColor)
-    redbrush = QBrush(QColor(255,0,0))
-    yellowbrush = QBrush(QColor(255,255,0))
-    greenbrush = QBrush(QColor(0,255,0))
-    bluepen = QPen(QColor(0,0,255))
-    neutralpen = QPen(QColor(255,255,255))
-    planetpen = QPen(Planet.PlanetColor)
-    redpen = QPen(QColor(255,0,0))
-    yellowpen = QPen(QColor(255,255,0))
-    greenpen = QPen(QColor(0,255,0))
-
 
     def __init__(self):
         super().__init__()
         self.Star = dict()
+        self.Sector = QRectF()
         self.createMap()
-        Starmap.neutralpen.setWidthF(3.5)
+        self.ComputeBoundingBox()
+
 
 
     def createMap(self):
@@ -64,6 +51,7 @@ class Starmap(QGraphicsScene):
         specs.Factories = 5000000
         specs.Mines = 100000
         p0 = Planet(200, 500, 'Earth')
+        p0.Friendlies = 1
         p0.setPlanetData(specs)
         self.Star['Earth'] = p0
         specs.Temperature = 120.0
@@ -84,37 +72,81 @@ class Starmap(QGraphicsScene):
         p2.Foes = 3000
         p2.setPlanetData(specs)
         self.Star['Tau Ceti'] = p2
+        specs.Temperature = 180.0
+        specs.Settlers = 3
+        specs.Factories = 500
+        specs.Mines = 100
+        p3 = Planet(150, 3000, 'Ursa Major')
+        p3.setPlanetData(specs)
+        p3.Foes = 30
+        p3.Friendlies = 0
+        self.Star['Ursa Major'] = p3
+        specs.Temperature = 320.0
+        specs.Settlers = 3000
+        specs.Factories = 2500
+        specs.Mines = 1200
+        p4 = Planet(3800, 4000, 'Canis Minor')
+        p4.setPlanetData(specs)
+        p4.Foes = 0
+        p4.Friendlies = 0
+        self.Star['Canis Minor'] = p4
         self.addItem(p0)
         self.addItem(p1)
         self.addItem(p2)
+        self.addItem(p3)
+        self.addItem(p4)
+
+
+    def ComputeBoundingBox(self):
+        """Compute the coordinates of the corners of the visible sector"""
+        initialize = True
+        PlanetList = self.Star.values()
+        for p in PlanetList:
+            if initialize:
+                x_nw = p.x
+                y_nw = p.y
+                x_se = p.x
+                y_se = p.y
+                initialize = False
+                continue
+            if p.x < x_nw :
+                x_nw = p.x
+            if p.y < y_nw :
+                y_nw = p.y
+            if p.x > x_se :
+                x_se = p.x
+            if p.y > y_se :
+                y_se = p.y
+        self.Sector.adjust( x_nw - 200, y_nw - 200, x_se + 200, y_se + 200 )
 
 
 
     def SelectColorAndSize(self,value):
         """Determine the size and the color of a system on the star map"""
         if value < 0.0 :
-            self.pen = Starmap.planetpen
-            self.brush = Starmap.planetbrush
+            self.pen = StarColors.PlanetPen
+            self.brush = StarColors.PlanetBrush
             self.radius = 1.0
         elif 3 * value < 1 :
-            self.brush = Starmap.redbrush
-            self.pen = Starmap.redpen
+            self.brush = StarColors.RedBrush
+            self.pen = StarColors.RedPen
             self.radius = 0.4 + 1.8 * value
         elif 3 * value < 2 :
-            self.brush = Starmap.yellowbrush
-            self.pen = Starmap.yellowpen
+            self.brush = StarColors.YellowBrush
+            self.pen = StarColors.YellowPen
             self.radius = 1.8 * value - 0.2
         else:
-            self.brush = Starmap.greenbrush
-            self.pen = Starmap.greenpen
+            self.brush = StarColors.GreenBrush
+            self.pen = StarColors.GreenPen
             self.radius = 1.8 * value - 0.8   
         
 
 
     def renderPlanets(self, settings, species):
         """Populate the universe with the stars in the map."""
+        self.addRect(self.Sector, StarColors.DarkPen)
         PlanetList = self.Star.values() 
-        for p in PlanetList:
+        for p in PlanetList :
             if settings.Mode == RenderMode.PlanetValue:
                 value = p.PlanetValue(species)
             elif settings.Mode == RenderMode.Settlements:
@@ -127,36 +159,36 @@ class Starmap(QGraphicsScene):
             p.setRect( p.x - r, p.y - r, d, d)
             p.setBrush(self.brush)
             name = self.addSimpleText(p.Name)
-            name.setBrush(Starmap.planetbrush)
-            name.setFont(p.PlanetFont)
+            name.setBrush(StarColors.PlanetBrush)
+            name.setFont(StarColors.PlanetFont)
             bounds = name.boundingRect()
             name.setX( p.x - bounds.width() / 2 )
             name.setY( p.y + r + 20 )
-            if settings.Mode == RenderMode.Orbiting:
+            if settings.Mode == RenderMode.Orbiting :
                 ShowFriends = ( settings.InOrbit == FleetFilter.Friend ) or ( settings.InOrbit == FleetFilter.Armed )
                 ShowFoes = ( settings.InOrbit == FleetFilter.Foe ) or ( settings.InOrbit == FleetFilter.Armed )
                 d = d + 30
                 r = r + 15
-                if ShowFriends and p.Friendlies > 0:
-                    self.addEllipse( p.x - r, p.y - r, d, d, Starmap.neutralpen)
+                if ShowFriends and p.Friendlies > 0 :
+                    self.addEllipse( p.x - r, p.y - r, d, d, StarColors.NeutralPen)
                     backdrop = self.addRect(0, 0, 10, 10 )
-                    backdrop.setBrush(Starmap.planetbrush)             
+                    backdrop.setBrush(StarColors.BlueBrush)             
                     counter = self.addSimpleText(str(p.Friendlies))
-                    counter.setBrush(Starmap.bluebrush)
-                    counter.setFont(Starmap.FleetFont)
+                    counter.setBrush(StarColors.PlanetBrush)
+                    counter.setFont(StarColors.FleetFont)
                     bounds = counter.boundingRect()
                     x0 = p.x + r + 20
                     y0 = p.y - bounds.height() / 2
                     counter.setX( x0 )
                     counter.setY( y0 )  
                     backdrop.setRect( x0 - 5, y0, bounds.width() + 10, bounds.height() )
-                if ShowFoes and p.Foes > 0:
-                    self.addEllipse( p.x - r, p.y - r, d, d, Starmap.neutralpen)
+                if ShowFoes and p.Foes > 0 :
+                    self.addEllipse( p.x - r, p.y - r, d, d, StarColors.NeutralPen)
                     backdrop = self.addRect(0, 0, 0, 0 )
-                    backdrop.setBrush(Starmap.planetbrush)             
+                    backdrop.setBrush(StarColors.RedBrush)             
                     counter = self.addSimpleText(str(p.Foes))
-                    counter.setBrush(Starmap.redbrush)
-                    counter.setFont(Starmap.FleetFont)
+                    counter.setBrush(StarColors.PlanetBrush)
+                    counter.setFont(StarColors.FleetFont)
                     bounds = counter.boundingRect()
                     x0 = p.x - r - 20 - bounds.width()
                     y0 = p.y - bounds.height() / 2

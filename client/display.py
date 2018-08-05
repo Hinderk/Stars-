@@ -3,6 +3,7 @@
 import sys
 
 from starmap import Starmap
+from starcolors import StarColors
 from speciesdata import SpeciesData
 from mapsettings import MapSettings
 from mapsettings import FleetFilter
@@ -27,7 +28,6 @@ from PyQt5.QtCore import QSize
 
 class Display(QWidget):
     """This class implements the plan position indicator."""
-    SpaceColor = QColor(0, 0, 0, 240)
 
     def __init__(self, starScape, mySpecies):
         super().__init__()
@@ -52,11 +52,11 @@ class Display(QWidget):
         self.View.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.View.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.View.setRenderHint(QPainter.Antialiasing)
-        self.Scene.setBackgroundBrush(self.SpaceColor)
+        self.Scene.setBackgroundBrush(StarColors.SpaceColor)
         self.Scene.renderPlanets(self.Settings, self.Species)
         self.Layout.addWidget(self.View)
-        self.Scaling = 0.95 * self.View.width() / self.Scene.width()
-        self.View.scale(self.Scaling, self.Scaling)
+        Scaling = 1.25 * self.View.width() / self.Scene.width()
+        self.View.scale(Scaling, Scaling)
         self.setObjectName("Universe")
 
 

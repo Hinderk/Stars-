@@ -12,3 +12,7 @@ client/__pycache__/square.cpython-37.pyc
 client/__pycache__/planet.cpython-37.pyc
 client/__pycache__/planetdata.cpython-37.pyc
 client/__pycache__/starmap.cpython-37.pyc
+client/__pycache__/resources.cpython-37.pyc
+client/__pycache__/speciesdata.cpython-37.pyc
+client/__pycache__/starcolors.cpython-37.pyc
+client/__pycache__/mapsettings.cpython-37.pyc

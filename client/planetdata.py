@@ -1,4 +1,4 @@
-"""This module maintains all star system data"""
+"""This module maintains all star system data."""
 
 
 # from speciesdata import SpeciesData
@@ -26,7 +26,7 @@ class PlanetData(object):
 
 
     def PlanetValue(self, mySpecies):
-        """Compute the value of a star system for a given species"""
+        """Compute the value of a star system for a given species."""
         value = 1.0
         if self.Temperature < mySpecies.minTemperature:
             value = 1.0 - (mySpecies.minTemperature - self.Temperature) / 50.0
@@ -44,10 +44,10 @@ class PlanetData(object):
 
 
     def CarryingCapacity(self, mySpecies):
-        """Compute the maximal number of settlers for a given species"""
+        """Compute the maximal number of settlers for a given species."""
         return mySpecies.maxSettlers * self.PlanetValue(mySpecies)
     
     
     def PopulationLevel(self, mySpecies):
-        """Compute an indicator for the current size of the population"""
+        """Compute an indicator for the current size of the population."""
         return self.Settlers / mySpecies.maxSettlers
