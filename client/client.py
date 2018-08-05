@@ -1,4 +1,4 @@
-"""The module creates the graphical user interface for the game client"""
+"""The module creates the graphical user interface for the game client."""
 
 import sys
 import resources
@@ -64,7 +64,7 @@ class Client(QMainWindow):
 
 
     def resizeEvent(self, event):
-        """Recompute spacings to keep the plan position indicator square"""
+        """Recompute spacings to keep the plan position indicator square."""
         TotalHeight = self.CentralWidget.height()
         TotalWidth = self.CentralWidget.width() - self.Controls.width()
         self.Layout.setStretch(0,TotalWidth-TotalHeight)
@@ -80,7 +80,7 @@ class Client(QMainWindow):
 
 
     def createMenubar(self):
-        """Create the menubar of the client"""
+        """Create the menu-bar of the client."""
         loadAction = QAction(QIcon(':icons/load.png'), '&Open', self)
         saveAction = QAction(QIcon(':icons/save.png'), '&Save', self)
         exitAction = QAction(QIcon(':icons/exit.png'), 'E&xit', self)
@@ -102,12 +102,12 @@ class Client(QMainWindow):
 
 
     def exitGame(self,event):
-        """Terminate the game client"""
+        """Terminate the game client."""
         qApp.quit()
 
 
     def saveFile(self,event):
-        """Save the current state of the game in a file"""
+        """Save the current state of the game in a file."""
         fileFilter='Game Files (*.trn);;All Files (*.*)'
         gameFile, _ = QFileDialog.getSaveFileName(self, 'Save Game', '', fileFilter)
         print(gameFile)
@@ -116,7 +116,7 @@ class Client(QMainWindow):
 
 
     def openFile(self, event):
-        """Load a new state for the game from a file"""
+        """Load a new state for the game from a file."""
         fileFilter='Game Files (*.trn);;All Files (*.*)'
         newGame, _ = QFileDialog.getOpenFileName(self, 'Open Saved Game', '', fileFilter)
         print(newGame)
