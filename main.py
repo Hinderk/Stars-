@@ -1,5 +1,5 @@
 
-from PyQt4 import QtGui, QtCore 
+from PyQt5 import QtWidgets, QtGui, QtCore
 
 from stars import Stars
 from planet import Planet
@@ -10,18 +10,20 @@ from planetinfo import PlanetInfo
 import sys
 import os
 
+import stars
 
 
-#class Stars(QtGui.QMainWindow, stars.Ui_GUI):
-    #def __init__(self):
-        #super(self.__class__, self).__init__()
-        #self.setupUi(self)  # This has been defined in the file 'stars.py'
+
+class Stars(QtWidgets.QMainWindow, stars.Ui_GUI):
+    def __init__(self):
+        super(self.__class__, self).__init__()
+        self.setupUi(self)  # This has been defined in the file 'stars.py'
 
 
 
 def main():
-    app = QtGui.QApplication( sys.argv )   # A new instance of QApplication
-    form = Stars()                         # Define the form 'Stars'
+    app = QtWidgets.QApplication(sys.argv)   # A new instance of QApplication
+    form = Stars()                           # Define the form 'Stars'
     
     SInfo = SpaceInfo( form )
     PInfo = PlanetInfo( form )
@@ -29,7 +31,7 @@ def main():
     SInfo.UpdateFriendlyDesigns( [ 'A', 'B', 'C' ] )
 
 
-    scene = QtGui.QGraphicsScene()
+    scene = QtWidgets.QGraphicsScene()
     scene.addText( 'Hallo Hinderk' )
 
     form.Universe.setScene( scene )
