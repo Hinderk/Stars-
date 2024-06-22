@@ -1,9 +1,5 @@
 
-from PyQt5 import QtGui, QtCore, QtWidgets
-from stars import Stars
-
-import sys
-import os
+from PyQt5 import QtGui, QtWidgets
 
 
 

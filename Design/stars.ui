@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>715</width>
-    <height>475</height>
+    <width>2063</width>
+    <height>1348</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,6 +15,12 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
   </property>
   <property name="palette">
    <palette>
@@ -166,6 +172,15 @@
      <colorrole role="ToolTipText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
         <red>0</red>
         <green>0</green>
         <blue>0</blue>
@@ -327,6 +342,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
     </inactive>
     <disabled>
      <colorrole role="WindowText">
@@ -482,15 +506,41 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
     </disabled>
    </palette>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>12</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
-   <string>My Stars!</string>
+   <string notr="true">My Stars!</string>
   </property>
   <property name="windowIcon">
    <iconset resource="stars.qrc">
     <normaloff>:/Icons/Stars</normaloff>:/Icons/Stars</iconset>
+  </property>
+  <property name="toolTip">
+   <string notr="true"/>
+  </property>
+  <property name="locale">
+   <locale language="English" country="Europe"/>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>60</width>
+    <height>60</height>
+   </size>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="enabled">
@@ -646,6 +696,15 @@
         </color>
        </brush>
       </colorrole>
+      <colorrole role="PlaceholderText">
+       <brush brushstyle="NoBrush">
+        <color alpha="128">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
      </active>
      <inactive>
       <colorrole role="WindowText">
@@ -777,6 +836,15 @@
       <colorrole role="ToolTipText">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="PlaceholderText">
+       <brush brushstyle="NoBrush">
+        <color alpha="128">
          <red>0</red>
          <green>0</green>
          <blue>0</blue>
@@ -920,11 +988,23 @@
         </color>
        </brush>
       </colorrole>
+      <colorrole role="PlaceholderText">
+       <brush brushstyle="NoBrush">
+        <color alpha="128">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
      </disabled>
     </palette>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="1">
+    <item row="0" column="1">
+     <widget class="QGraphicsView" name="Universe"/>
+    </item>
+    <item row="2" column="1">
      <widget class="QGraphicsView" name="Inspector">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
@@ -940,20 +1020,173 @@
       </property>
      </widget>
     </item>
+    <item row="2" column="0">
+     <layout class="QVBoxLayout" name="Messages_VL">
+      <item>
+       <layout class="QHBoxLayout" name="CurrentYear_HL">
+        <item>
+         <widget class="QCheckBox" name="FilterMessage">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string notr="true">Current game year</string>
+          </property>
+          <property name="accessibleName">
+           <string notr="true"/>
+          </property>
+          <property name="accessibleDescription">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="shortcut">
+           <string notr="true"/>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="CurrentGameYear">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string notr="true">Current age of the galaxy</string>
+          </property>
+          <property name="text">
+           <string notr="true">Year 2400 - Message: 1 of 10</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="HS1">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="CurrentMessage_HL">
+        <item>
+         <widget class="QPlainTextEdit" name="CurrentMessage">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="documentTitle">
+           <string notr="true"/>
+          </property>
+          <property name="undoRedoEnabled">
+           <bool>false</bool>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="plainText">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="NewsButtons_VL">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetMinimumSize</enum>
+          </property>
+          <item>
+           <spacer name="VS2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="PreviousMessage">
+            <property name="toolTip">
+             <string notr="true">Read previous message</string>
+            </property>
+            <property name="text">
+             <string>Previous</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="FollowMessage">
+            <property name="toolTip">
+             <string notr="true">Follow up on current message</string>
+            </property>
+            <property name="text">
+             <string>Goto</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="NextMessage">
+            <property name="text">
+             <string notr="true">Next</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="VS1">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
     <item row="0" column="0">
-     <widget class="QCheckBox" name="checkBox">
-      <property name="text">
-       <string>CheckBox</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QGraphicsView" name="Universe"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QRadioButton" name="radioButton">
-      <property name="text">
-       <string>RadioButton</string>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>GroupBox</string>
       </property>
      </widget>
     </item>
@@ -964,8 +1197,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>715</width>
-     <height>21</height>
+     <width>2063</width>
+     <height>34</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -976,6 +1209,8 @@
     <addaction name="actionOpenGame"/>
     <addaction name="actionCloseGame"/>
     <addaction name="actionSaveGame"/>
+    <addaction name="actionSaveSubmit"/>
+    <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -1044,6 +1279,18 @@
    <property name="autoFillBackground">
     <bool>true</bool>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::NoToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>40</width>
+     <height>40</height>
+    </size>
+   </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonFollowStyle</enum>
    </property>
@@ -1056,6 +1303,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionDefaultView"/>
+   <addaction name="actionSurfaceMineralView"/>
+   <addaction name="actionConcentrationView"/>
+   <addaction name="actionPercentView"/>
+   <addaction name="actionPopulationView"/>
+   <addaction name="actionNoPlayerInfoView"/>
   </widget>
   <widget class="QToolBar" name="SpaceInfo">
    <property name="windowTitle">
@@ -1063,6 +1316,12 @@
    </property>
    <property name="autoFillBackground">
     <bool>true</bool>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>48</width>
+     <height>48</height>
+    </size>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1085,13 +1344,27 @@
      <normaloff>:/Menu/NewGame</normaloff>:/Menu/NewGame</iconset>
    </property>
    <property name="text">
-    <string>New</string>
+    <string notr="true">New</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">New</string>
    </property>
    <property name="toolTip">
-    <string>Create an new game</string>
+    <string notr="true">Create an new game</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="shortcut">
-    <string>Ctrl+N</string>
+    <string notr="true">Ctrl+N</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionSave_Game_as">
@@ -1103,15 +1376,29 @@
    </property>
   </action>
   <action name="actionOpenGame">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="stars.qrc">
      <normaloff>:/Menu/OpenGame</normaloff>:/Menu/OpenGame</iconset>
    </property>
    <property name="text">
-    <string>Open</string>
+    <string notr="true">Open</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Open</string>
    </property>
    <property name="toolTip">
-    <string>Open a game</string>
+    <string notr="true">Open a game</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -1127,10 +1414,27 @@
   </action>
   <action name="actionCloseGame">
    <property name="text">
-    <string>Close</string>
+    <string notr="true">Close</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Close</string>
    </property>
    <property name="toolTip">
-    <string>Close the current game</string>
+    <string notr="true">Close the current game</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionSaveGame">
@@ -1139,15 +1443,52 @@
      <normaloff>:/Menu/SaveGame</normaloff>:/Menu/SaveGame</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string notr="true">Save</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Save</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Save</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="shortcut">
-    <string>Ctrl+S</string>
+    <string notr="true">Ctrl+S</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Exit</string>
+    <string notr="true">Exit</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Exit</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Exit</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Alt+X</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionShowToolbar">
@@ -1167,10 +1508,27 @@
   </action>
   <action name="actionGenerate">
    <property name="text">
-    <string>Generate</string>
+    <string notr="true">Generate</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Generate</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Generate a new turn</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="shortcut">
-    <string>F9</string>
+    <string notr="true">F9</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionToolbar">
@@ -1262,6 +1620,110 @@
    </property>
    <property name="text">
     <string>400%</string>
+   </property>
+  </action>
+  <action name="actionSaveSubmit">
+   <property name="text">
+    <string notr="true">Save and Submit</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Save and Submit</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Save Game &amp; submit Your turn</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Ctrl+A</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionDefaultView">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Default</normaloff>:/Toolbar/Default</iconset>
+   </property>
+   <property name="text">
+    <string>DefaultView</string>
+   </property>
+   <property name="toolTip">
+    <string>Normal View</string>
+   </property>
+  </action>
+  <action name="actionPercentView">
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Percent</normaloff>:/Toolbar/Percent</iconset>
+   </property>
+   <property name="text">
+    <string>PercentView</string>
+   </property>
+   <property name="toolTip">
+    <string>Planet Value View</string>
+   </property>
+  </action>
+  <action name="actionPopulationView">
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/People</normaloff>:/Toolbar/People</iconset>
+   </property>
+   <property name="text">
+    <string>PopulationView</string>
+   </property>
+   <property name="toolTip">
+    <string>Population View</string>
+   </property>
+  </action>
+  <action name="actionSurfaceMineralView">
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Surface</normaloff>:/Toolbar/Surface</iconset>
+   </property>
+   <property name="text">
+    <string>SurfaceMineralView</string>
+   </property>
+   <property name="toolTip">
+    <string>Surface Mineral View</string>
+   </property>
+  </action>
+  <action name="actionConcentrationView">
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Minerals</normaloff>:/Toolbar/Minerals</iconset>
+   </property>
+   <property name="text">
+    <string>ConcentrationView</string>
+   </property>
+   <property name="toolTip">
+    <string>Mineral Concentration View</string>
+   </property>
+  </action>
+  <action name="actionNoPlayerInfoView">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Cancel</normaloff>
+     <normalon>:/Toolbar/Cancel</normalon>:/Toolbar/Cancel</iconset>
+   </property>
+   <property name="text">
+    <string>NoPlayerInfoView</string>
+   </property>
+   <property name="toolTip">
+    <string>No Player Info View</string>
    </property>
   </action>
  </widget>

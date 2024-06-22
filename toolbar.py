@@ -1,12 +1,9 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-##import stars_rc
-import os
 
 
-
-class PlanetInfo :
+class ToolBar:
 
     def __init__( self, form ) :
 
@@ -57,4 +54,4 @@ class PlanetInfo :
         self.RadarRange.setValue( 100 )
         self.RadarRange.setSingleStep( 10 )
         self.RadarRange.setAlignment( QtCore.Qt.AlignRight )
-        form.PlanetInfo.addWidget( self.RadarRange )
+        form.PlanetInfo.addWidget(self.RadarRange)
