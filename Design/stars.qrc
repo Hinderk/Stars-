@@ -18,11 +18,11 @@
     <file alias="Names">Images/Toolbar/names.bmp</file>
     <file alias="Waiting">Images/Toolbar/standby.bmp</file>
     <file alias="Scanner">Images/Toolbar/scanner.bmp</file>
-    <file alias="Cancel">Images/Toolbar/stop.svg</file>
+    <file alias="Cancel">Images/Toolbar/cancel.svg</file>
     <file alias="Minerals">Images/Toolbar/minerals.svg</file>
     <file alias="Waypoint">Images/Toolbar/add.bmp</file>
     <file alias="Default">Images/Toolbar/default.bmp</file>
-    <file alias="Percent">Images/Toolbar/percent.bmp</file>
+    <file alias="Percent">Images/Toolbar/percent.svg</file>
     <file alias="Surface">Images/Toolbar/surface.svg</file>
     <file alias="Mine">Images/Toolbar/mine.bmp</file>
     <file alias="People">Images/Toolbar/growth.svg</file>

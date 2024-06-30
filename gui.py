@@ -1,5 +1,5 @@
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from fonts import LoadFonts
 
 import stars_rc

@@ -11,11 +11,17 @@ class Ruleset :
     def Random( self, MinVal, MaxVal, Optimum ) :
         return( Optimum )
 
-    def FindName( self ) :
+    def FindName(self):
         return 'No Name'
 
+    def FirstYear(self):
+        return 2400
+
+    def GetMaxResources(self):
+        return 100000.0
+
     def GetMinResources( self ) :
-        return 30.0
+        return 1000.0
 
     def GetResources( self ) :
-        return 70.0
+        return 70000.0

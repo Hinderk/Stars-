@@ -1001,26 +1001,32 @@
     </palette>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="1">
-     <widget class="QGraphicsView" name="Universe"/>
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>GroupBox</string>
+      </property>
+     </widget>
     </item>
-    <item row="2" column="1">
-     <widget class="QGraphicsView" name="Inspector">
+    <item row="0" column="1">
+     <widget class="QGraphicsView" name="Universe">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>150</height>
-       </size>
+      <property name="sceneRect">
+       <rectf>
+        <x>0.000000000000000</x>
+        <y>0.000000000000000</y>
+        <width>100.000000000000000</width>
+        <height>100.000000000000000</height>
+       </rectf>
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item row="1" column="0">
      <layout class="QVBoxLayout" name="Messages_VL">
       <item>
        <layout class="QHBoxLayout" name="CurrentYear_HL">
@@ -1087,7 +1093,7 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>20</width>
+            <width>100</width>
             <height>20</height>
            </size>
           </property>
@@ -1183,12 +1189,125 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="0">
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>GroupBox</string>
-      </property>
-     </widget>
+    <item row="1" column="1">
+     <layout class="QVBoxLayout" name="Inspector_VL">
+      <item>
+       <layout class="QHBoxLayout" name="SelectedObject_HL">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
+        <item>
+         <spacer name="HS4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>32</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <spacer name="HS2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="SelectedObject">
+          <property name="text">
+           <string>Selected Object</string>
+          </property>
+          <property name="scaledContents">
+           <bool>false</bool>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::NoTextInteraction</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="HS3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="SelectNextObject">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="stars.qrc">
+            <normaloff>:/Toolbar/Percent</normaloff>:/Toolbar/Percent</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QGraphicsView" name="Inspector">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>1200</width>
+          <height>450</height>
+         </size>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -1198,10 +1317,18 @@
      <x>0</x>
      <y>0</y>
      <width>2063</width>
-     <height>34</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="acceptDrops">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>File</string>
     </property>
@@ -1215,16 +1342,31 @@
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuView">
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>View</string>
     </property>
     <widget class="QMenu" name="menuLayout">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="title">
       <string>Layout</string>
      </property>
      <addaction name="actionDefault"/>
     </widget>
     <widget class="QMenu" name="menuZoom">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="title">
       <string>Zoom</string>
      </property>
@@ -1244,15 +1386,34 @@
     <addaction name="actionRace"/>
    </widget>
    <widget class="QMenu" name="menuTurn">
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>Turn</string>
     </property>
     <addaction name="actionGenerate"/>
    </widget>
    <widget class="QMenu" name="menuCommands">
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="acceptDrops">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>Commands</string>
     </property>
+    <addaction name="actionShipDesign"/>
+    <addaction name="actionResearch"/>
+    <addaction name="actionBattlePlans"/>
+    <addaction name="actionPlayerRelations"/>
+    <addaction name="separator"/>
+    <addaction name="actionChangePassword"/>
    </widget>
    <widget class="QMenu" name="menuReport">
     <property name="title">
@@ -1367,7 +1528,7 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionSave_Game_as">
+  <action name="actionSaveGameAs">
    <property name="text">
     <string>Save Turn as ...</string>
    </property>
@@ -1404,9 +1565,12 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="actionCompute_new_Turn">
+  <action name="actionComputeNewTurn">
    <property name="text">
     <string>Compute new Turn</string>
+   </property>
+   <property name="toolTip">
+    <string>Compute the Next Turn</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+F12</string>
@@ -1525,7 +1689,7 @@
     </font>
    </property>
    <property name="shortcut">
-    <string notr="true">F9</string>
+    <string>F9</string>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
@@ -1541,15 +1705,30 @@
    <property name="text">
     <string>Toolbar</string>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
   </action>
   <action name="actionDefault">
    <property name="text">
     <string>Default</string>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
   </action>
   <action name="actionRace">
    <property name="text">
     <string>Race</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="shortcut">
     <string>F8</string>
@@ -1724,6 +1903,68 @@
    </property>
    <property name="toolTip">
     <string>No Player Info View</string>
+   </property>
+  </action>
+  <action name="actionShipDesign">
+   <property name="text">
+    <string>Ship Design ...</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string>F4</string>
+   </property>
+  </action>
+  <action name="actionBattlePlans">
+   <property name="text">
+    <string>Battle Plans ...</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
+  </action>
+  <action name="actionPlayerRelations">
+   <property name="text">
+    <string>Player Relations ...</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string>F7</string>
+   </property>
+  </action>
+  <action name="actionResearch">
+   <property name="text">
+    <string>Research ...</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionChangePassword">
+   <property name="text">
+    <string>Change Password ...</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
   </action>
  </widget>

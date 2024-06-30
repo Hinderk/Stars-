@@ -1,5 +1,5 @@
 
-from PyQt5 import QtGui, QtCore
+from PyQt6 import QtGui, QtCore
 from pathlib import Path
 
 import os
