@@ -1,13 +1,5 @@
 <RCC>
-  <qresource prefix="Technology">
-    <file alias="Tech01">Images/armour.bmp</file>
-    <file alias="Tech02">Images/bombs.bmp</file>
-    <file alias="Tech03">Images/engines.bmp</file>
-    <file alias="Tech04">Images/mines.bmp</file>
-    <file alias="Tech05">Images/scanners.bmp</file>
-    <file alias="Tech06">Images/terraforming.bmp</file>
-    <file alias="Tech07">Images/rockets.bmp</file>
-  </qresource>
+  <qresource prefix="Technology"/>
   <qresource prefix="Ships"/>
   <qresource prefix="Toolbar">
     <file alias="Zoomlevel">Images/Toolbar/zoom.bmp</file>
