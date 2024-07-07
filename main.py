@@ -44,9 +44,9 @@ def main():
     PlanetInfo = Inspector(Terra)
 
     form.Inspector.setScene(PlanetInfo)
-    Terra.Available.Ironium = 45000
-    Terra.Available.Boranium = 2500
-    Terra.Available.Germanium = 15000
+    Terra.Mined.Ironium = 45000
+    Terra.Mined.Boranium = 2500
+    Terra.Mined.Germanium = 15000
     PlanetInfo.Update(Terra)
 
 # PlanetInfo.sText[2].setVisible(False)

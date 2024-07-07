@@ -8,8 +8,10 @@ from PyQt6.QtWidgets import QGraphicsSimpleTextItem
 
 class Inspector(QGraphicsScene):
 
+  xInfo = 0
+  yInfo = 0
   xMinerals = 0
-  yMinerals = 0
+  yMinerals = 120
   xWidth = 1000
   yWidth = 120
   xOffset = 40
@@ -20,11 +22,12 @@ class Inspector(QGraphicsScene):
 
     self.sConc = []
     self.sText = []
+    self.Biome = []
     sConc = []
 
-    sConc.append(planet.Available.Ironium)
-    sConc.append(planet.Available.Boranium)
-    sConc.append(planet.Available.Germanium)
+    sConc.append(planet.Mined.Ironium)
+    sConc.append(planet.Mined.Boranium)
+    sConc.append(planet.Mined.Germanium)
     black = QColor(0, 0, 0)
     white = QColor(255, 255, 255)
     blue = QColor(0, 0, 255)
@@ -41,12 +44,27 @@ class Inspector(QGraphicsScene):
     deltaX = self.xWidth / 10
     deltaY = self.yWidth / 17
     Minerals = QRectF(self.xMinerals, self.yMinerals, self.xWidth, self.yWidth)
-    
+
+    Info = QRectF(self.xInfo, self.yInfo, self.xWidth, 3 * deltaY)
+    self.addRect(Info, blackPen, blackBrush)
+    xp = self.xInfo + self.xWidth
+    yp = self.yInfo + 3 * deltaY + 2
+    self.addLine(self.xInfo, yp, xp, yp, whitePen)
+    yp += 2
+    Info = QRectF(self.xInfo, yp, self.xWidth, 3 * deltaY)
+    self.addRect(Info, blackPen, blackBrush)
+    yp += 2 + 3 * deltaY
+    self.addLine(self.xInfo, yp, xp, yp, whitePen)
+    yp += 2
+    Info = QRectF(self.xInfo, yp, self.xWidth, 3 * deltaY)
+    self.addRect(Info, blackPen, blackBrush)
+
     self.addRect(Minerals, blackPen, blackBrush)
-    xp = 0
+    xp = self.xMinerals
+    yp = self.yMinerals + self.yWidth
     for n in range(0, 10):
       xp += deltaX
-      self.addLine(xp, 0, xp, self.yWidth, whitePen)
+      self.addLine(xp, self.yMinerals, xp, yp, whitePen)
     yp = self.yMinerals + 2 * deltaY
     for n in (0, 1, 2):
       xlen = self.xWidth * sConc[n] / 5000.0
@@ -66,9 +84,9 @@ class Inspector(QGraphicsScene):
       
   def Update(self, planet):
     sConc = []
-    sConc.append(planet.Available.Ironium)
-    sConc.append(planet.Available.Boranium)
-    sConc.append(planet.Available.Germanium)
+    sConc.append(planet.Mined.Ironium)
+    sConc.append(planet.Mined.Boranium)
+    sConc.append(planet.Mined.Germanium)
     deltaY = self.yWidth / 17
     yp = self.yMinerals + 2 * deltaY
     for n in (0, 1, 2):
