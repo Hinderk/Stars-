@@ -1320,6 +1320,17 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
    <widget class="QMenu" name="menuFile">
     <property name="font">
      <font>
@@ -1416,9 +1427,36 @@
     <addaction name="actionChangePassword"/>
    </widget>
    <widget class="QMenu" name="menuReport">
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>Report</string>
     </property>
+    <widget class="QMenu" name="menuDump_to_text_file">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="title">
+      <string>Dump to text file</string>
+     </property>
+     <addaction name="actionUniverse_Definition"/>
+     <addaction name="actionPlanet_Information"/>
+     <addaction name="actionFleet_Information"/>
+    </widget>
+    <addaction name="actionPlanets"/>
+    <addaction name="actionFleets"/>
+    <addaction name="actionOther_s_Fleets"/>
+    <addaction name="separator"/>
+    <addaction name="actionBattles"/>
+    <addaction name="separator"/>
+    <addaction name="actionScore"/>
+    <addaction name="separator"/>
+    <addaction name="menuDump_to_text_file"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1943,6 +1981,9 @@
    <property name="shortcut">
     <string>F7</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionResearch">
    <property name="text">
@@ -1965,6 +2006,146 @@
     <font>
      <pointsize>12</pointsize>
     </font>
+   </property>
+  </action>
+  <action name="actionPlanets">
+   <property name="text">
+    <string>Planets ...</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">F3</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionFleets">
+   <property name="text">
+    <string>Fleets ...</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string>F3</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionOther_s_Fleets">
+   <property name="text">
+    <string>Other's Fleets ...</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">F3</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionBattles">
+   <property name="text">
+    <string>Battles ...</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">F3</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionScore">
+   <property name="text">
+    <string>Score ...</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">F10</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionUniverse_Definition">
+   <property name="text">
+    <string>Universe Defintion</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionPlanet_Information">
+   <property name="text">
+    <string>Planet Information</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionFleet_Information">
+   <property name="text">
+    <string>Fleet Information</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

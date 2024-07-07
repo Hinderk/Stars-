@@ -1,28 +1,25 @@
 
 import sys
 import stars_ui
+import stars_rc
 
-from PyQt6.QtCore import QRectF
-from PyQt6.QtGui import QPen, QBrush, QColor, QPolygon
-from PyQt6.QtWidgets import QApplication, QMainWindow, QGraphicsScene
+from PyQt6.QtWidgets import QApplication, QMainWindow
 
-from gui import Gui
+#from gui import Gui
 from planet import Planet
 from ruleset import Ruleset
-from spaceinfo import SpaceInfo
-from toolbar import ToolBar
+#from spaceinfo import SpaceInfo
+#from toolbar import ToolBar
 from inspector import Inspector
+from design import Design
 
-
-
-class Design:
-    MenuFontSize = 16
 
 
 class Stars(QMainWindow, stars_ui.Ui_GUI):
 
     def __init__(self):
         super(self.__class__, self).__init__()
+        self.setStyleSheet(Design().getStyle())
         self.setupUi(self)  # This has been defined in 'stars_ui.py'
 
 
@@ -36,7 +33,6 @@ def main():
 #    PInfo = ToolBar(form)
 
 #    SInfo.UpdateFriendlyDesigns( [ 'A', 'B', 'C' ] )
-
 
     Rules = Ruleset()
     Terra = Planet(Rules)
