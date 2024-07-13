@@ -10,6 +10,7 @@
     <file alias="Names">Images/Toolbar/names.bmp</file>
     <file alias="Waiting">Images/Toolbar/standby.bmp</file>
     <file alias="Scanner">Images/Toolbar/scanner.bmp</file>
+    <file alias="Planet">Images/Toolbar/planet.svg</file>
     <file alias="Cancel">Images/Toolbar/cancel.svg</file>
     <file alias="Minerals">Images/Toolbar/minerals.svg</file>
     <file alias="Waypoint">Images/Toolbar/add.bmp</file>
