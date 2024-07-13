@@ -1878,8 +1878,14 @@
    <property name="toolTip">
     <string>Normal View</string>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionPercentView">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="stars.qrc">
      <normaloff>:/Toolbar/Percent</normaloff>:/Toolbar/Percent</iconset>
@@ -1890,8 +1896,14 @@
    <property name="toolTip">
     <string>Planet Value View</string>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionPopulationView">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="stars.qrc">
      <normaloff>:/Toolbar/People</normaloff>:/Toolbar/People</iconset>
@@ -1902,8 +1914,14 @@
    <property name="toolTip">
     <string>Population View</string>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionSurfaceMineralView">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="stars.qrc">
      <normaloff>:/Toolbar/Surface</normaloff>:/Toolbar/Surface</iconset>
@@ -1914,8 +1932,14 @@
    <property name="toolTip">
     <string>Surface Mineral View</string>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionConcentrationView">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="stars.qrc">
      <normaloff>:/Toolbar/Minerals</normaloff>:/Toolbar/Minerals</iconset>
@@ -1925,6 +1949,9 @@
    </property>
    <property name="toolTip">
     <string>Mineral Concentration View</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionNoPlayerInfoView">
@@ -1941,6 +1968,9 @@
    </property>
    <property name="toolTip">
     <string>No Player Info View</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionShipDesign">
