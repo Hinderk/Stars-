@@ -2,10 +2,10 @@
   <qresource prefix="Technology"/>
   <qresource prefix="Ships"/>
   <qresource prefix="Toolbar">
-    <file alias="Zoomlevel">Images/Toolbar/zoom.bmp</file>
+    <file alias="Zoomlevel">Images/Toolbar/zoom.svg</file>
     <file alias="Paths">Images/Toolbar/path.svg</file>
-    <file alias="Foes">Images/Toolbar/foes.bmp</file>
-    <file alias="Friendlies">Images/Toolbar/friendlies.bmp</file>
+    <file alias="Foes">Images/Toolbar/foes.svg</file>
+    <file alias="Friendlies">Images/Toolbar/friendlies.svg</file>
     <file alias="Orbiting">Images/Toolbar/orbit.svg</file>
     <file alias="Names">Images/Toolbar/names.bmp</file>
     <file alias="Waiting">Images/Toolbar/standby.svg</file>

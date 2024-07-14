@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Creator: fig2dev Version 3.2.8b -->
-<!-- CreationDate: 2024-07-13 19:31:25 -->
+<!-- CreationDate: 2024-07-14 04:19:28 -->
 <!-- Magnification: 1.05 -->
 <svg	xmlns="http://www.w3.org/2000/svg"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -14,31 +14,28 @@
 <defs>
 <clipPath id="cp0">
 	<path clip-rule="evenodd" d="M -2262,-2262 H 2262 V 2262 H -2262 z
-		M -1684,1056 -1873,1518 -1952,1026 -1935,1701 -1854,1710z"/>
+		M -1602,999 -1872,1512 -2019,951 -1968,1727 -1828,1743z"/>
 </clipPath>
 </defs>
 <polyline points=" 1935,1260 1035,1890 -180,855 1800,-1125 -1485,-1845 -1890,1665" clip-path="url(#cp0)"
-	stroke="#0000ff" stroke-width="75px"/>
+	stroke="#0000ff" stroke-width="135px"/>
 <!-- Forward arrow to point -1890,1665 -->
-<polyline points=" -1684,1056 -1873,1518 -1952,1026"
-	stroke="#0000ff" stroke-width="75px" stroke-miterlimit="8"/>
+<polyline points=" -1602,999 -1872,1512 -2019,951"
+	stroke="#0000ff" stroke-width="105px" stroke-miterlimit="8"/>
 <!-- Circle -->
-<circle cx="-1485" cy="-1845" r="142" fill="#a14000"
+<circle cx="-1935" cy="1935" r="265" fill="#a14000"
 	stroke="#a14000" stroke-width="75px"/>
 <!-- Circle -->
-<circle cx="1800" cy="-1125" r="142" fill="#a14000"
+<circle cx="-180" cy="855" r="265" fill="#a14000"
 	stroke="#a14000" stroke-width="75px"/>
 <!-- Circle -->
-<circle cx="1935" cy="1260" r="142" fill="#a14000"
+<circle cx="-1485" cy="-1845" r="265" fill="#a14000"
 	stroke="#a14000" stroke-width="75px"/>
 <!-- Circle -->
-<circle cx="1035" cy="1890" r="142" fill="#a14000"
+<circle cx="1800" cy="-1125" r="265" fill="#a14000"
 	stroke="#a14000" stroke-width="75px"/>
 <!-- Circle -->
-<circle cx="-1926" cy="1842" r="142" fill="#a14000"
-	stroke="#a14000" stroke-width="75px"/>
-<!-- Circle -->
-<circle cx="-180" cy="859" r="142" fill="#a14000"
+<circle cx="1935" cy="1260" r="265" fill="#a14000"
 	stroke="#a14000" stroke-width="75px"/>
 </g>
 </svg>
