@@ -7,7 +7,7 @@
     <file alias="Foes">Images/Toolbar/foes.svg</file>
     <file alias="Friendlies">Images/Toolbar/friendlies.svg</file>
     <file alias="Orbiting">Images/Toolbar/orbit.svg</file>
-    <file alias="Names">Images/Toolbar/names.bmp</file>
+    <file alias="Names">Images/Toolbar/names.svg</file>
     <file alias="Waiting">Images/Toolbar/standby.svg</file>
     <file alias="Scanner">Images/Toolbar/scanner.bmp</file>
     <file alias="Cancel">Images/Toolbar/cancel.svg</file>
