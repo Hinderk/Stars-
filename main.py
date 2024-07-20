@@ -3,13 +3,11 @@ import sys
 import stars_ui
 import stars_rc
 
-from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMenu
 
-#from gui import Gui
+from gui import Gui
 from planet import Planet
 from ruleset import Ruleset
-#from spaceinfo import SpaceInfo
-#from toolbar import ToolBar
 from inspector import Inspector
 from design import Design
 
@@ -27,12 +25,17 @@ class Stars(QMainWindow, stars_ui.Ui_GUI):
 def main():
     app = QApplication(sys.argv)
 
-    form = Stars()                 # Create the main user interface
+# form = Stars()                 # Create the main user interface
+    form = Gui()                 # Create the main user interface
 
-#    SInfo = SpaceInfo( form )
-#    PInfo = ToolBar(form)
+#    SInfo.UpdateFriendlyDesigns(['A', 'B', 'C'])
 
-#    SInfo.UpdateFriendlyDesigns( [ 'A', 'B', 'C' ] )
+#    FoeFilter = QMenu(form)
+#    form.actionFoes.setMenu(FoeFilter)
+#    FoeFilter.addAction('All Designs')
+#    FoeFilter.addAction('Invert Filter')
+#    FoeFilter.addAction('No Designs')
+#    FoeFilter.addSeparator()
 
     Rules = Ruleset()
     Terra = Planet(Rules)

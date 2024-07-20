@@ -1,6 +1,9 @@
 
 from PyQt6 import QtWidgets, QtGui, QtCore
-from fonts import LoadFonts
+from PyQt6.QtWidgets import QWidget
+from design import Design
+from menubar import Menu
+from toolbar import ToolBar
 
 import stars_rc
 #import os
@@ -8,286 +11,225 @@ import stars_rc
 
 
 class Gui(QtWidgets.QMainWindow):
-    
-    def __init__(self, design):
-        
-        super(Gui, self).__init__()
+
+    def __init__(self):
+
+        super(self.__class__, self).__init__()
+        design = Design()
+        self.setStyleSheet(design.getStyle())
+        self.Action = dict()
         self.SetupUI(design)
 
 
-    def DefineZoomLevel( self, Menu, Level ) :
-     
-        for NewLevel in Level :
-            NewAction = Menu.addAction( NewLevel + '%' )
-            NewAction.setCheckable( True )
-            self.Action['Zoom' + NewLevel] = NewAction
+    def retranslateUi(self, GUI):
+
+        _translate = QtCore.QCoreApplication.translate
+        self.groupBox.setTitle(_translate("GUI", "GroupBox"))
+        self.PreviousMessage.setText(_translate("GUI", "Previous"))
+        self.FollowMessage.setText(_translate("GUI", "Goto"))
+        self.SelectedObject.setText(_translate("GUI", "Selected Object"))
+        self.actionLoadGame.setText(_translate("GUI", "Load Turn"))
+        self.actionLoadGame.setShortcut(_translate("GUI", "Ctrl+L"))
+        self.actionSaveGameAs.setText(_translate("GUI", "Save Turn as ..."))
+        self.actionSaveGameAs.setShortcut(_translate("GUI", "Ctrl+A"))
+        self.actionOpenGame.setShortcut(_translate("GUI", "Ctrl+O"))
+        self.actionComputeNewTurn.setText(_translate("GUI", "Compute new Turn"))
+        self.actionComputeNewTurn.setToolTip(_translate("GUI", "Compute the Next Turn"))
+        self.actionComputeNewTurn.setShortcut(_translate("GUI", "Ctrl+F12"))
+        self.actionShowToolbar.setText(_translate("GUI", "Toolbar"))
+        self.actionGameParameters.setText(_translate("GUI", "Game Parameters"))
+        self.actionCompute.setText(_translate("GUI", "Compute "))
+        self.actionGenerate.setShortcut(_translate("GUI", "F9"))
+        self.actionToolbar.setText(_translate("GUI", "Toolbar"))
+        self.actionDefault.setText(_translate("GUI", "Default"))
+        self.actionRace.setText(_translate("GUI", "Race"))
+        self.actionRace.setShortcut(_translate("GUI", "F8"))
+        self.action25.setText(_translate("GUI", "25%"))
+        self.action50.setText(_translate("GUI", "50%"))
+        self.action75.setText(_translate("GUI", "75%"))
+        self.action100.setText(_translate("GUI", "100%"))
+        self.action125.setText(_translate("GUI", "125%"))
+        self.action150.setText(_translate("GUI", "150%"))
+        self.action200.setText(_translate("GUI", "200%"))
+        self.action400.setText(_translate("GUI", "400%"))
+        self.actionDefaultView.setText(_translate("GUI", "DefaultView"))
+        self.actionDefaultView.setToolTip(_translate("GUI", "Normal View"))
+        self.actionPercentView.setText(_translate("GUI", "PercentView"))
+        self.actionPercentView.setToolTip(_translate("GUI", "Planet Value View"))
+        self.actionPopulationView.setText(_translate("GUI", "PopulationView"))
+        self.actionPopulationView.setToolTip(_translate("GUI", "Population View"))
+        self.actionSurfaceMineralView.setText(_translate("GUI", "SurfaceMineralView"))
+        self.actionSurfaceMineralView.setToolTip(_translate("GUI", "Surface Mineral View"))
+        self.actionConcentrationView.setText(_translate("GUI", "ConcentrationView"))
+        self.actionConcentrationView.setToolTip(_translate("GUI", "Mineral Concentration View"))
+        self.actionNoInfoView.setText(_translate("GUI", "NoPlayerInfoView"))
+        self.actionNoInfoView.setToolTip(_translate("GUI", "No Player Info View"))
+        self.actionShipDesign.setText(_translate("GUI", "Ship Design ..."))
+        self.actionShipDesign.setShortcut(_translate("GUI", "F4"))
+        self.actionBattlePlans.setText(_translate("GUI", "Battle Plans ..."))
+        self.actionBattlePlans.setShortcut(_translate("GUI", "F6"))
+        self.actionPlayerRelations.setText(_translate("GUI", "Player Relations ..."))
+        self.actionPlayerRelations.setShortcut(_translate("GUI", "F7"))
+        self.actionResearch.setText(_translate("GUI", "Research ..."))
+        self.actionResearch.setShortcut(_translate("GUI", "F5"))
+        self.actionChangePassword.setText(_translate("GUI", "Change Password ..."))
+        self.actionPlanets.setText(_translate("GUI", "Planets ..."))
+        self.actionFleets.setText(_translate("GUI", "Fleets ..."))
+        self.actionFleets.setShortcut(_translate("GUI", "F3"))
+        self.actionOtherFleets.setText(_translate("GUI", "Other\'s Fleets ..."))
+        self.actionBattles.setText(_translate("GUI", "Battles ..."))
+        self.actionScore.setText(_translate("GUI", "Score ..."))
+        self.actionUniverseDefinition.setText(_translate("GUI", "Universe Defintion"))
+        self.actionPlanetInformation.setText(_translate("GUI", "Planet Information"))
+        self.actionFleetInformation.setText(_translate("GUI", "Fleet Information"))
+        self.actionAddWaypoint.setText(_translate("GUI", "Add way points mode"))
+        self.actionAddWaypoint.setIconText(_translate("GUI", "Add way points mode"))
+        self.actionAddWaypoint.setToolTip(_translate("GUI", "Add way points mode"))
+        self.actionWaitingFleets.setText(_translate("GUI", "Idle fleets filter"))
+        self.actionWaitingFleets.setToolTip(_translate("GUI", "Idle fleets filter"))
+        self.actionShipCount.setText(_translate("GUI", "ShipCount"))
+        self.actionShipCount.setToolTip(_translate("GUI", "Ship counts overlay"))
+        self.actionFriendlies.setText(_translate("GUI", "Friendlies"))
+        self.actionFriendlies.setToolTip(_translate("GUI", "Show friendly fleets"))
+        self.actionFoes.setText(_translate("GUI", "Foes"))
+        self.actionFoes.setToolTip(_translate("GUI", "Show enemy ships"))
+        self.actionZoom.setText(_translate("GUI", "Zoom"))
+        self.actionPathOverlay.setText(_translate("GUI", "PathOverlay"))
+        self.actionPathOverlay.setToolTip(_translate("GUI", "Show fleet paths"))
             
 
     def SetupUI(self, design):
 
-        LoadFonts("Design/Fonts")
-        FontDB = QtGui.QFontDatabase()
+        ExpandSize = QtWidgets.QSizePolicy.Policy.Expanding
+        MaxSize = QtWidgets.QSizePolicy.Policy.Maximum
+        MinSize = QtWidgets.QSizePolicy.Policy.Minimum
+        FixedSize = QtWidgets.QSizePolicy.Policy.Fixed
 
-        styles = FontDB.styles("Playfair Display")
-        print(styles)
-        MenuFont = FontDB.font("Playfair Display", "Medium", design.MenuFontSize)
-        MenuFont.setPointSize(design.MenuFontSize)
-
-        self.setObjectName('Stars')
-        self.setWindowTitle('Stars!')
-   #     self.resize(1920, 1080)
-        # Policy = QtWidgets.QSizePolicy()
-        # self.setSizePolicy( Policy )
-        Icon = QtGui.QIcon(':/Icons/Stars')
+        self.resize(1600, 1200)
+        sizePolicy = QtWidgets.QSizePolicy(MaxSize, MaxSize)  # TODO: Query design for details!
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.setSizePolicy(sizePolicy)
+        self.setWindowTitle("My Stars!")
+        Icon = QtGui.QIcon()
+        Icon.addPixmap(QtGui.QPixmap(":/Icons/Stars"))
         self.setWindowIcon(Icon)
-        self.CentralWidget=QtWidgets.QWidget(self)
+        self.setLocale(QtCore.QLocale(QtCore.QLocale.Language.English, QtCore.QLocale.Country.Europe))
+        self.setIconSize(QtCore.QSize(60, 60))
+        self.CentralWidget = QWidget(self)
         self.CentralWidget.setEnabled(True)
+        sizePolicy = QtWidgets.QSizePolicy(ExpandSize, ExpandSize)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.CentralWidget.setSizePolicy(sizePolicy)
+        self.CentralWidget.setMinimumSize(QtCore.QSize(800, 600))  # TODO: Query design!
+
         GridLayout = QtWidgets.QGridLayout(self.CentralWidget)
-        self.Inspector=QtWidgets.QGraphicsView(self.CentralWidget)
-        self.Inspector.setMinimumHeight(200)
-        GridLayout.addWidget(self.Inspector, 1, 1)
-
-        MessageLayout = QtWidgets.QGridLayout(self.CentralWidget)
-        MessageLabel = QtWidgets.QLabel(self.CentralWidget)
-        MessageLabel.setText("This is a message!")
-        MessageLayout.addWidget(MessageLabel, 0, 0)
-  
-  
-        CurrentMessage = QtWidgets.QTextEdit(self.CentralWidget)
-        CurrentMessage.insertPlainText("This is a very simple message that requires Your attention!")
-        
-        scrollArea = QtWidgets.QScrollArea(self.CentralWidget)
-        scrollArea.setBackgroundRole(QtGui.QPalette.Dark)
-        scrollArea.setWidget(CurrentMessage)
-        MessageLayout.addWidget(scrollArea, 1, 0)
-
-        GridLayout.addLayout(MessageLayout, 1, 0)
-
+        self.groupBox = QtWidgets.QGroupBox(self.CentralWidget)
+        GridLayout.addWidget(self.groupBox, 0, 0, 1, 1)
         self.Universe = QtWidgets.QGraphicsView(self.CentralWidget)
-        self.Universe.setMinimumSize(1440, 1080)
-        GridLayout.addWidget(self.Universe, 0, 1)
-
-
+        sizePolicy = QtWidgets.QSizePolicy(ExpandSize, ExpandSize)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.Universe.setSizePolicy(sizePolicy)
+        self.Universe.setSceneRect(QtCore.QRectF(0.0, 0.0, 100.0, 100.0))
+        GridLayout.addWidget(self.Universe, 0, 1, 1, 1)
+        Filter_HL = QtWidgets.QHBoxLayout(self.CentralWidget)
+        self.FilterMessage = QtWidgets.QCheckBox(self.CentralWidget)
+        sizePolicy = QtWidgets.QSizePolicy(MinSize, FixedSize)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.FilterMessage.setSizePolicy(sizePolicy)
+        self.FilterMessage.setMinimumSize(QtCore.QSize(20, 20))
+        self.FilterMessage.setToolTip("Show the likes of the current message ...")
+        self.FilterMessage.setChecked(True)
+        Filter_HL.addWidget(self.FilterMessage)
+        self.CurrentGameYear = QtWidgets.QLabel(self.CentralWidget)
+        sizePolicy = QtWidgets.QSizePolicy(ExpandSize, FixedSize)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.CurrentGameYear.setSizePolicy(sizePolicy)
+        self.CurrentGameYear.setToolTip("Current Age of the Galaxy ...")
+        self.CurrentGameYear.setText("Year 2400 - Message: 1 of 10")  # TODO: Fix messages!
+        self.CurrentGameYear.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        Filter_HL.addWidget(self.CurrentGameYear)
+        Spacer = QtWidgets.QSpacerItem(100, 20, FixedSize, MinSize)
+        Filter_HL.addItem(Spacer)
+        Messages_VL = QtWidgets.QVBoxLayout()
+        Messages_VL.addLayout(Filter_HL)
+        CurrentMessage_HL = QtWidgets.QHBoxLayout()
+        self.CurrentMessage = QtWidgets.QPlainTextEdit(self.CentralWidget)
+        self.CurrentMessage.setMinimumSize(QtCore.QSize(0, 0))
+        self.CurrentMessage.setUndoRedoEnabled(False)
+        self.CurrentMessage.setReadOnly(True)
+#
+        self.CurrentMessage.setPlainText("This is a very simple message that requires Your attention!")
+#
+        CurrentMessage_HL.addWidget(self.CurrentMessage)
+        NewsButtons_VL = QtWidgets.QVBoxLayout()
+        NewsButtons_VL.setSizeConstraint(QtWidgets.QLayout.SizeConstraint.SetMinimumSize)
+        Spacer = QtWidgets.QSpacerItem(20, 40, MinSize, ExpandSize)
+        NewsButtons_VL.addItem(Spacer)
+        self.PreviousMessage = QtWidgets.QPushButton(self.CentralWidget)
+        self.PreviousMessage.setToolTip("Read previous message ...")
+        NewsButtons_VL.addWidget(self.PreviousMessage)
+        self.FollowMessage = QtWidgets.QPushButton(self.CentralWidget)
+        self.FollowMessage.setToolTip("Follow up on current message ...")
+        NewsButtons_VL.addWidget(self.FollowMessage)
+        self.NextMessage = QtWidgets.QPushButton(self.CentralWidget)
+        self.NextMessage.setText("Next")
+        self.NextMessage.setToolTip("Read next message ...")
+        NewsButtons_VL.addWidget(self.NextMessage)
+        Spacer = QtWidgets.QSpacerItem(20, 40, MinSize, ExpandSize)
+        NewsButtons_VL.addItem(Spacer)
+        CurrentMessage_HL.addLayout(NewsButtons_VL)
+        Messages_VL.addLayout(CurrentMessage_HL)
+        GridLayout.addLayout(Messages_VL, 1, 0, 1, 1)
+        Inspector_VL = QtWidgets.QVBoxLayout()
+        SelectedObject_HL = QtWidgets.QHBoxLayout()
+        SelectedObject_HL.setSpacing(0)
+        Spacer = QtWidgets.QSpacerItem(32, 20, FixedSize, MinSize)
+        SelectedObject_HL.addItem(Spacer)
+        Spacer = QtWidgets.QSpacerItem(40, 20, ExpandSize, MinSize)
+        SelectedObject_HL.addItem(Spacer)
+        self.SelectedObject = QtWidgets.QLabel(self.CentralWidget)
+#        self.SelectedObject.setScaledContents(False)
+#        self.SelectedObject.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.NoTextInteraction)
+        SelectedObject_HL.addWidget(self.SelectedObject)
+        Spacer = QtWidgets.QSpacerItem(40, 20, ExpandSize, MinSize)
+        SelectedObject_HL.addItem(Spacer)
+        self.SelectNextObject = QtWidgets.QPushButton(self.CentralWidget)
+        sizePolicy = QtWidgets.QSizePolicy(FixedSize, FixedSize)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.SelectNextObject.setSizePolicy(sizePolicy)
+        self.SelectNextObject.setMinimumSize(QtCore.QSize(20, 20))
+        SelectedObject_HL.addWidget(self.SelectNextObject)
+        Inspector_VL.addLayout(SelectedObject_HL)
+#
+        Icon = QtGui.QIcon()
+        Icon.addPixmap(QtGui.QPixmap(":/Toolbar/Percent"))
+        self.SelectNextObject.setIcon(Icon)
+        self.SelectNextObject.setIconSize(QtCore.QSize(20, 20))
+        self.SelectNextObject.setFlat(True)
+        self.Inspector = QtWidgets.QGraphicsView(parent=self.CentralWidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.Inspector.setSizePolicy(sizePolicy)
+        self.Inspector.setMaximumSize(QtCore.QSize(1200, 450))
+        self.Inspector.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
+        Inspector_VL.addWidget(self.Inspector)
+        GridLayout.addLayout(Inspector_VL, 1, 1, 1, 1)
         self.setCentralWidget(self.CentralWidget)
+#
+        Buttons = ToolBar(self)
+#        Buttons.setAutoFillBackground(True)
+        Buttons.setMovable(False)
+        Buttons.setIconSize(QtCore.QSize(40, 40))
+        self.addToolBar(Buttons)
+        self.setMenuBar(Menu(self))
+        self.statusbar = QtWidgets.QStatusBar(self)
+        self.setStatusBar(self.statusbar)
 
-        self.MenuBar = QtWidgets.QMenuBar(self)
-        self.MenuBar.setFont(MenuFont)
-        self.MenuFile = QtWidgets.QMenu(self.MenuBar)
-        self.MenuView = QtWidgets.QMenu(self.MenuBar)
-        self.MenuLayout=QtWidgets.QMenu(self.MenuView)
-        self.MenuZoom=QtWidgets.QMenu(self.MenuView)
-        self.MenuTurn=QtWidgets.QMenu(self.MenuBar)
-        self.MenuCommands=QtWidgets.QMenu(self.MenuBar)
-        self.MenuReport=QtWidgets.QMenu(self.MenuBar)
-        self.MenuHelp=QtWidgets.QMenu(self.MenuBar)
-        self.MenuExport=QtWidgets.QMenu(self.MenuBar)
-        self.setMenuBar(self.MenuBar)
-        self.MenuBar.addAction(self.MenuFile.menuAction())
-        self.MenuBar.addAction(self.MenuView.menuAction())
-        self.MenuBar.addAction(self.MenuTurn.menuAction())
-        self.MenuBar.addAction(self.MenuCommands.menuAction())
-        self.MenuBar.addAction(self.MenuReport.menuAction())
-        self.MenuBar.addAction(self.MenuHelp.menuAction())
-        self.MenuFile.setTitle('File')
-        self.MenuView.setTitle('View')
-        self.MenuLayout.setTitle('Layout')
-        self.MenuZoom.setTitle('Zoom')
-        self.MenuTurn.setTitle('Turn')
-        self.MenuCommands.setTitle('Commands')
-        self.MenuReport.setTitle('Report')
-        self.MenuHelp.setTitle('Help')
-        self.MenuExport.setTitle('Save a report')
-
-        self.PlanetInfo=QtWidgets.QToolBar(self)
-        self.PlanetInfo.setFloatable(True)
-        self.PlanetInfo.setWindowTitle('Planetary Data')
-        self.addToolBar(QtCore.Qt.TopToolBarArea, self.PlanetInfo)
-        self.SpaceInfo=QtWidgets.QToolBar(self)
-        self.addToolBar(QtCore.Qt.TopToolBarArea, self.SpaceInfo)
-        self.SpaceInfo.setWindowTitle('Minefields & Fleets')
-
-        self.Action=dict()
-
-        NewAction=QtWidgets.QAction(self)
-        Icon = QtGui.QIcon(':/Menu/NewGame')
-        NewAction.setIcon(Icon)
-        NewAction.setText('New')
-        NewAction.setToolTip('Create an new game')
-        NewAction.setShortcut('Ctrl+N')
-        self.MenuFile.addAction(NewAction)
-        self.Action['New Game']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Open')
-        Icon=QtGui.QIcon(':/Menu/OpenGame')
-        NewAction.setIcon(Icon)
-        NewAction.setToolTip('Open a saved game')
-        NewAction.setShortcut('Ctrl+O')
-        self.MenuFile.addAction(NewAction)
-        self.Action['Open Game']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Close')
-        NewAction.setToolTip('Close the current game')
-        self.MenuFile.addAction(NewAction)
-        self.Action['Close Game']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Save')
-        Icon=QtGui.QIcon(':/Menu/SaveGame')
-        NewAction.setIcon(Icon)
-        NewAction.setToolTip('Save the current game')
-        NewAction.setShortcut('Ctrl+S')
-        self.MenuFile.addAction(NewAction)
-        self.Action['Save Game']=NewAction
-        self.MenuFile.addSeparator()
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Exit')
-        NewAction.setToolTip('Exit the game')
-        NewAction.setShortcut('Ctrl+X')
-        self.MenuFile.addAction(NewAction)
-        self.Action['Exit Game']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Toolbar')
-        NewAction.setToolTip('Show the toolbar')
-        NewAction.setCheckable(True)
-        NewAction.setChecked(True)
-        self.MenuView.addAction(NewAction)
-        self.Action['Toolbar']=NewAction
-        self.MenuView.addSeparator()
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Find')
-        NewAction.setShortcut('Ctrl+F')
-        NewAction.setToolTip('Find planet or fleet by name or number')
-        self.MenuView.addAction(NewAction)
-        self.Action['Find']=NewAction
-
-        self.MenuView.addAction(self.MenuZoom.menuAction())
-        self.MenuView.addAction(self.MenuLayout.menuAction())
-        Level=['25', '38', '50', '75', '100', '125', '150', '200', '400']
-        self.DefineZoomLevel(self.MenuZoom, Level)
-        self.Action['Zoom100'].setChecked(True)
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Player Colours')
-        NewAction.setToolTip('Display player colours')
-        NewAction.setCheckable(True)
-        NewAction.setChecked(True)
-        self.MenuView.addAction(NewAction)
-        self.Action['Traits']=NewAction
-        self.MenuView.addSeparator()
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Traits')
-        NewAction.setToolTip('Display the perks of the civilisation')
-        NewAction.setShortcut('F8')
-        self.MenuView.addAction(NewAction)
-        self.Action['Traits']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Parameters')
-        NewAction.setToolTip('Display the setup parameters of the game')
-        self.MenuView.addAction(NewAction)
-        self.Action['Parameters']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Generate')
-        NewAction.setToolTip('Compute a new turn for the game')
-        NewAction.setShortcut('F9')
-        self.MenuTurn.addAction(NewAction)
-        self.Action['Generate']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Ship Design')
-        NewAction.setToolTip('Manage the ship designs')
-        NewAction.setShortcut('F4')
-        self.MenuCommands.addAction(NewAction)
-        self.Action['Design']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Research')
-        NewAction.setToolTip('Allocate spending on research')
-        NewAction.setShortcut('F5')
-        self.MenuCommands.addAction(NewAction)
-        self.Action['Research']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Battle Plans')
-        NewAction.setToolTip('Modifiy the programming of the battle computers')
-        NewAction.setShortcut('F6')
-        self.MenuCommands.addAction(NewAction)
-        self.Action['Battle Plan']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Player Relations')
-        NewAction.setToolTip('Declare war or negotiate peace')
-        NewAction.setShortcut('F7')
-        NewAction.setDisabled(True)
-        self.MenuCommands.addAction(NewAction)
-        self.Action['Diplomacy']=NewAction
-        self.MenuCommands.addSeparator()
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Manage Keys')
-        NewAction.setToolTip('Protect the game data')
-        self.MenuCommands.addAction(NewAction)
-        self.Action['Security']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Planets ...')
-        NewAction.setToolTip('Review planetary data')
-        NewAction.setShortcut('F3')
-        self.MenuReport.addAction(NewAction)
-        self.Action['Planets']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Fleets ...')
-        NewAction.setToolTip('Review fleet movements')
-        NewAction.setShortcut('F3')
-        self.MenuReport.addAction(NewAction)
-        self.Action['Fleets']=NewAction
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Others\' Fleets ...')
-        NewAction.setToolTip('Review fleet intelligence')
-        NewAction.setShortcut('F3')
-        self.MenuReport.addAction(NewAction)
-        self.Action['Enemies']=NewAction
-        self.MenuReport.addSeparator()
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Battles ...')
-        NewAction.setToolTip('Review battle outcomes')
-        NewAction.setShortcut('F1')
-        self.MenuReport.addAction(NewAction)
-        self.Action['Battles']=NewAction
-        self.MenuReport.addSeparator()
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('Score')
-        NewAction.setToolTip('Review the current game score')
-        NewAction.setShortcut('F10')
-        self.MenuReport.addAction(NewAction)
-        self.Action['Score']=NewAction
-        self.MenuReport.addSeparator()
-
-        self.MenuReport.addAction(self.MenuExport.menuAction())
-
-        NewAction=QtWidgets.QAction(self)
-        Icon=QtGui.QIcon(':/Menu/Science')
-        NewAction.setIcon(Icon)
-        NewAction.setText('Technology Browser')
-        NewAction.setToolTip('Review research options')
-        NewAction.setShortcut('F2')
-        self.MenuHelp.addAction(NewAction)
-        self.Action['Science']=NewAction
-        self.MenuHelp.addSeparator()
-
-        NewAction=QtWidgets.QAction(self)
-        NewAction.setText('About')
-        NewAction.setToolTip('About this clone of Stars!')
-        self.MenuHelp.addAction(NewAction)
-        self.Action['About']=NewAction
+        self.retranslateUi(self)

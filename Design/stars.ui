@@ -1001,12 +1001,125 @@
     </palette>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>GroupBox</string>
-      </property>
-     </widget>
+    <item row="1" column="1">
+     <layout class="QVBoxLayout" name="Inspector_VL">
+      <item>
+       <layout class="QHBoxLayout" name="SelectedObject_HL">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
+        <item>
+         <spacer name="HS4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>32</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <spacer name="HS2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="SelectedObject">
+          <property name="text">
+           <string>Selected Object</string>
+          </property>
+          <property name="scaledContents">
+           <bool>false</bool>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::NoTextInteraction</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="HS3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="SelectNextObject">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="stars.qrc">
+            <normaloff>:/Toolbar/Percent</normaloff>:/Toolbar/Percent</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QGraphicsView" name="Inspector">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>1200</width>
+          <height>450</height>
+         </size>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item row="0" column="1">
      <widget class="QGraphicsView" name="Universe">
@@ -1189,125 +1302,12 @@
       </item>
      </layout>
     </item>
-    <item row="1" column="1">
-     <layout class="QVBoxLayout" name="Inspector_VL">
-      <item>
-       <layout class="QHBoxLayout" name="SelectedObject_HL">
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <property name="sizeConstraint">
-         <enum>QLayout::SetDefaultConstraint</enum>
-        </property>
-        <item>
-         <spacer name="HS4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>32</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <spacer name="HS2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="SelectedObject">
-          <property name="text">
-           <string>Selected Object</string>
-          </property>
-          <property name="scaledContents">
-           <bool>false</bool>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::NoTextInteraction</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="HS3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="SelectNextObject">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="text">
-           <string notr="true"/>
-          </property>
-          <property name="icon">
-           <iconset resource="stars.qrc">
-            <normaloff>:/Toolbar/Percent</normaloff>:/Toolbar/Percent</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QGraphicsView" name="Inspector">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>1200</width>
-          <height>450</height>
-         </size>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QAbstractScrollArea::AdjustIgnored</enum>
-        </property>
-       </widget>
-      </item>
-     </layout>
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>GroupBox</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -1435,7 +1435,7 @@
     <property name="title">
      <string>Report</string>
     </property>
-    <widget class="QMenu" name="menuDump_to_text_file">
+    <widget class="QMenu" name="menuDumpTextFile">
      <property name="font">
       <font>
        <pointsize>12</pointsize>
@@ -1456,7 +1456,7 @@
     <addaction name="separator"/>
     <addaction name="actionScore"/>
     <addaction name="separator"/>
-    <addaction name="menuDump_to_text_file"/>
+    <addaction name="menuDumpTextFile"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1508,6 +1508,13 @@
    <addaction name="actionPercentView"/>
    <addaction name="actionPopulationView"/>
    <addaction name="actionNoPlayerInfoView"/>
+   <addaction name="actionAddWaypoint"/>
+   <addaction name="actionPathOverlay"/>
+   <addaction name="actionShipCount"/>
+   <addaction name="actionFleetPathsOverlay"/>
+   <addaction name="actionFriendlies"/>
+   <addaction name="actionFoes"/>
+   <addaction name="actionZoom"/>
   </widget>
   <widget class="QToolBar" name="SpaceInfo">
    <property name="windowTitle">
@@ -2176,6 +2183,147 @@
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionAddWaypoint">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Waypoint</normaloff>:/Toolbar/Waypoint</iconset>
+   </property>
+   <property name="text">
+    <string>Add way points mode</string>
+   </property>
+   <property name="iconText">
+    <string>Add way points mode</string>
+   </property>
+   <property name="toolTip">
+    <string>Add way points mode</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actionFleetPathsOverlay">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Waiting</normaloff>:/Toolbar/Waiting</iconset>
+   </property>
+   <property name="text">
+    <string>Idle fleets filter</string>
+   </property>
+   <property name="toolTip">
+    <string>Idle fleets filter</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actionShipCount">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Orbiting</normaloff>:/Toolbar/Orbiting</iconset>
+   </property>
+   <property name="text">
+    <string>ShipCount</string>
+   </property>
+   <property name="toolTip">
+    <string>Ship counts overlay</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actionFriendlies">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Friendlies</normaloff>:/Toolbar/Friendlies</iconset>
+   </property>
+   <property name="text">
+    <string>Friendlies</string>
+   </property>
+   <property name="toolTip">
+    <string>Show friendly fleets</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actionFoes">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Foes</normaloff>:/Toolbar/Foes</iconset>
+   </property>
+   <property name="text">
+    <string>Foes</string>
+   </property>
+   <property name="toolTip">
+    <string>Show enemy ships</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actionZoom">
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Zoomlevel</normaloff>:/Toolbar/Zoomlevel</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actionPathOverlay">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="stars.qrc">
+     <normaloff>:/Toolbar/Paths</normaloff>:/Toolbar/Paths</iconset>
+   </property>
+   <property name="text">
+    <string>PathOverlay</string>
+   </property>
+   <property name="toolTip">
+    <string>Show fleet paths</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
  </widget>
