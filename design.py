@@ -4,6 +4,39 @@ class Design:
 
     Style_0 = """
 
+             QPlainTextEdit {
+                 padding: 10px 10px 10px 10px;
+                 border: 1px solid rgb(120,120,120);
+                 border-radius: 6px;
+                 font-size: 16pt;
+                 font-weight: 400;
+                 background-color: white;
+             }
+
+             QLabel {
+                 padding: 5px 10px 5px 10px;
+                 font-size: 18pt;
+                 font-weight: 600;
+                 background-color: white;
+             }
+
+             QPushButton {
+                 padding: 5px 10px 5px 10px;
+                 font-size: 16pt;
+                 font-weight: 400;
+                 border: 1.5px solid rgb(120,120,120);
+                 border-radius: 6px;
+                 background-color: white;
+             }
+
+             QStatusBar {
+                 background: rgb(243,243,243);
+                 color: black;
+                 font-style: italic;
+                 font-size: 16pt;
+                 font-weight: 600;
+             }
+
              QSpinBox {
                  font-size: 24px;
                  font-style: italic;
@@ -42,9 +75,9 @@ class Design:
              }
 
              QMenu::separator {
-                 width: 1.5px;
-                 height: 1.5px;
-                 background-color: #000;
+                 width: 1.0px;
+                 height: 1.0px;
+                 background-color: rgb(0,0,0);
              }
 
              QMenu::item::selected {
