@@ -96,7 +96,37 @@ class Gui(QtWidgets.QMainWindow):
         self.actionZoom.setText(_translate("GUI", "Zoom"))
         self.actionPathOverlay.setText(_translate("GUI", "PathOverlay"))
         self.actionPathOverlay.setToolTip(_translate("GUI", "Show fleet paths"))
-            
+
+
+    def UpdateFriendlyDesigns(self, DesignData):
+
+        self.FriendFilter.clear()
+        self.AllFriends = self.FriendFilter.addAction( 'All Designs' )
+        self.InvertFriends = self.FriendFilter.addAction( 'Invert Filter' )
+        self.NoFriends = self.FriendFilter.addAction( 'No Designs' )
+        self.FriendFilter.addSeparator()
+        self.FriendlyDesigns.clear()
+        for NewDesign in DesignData:
+            NewAction = self.FriendFilter.addAction(NewDesign)
+            NewAction.setCheckable(True)
+            NewAction.setChecked(True)
+            self.FriendlyDesigns[NewDesign] = NewAction
+
+
+    def UpdateEnemyDesigns(self, DesignData):
+
+        self.FoeFilter.clear()
+        self.AllFoes = self.FoeFilter.addAction('All Designs')
+        self.InvertFoes = self.FoeFilter.addAction('Invert Filter')
+        self.NoFoes = self.FoeFilter.addAction('No Designs')
+        self.FoeFilter.addSeparator()
+        self.EnemyDesigns.clear()
+        for NewDesign in DesignData:
+            NewAction = self.FoeFilter.addAction(NewDesign)
+            NewAction.setCheckable(True)
+            NewAction.setChecked(True)
+            self.EnemyDesigns[NewDesign] = NewAction
+
 
     def SetupUI(self, design):
 
@@ -223,6 +253,9 @@ class Gui(QtWidgets.QMainWindow):
         GridLayout.addLayout(Inspector_VL, 1, 1, 1, 1)
         self.setCentralWidget(self.CentralWidget)
 #
+        self.FriendlyDesigns = dict()
+        self.EnemyDesigns = dict()
+#
         Buttons = ToolBar(self)
 #        Buttons.setAutoFillBackground(True)
         Buttons.setMovable(False)
@@ -231,5 +264,12 @@ class Gui(QtWidgets.QMainWindow):
         self.setMenuBar(Menu(self))
         self.statusbar = QtWidgets.QStatusBar(self)
         self.setStatusBar(self.statusbar)
+#
+        self.UpdateFriendlyDesigns([])
+        self.UpdateEnemyDesigns(
+            ['Colony Ships', 'Freighters', 'Scouts', 'Warships', 'Utility Ships',
+              'Bombers', 'Mining Ships', 'Fuel Transports']
+        )
+#
 
         self.retranslateUi(self)

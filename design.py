@@ -41,6 +41,12 @@ class Design:
                  padding: 5px 25px 5px 15px;
              }
 
+             QMenu::separator {
+                 width: 1.5px;
+                 height: 1.5px;
+                 background-color: #000;
+             }
+
              QMenu::item::selected {
                  background-color: rgb(240,240,240);
                  color: rgb(0,0,0);
