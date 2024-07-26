@@ -16,7 +16,7 @@
     <file alias="Default">Images/Toolbar/default.svg</file>
     <file alias="Percent">Images/Toolbar/percent.svg</file>
     <file alias="Surface">Images/Toolbar/surface.svg</file>
-    <file alias="Mine">Images/Toolbar/mine.bmp</file>
+    <file alias="Mine">Images/Toolbar/mine.svg</file>
     <file alias="People">Images/Toolbar/growth.svg</file>
   </qresource>
   <qresource prefix="Menu">
