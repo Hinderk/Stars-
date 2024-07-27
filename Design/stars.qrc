@@ -9,7 +9,7 @@
     <file alias="Orbiting">Images/Toolbar/orbit.svg</file>
     <file alias="Names">Images/Toolbar/names.svg</file>
     <file alias="Waiting">Images/Toolbar/standby.svg</file>
-    <file alias="Scanner">Images/Toolbar/scanner.bmp</file>
+    <file alias="Scanner">Images/Toolbar/radar.svg</file>
     <file alias="Cancel">Images/Toolbar/cancel.svg</file>
     <file alias="Minerals">Images/Toolbar/minerals.svg</file>
     <file alias="Waypoint">Images/Toolbar/add.svg</file>
