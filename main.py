@@ -1,6 +1,6 @@
 
 import sys
-import stars_ui
+# import stars_ui
 import stars_rc
 
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMenu
@@ -13,12 +13,12 @@ from design import Design
 
 
 
-class Stars(QMainWindow, stars_ui.Ui_GUI):
-
-    def __init__(self):
-        super(self.__class__, self).__init__()
-        self.setStyleSheet(Design().getStyle())
-        self.setupUi(self)  # This has been defined in 'stars_ui.py'
+# class Stars(QMainWindow, stars_ui.Ui_GUI):
+#
+#    def __init__(self):
+#        super(self.__class__, self).__init__()
+#        self.setStyleSheet(Design().getStyle())
+#        self.setupUi(self)  # This has been defined in 'stars_ui.py'
 
 
 
