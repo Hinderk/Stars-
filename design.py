@@ -4,6 +4,15 @@ class Design:
 
     Style_0 = """
 
+             QCheckBox {
+                 spacing: 0px;
+             }
+
+             QCheckBox::indicator {
+                 width: 20px;
+                 height: 20px;
+             }
+
              QPlainTextEdit {
                  padding: 10px 10px 10px 10px;
                  border: 1px solid rgb(120,120,120);
@@ -72,6 +81,15 @@ class Design:
                  color: rgb(0,0,0);
                  font-size: 18px;
                  padding: 5px 25px 5px 15px;
+             }
+
+             QMenu::indicator:unchecked {
+                 width: 30px;
+             }
+
+             QMenu::indicator:checked {
+                 width: 20px;
+                 padding: 0px 0px 0px 10px;
              }
 
              QMenu::separator {

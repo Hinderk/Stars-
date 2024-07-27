@@ -15,8 +15,9 @@ class ToolBar(QtWidgets.QToolBar):
         Instant = QtWidgets.QToolButton.ToolButtonPopupMode.InstantPopup
 
         MineFilter = QtWidgets.QMenu(self)
-        self.AllMines = MineFilter.addAction('All Mine Fields')
-        self.NoMines = MineFilter.addAction('No Mine Fields')
+        MineFilter.setStyleSheet("QMenu::item{padding: 5px 40px 5px 0px}")
+        self.AllMines = MineFilter.addAction('   All Mine Fields')
+        self.NoMines = MineFilter.addAction('   No Mine Fields')
         MineFilter.addSeparator()
         self.YourMines = MineFilter.addAction('Mine Fields of Yours')
         self.FriendlyMines = MineFilter.addAction('Mine Fields of Friends')
@@ -122,10 +123,12 @@ class ToolBar(QtWidgets.QToolBar):
         self.actionFriendlies.setToolTip("Show friendly fleets ...")
         self.actionFriendlies.setStatusTip("Show only friendly fleets on the star map ...")
         self.FriendFilter = QtWidgets.QMenu(self)
+        self.FriendFilter.setStyleSheet("QMenu::item{padding: 5px 45px 5px 0px}")
         self.actionFriendlies.setMenu(self.FriendFilter)
 
         Icon = QtGui.QIcon(":/Toolbar/Foes")
         self.FoeFilter = QtWidgets.QMenu(self)
+        self.FoeFilter.setStyleSheet("QMenu::item{padding: 5px 45px 5px 0px}")
         self.actionFoes = QtWidgets.QToolButton(self)
         self.actionFoes.setCheckable(True)
         self.actionFoes.setIcon(Icon)
@@ -143,6 +146,7 @@ class ToolBar(QtWidgets.QToolBar):
         Zoom.setStatusTip("Define the level of magnification ...")
         self.actionZoom = dict()
         Menu = QtWidgets.QMenu(self)
+        Menu.setStyleSheet("QMenu::item { padding: 5px 30px 5px 0px }")
         self.DefineZoomLevel(Menu, ['25%', '50%', '75%', '100%', '125%', '150%', '200%', '400%'])
         Zoom.setMenu(Menu)
         self.actionZoom['100%'].setChecked(True)
@@ -201,9 +205,9 @@ class ToolBar(QtWidgets.QToolBar):
     def UpdateFriendlyDesigns(self, DesignData):
 
         self.FriendFilter.clear()
-        self.AllFriends = self.FriendFilter.addAction( 'All Designs' )
-        self.InvertFriends = self.FriendFilter.addAction( 'Invert Filter' )
-        self.NoFriends = self.FriendFilter.addAction( 'No Designs' )
+        self.AllFriends = self.FriendFilter.addAction('   All Designs')
+        self.InvertFriends = self.FriendFilter.addAction('   Invert Filter')
+        self.NoFriends = self.FriendFilter.addAction('   No Designs')
         self.FriendFilter.addSeparator()
         self.FriendlyDesigns.clear()
         for NewDesign in DesignData:
@@ -216,9 +220,9 @@ class ToolBar(QtWidgets.QToolBar):
     def UpdateEnemyDesigns(self, DesignData):
 
         self.FoeFilter.clear()
-        self.AllFoes = self.FoeFilter.addAction('All Designs')
-        self.InvertFoes = self.FoeFilter.addAction('Invert Filter')
-        self.NoFoes = self.FoeFilter.addAction('No Designs')
+        self.AllFoes = self.FoeFilter.addAction('   All Designs')
+        self.InvertFoes = self.FoeFilter.addAction('   Invert Filter')
+        self.NoFoes = self.FoeFilter.addAction('   No Designs')
         self.FoeFilter.addSeparator()
         self.EnemyDesigns.clear()
         for NewDesign in DesignData:

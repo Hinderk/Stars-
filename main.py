@@ -28,14 +28,7 @@ def main():
 # form = Stars()                 # Create the main user interface
     form = Gui()                 # Create the main user interface
 
-#    SInfo.UpdateFriendlyDesigns(['A', 'B', 'C'])
-
-#    FoeFilter = QMenu(form)
-#    form.actionFoes.setMenu(FoeFilter)
-#    FoeFilter.addAction('All Designs')
-#    FoeFilter.addAction('Invert Filter')
-#    FoeFilter.addAction('No Designs')
-#    FoeFilter.addSeparator()
+    form.Buttons.UpdateFriendlyDesigns(['A - This is a very long name ...', 'B', 'C'])
 
     Rules = Ruleset()
     Terra = Planet(Rules)
