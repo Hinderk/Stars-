@@ -19,12 +19,8 @@
     <file alias="Mine">Images/Toolbar/mine.svg</file>
     <file alias="People">Images/Toolbar/growth.svg</file>
   </qresource>
-  <qresource prefix="Menu">
-    <file alias="NewGame">Images/Menu/new.png</file>
-    <file alias="OpenGame">Images/Menu/open.png</file>
-    <file alias="SaveGame">Images/Menu/save.png</file>
-  </qresource>
   <qresource prefix="Icons">
     <file alias="Stars">Images/Icons/stars.ico</file>
+    <file alias="Triangle">Images/Icons/switch.svg</file>
   </qresource>
 </RCC>
