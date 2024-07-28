@@ -24,9 +24,9 @@ class Planet:
 
     self.Name = Rules.FindName()      # The name of the solar system
 
-    self.Radioactivity = Rules.Random(0, 100, 10)      # These parameters may be modified via
-    self.Gravity = Rules.Random(0, 8, 1)               # terraforming technologies and influence
-    self.Temperature = Rules.Random(-200, 250, 0)      # population density & growth
+    self.Radioactivity = Rules.Random(0, 100, 50)      # These parameters may be modified via
+    self.Gravity = 64.0 ** Rules.Random(-0.5, 0.5, 0)  # terraforming technologies and influence
+    self.Temperature = Rules.Random(-200, 200, 0)      # population density & growth
 
     self.Crust = Minerals(Rules)                       # Create a random amount of minerals
     self.Explored = Minerals()                         # inside the planet's crust and - for

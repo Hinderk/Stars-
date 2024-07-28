@@ -18,10 +18,10 @@ class Ruleset :
         return 2400
 
     def GetMaxResources(self):
-        return 100000.0
+        return 100.0
 
     def GetMinResources( self ) :
-        return 1000.0
+        return 5.0
 
     def GetResources( self ) :
-        return 70000.0
+        return 70.0

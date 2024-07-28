@@ -9,7 +9,7 @@ from gui import Gui
 from planet import Planet
 from ruleset import Ruleset
 from inspector import Inspector
-from design import Design
+from race import Race
 
 
 
@@ -32,14 +32,20 @@ def main():
 
     Rules = Ruleset()
     Terra = Planet(Rules)
+    People = Race()
 
-    PlanetInfo = Inspector(Terra)
+    PlanetInfo = Inspector(Terra, People)
 
     form.Inspector.setScene(PlanetInfo)
     Terra.Mined.Ironium = 45000
     Terra.Mined.Boranium = 2500
     Terra.Mined.Germanium = 15000
-    PlanetInfo.Update(Terra)
+    Terra.Crust.Boranium = 55.0
+    PlanetInfo.UpdateMinerals(Terra)
+
+    Terra.Gravity = 0.5
+
+    PlanetInfo.UpdateBiome(Terra)
 
 # PlanetInfo.sText[2].setVisible(False)
 

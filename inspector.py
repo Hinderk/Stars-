@@ -1,8 +1,9 @@
 
-from PyQt6.QtCore import QRectF
-from PyQt6.QtGui import QPen, QBrush, QColor, QPolygon
-from PyQt6.QtWidgets import QGraphicsScene, QGraphicsRectItem
-from PyQt6.QtWidgets import QGraphicsSimpleTextItem
+from PyQt6.QtCore import QRectF, QPointF
+from PyQt6.QtGui import QPen, QBrush, QColor, QPolygonF
+from PyQt6.QtWidgets import QGraphicsScene
+
+import math
 
 
 
@@ -13,91 +14,181 @@ class Inspector(QGraphicsScene):
   xMinerals = 0
   yMinerals = 120
   xWidth = 1000
-  yWidth = 120
+  yWidth = 100
   xOffset = 40
-  TextOffset = 2
+  TextOffset = 1
 
-  def __init__(self, planet):
+  def __init__(self, planet, race):
     super(self.__class__, self).__init__()
 
+    self.mConc = []
     self.sConc = []
     self.sText = []
     self.Biome = []
-    sConc = []
 
+    Data = []
+    Data.append(0.5 + math.log2(planet.Gravity) / 3.0)
+    Data.append(0.5 + planet.Temperature / 400.0)
+    Data.append(planet.Radioactivity / 100.0)
+
+    self.SetupColors()
+    self.PaintBackdrop(race)
+    self.InitBiome(planet)
+    self.InitMinerals(planet)
+
+
+  def InitBiome(self, planet):
+    Data = []
+    Data.append(0.5 + math.log2(planet.Gravity) / 3.0)
+    Data.append(0.5 + planet.Temperature / 400.0)
+    Data.append(planet.Radioactivity / 100.0)
+    caret = QPolygonF()
+    dy = self.yWidth / 12.0
+    caret << QPointF(0, 0) << QPointF(dy, dy)
+    caret << QPointF(0, dy + dy) << QPointF(-dy, dy)
+    yp = self.yInfo + dy
+    for n in (0, 1, 2):
+      xp = self.xWidth * Data[n]
+      mark = caret.translated(xp, yp)
+      self.Biome.append(self.addPolygon(mark, self.pen[n + 6], self.brush[n + 6]))
+      yp += 4 * dy
+
+
+  def InitMinerals(self, planet):
+    mConc = []
+    sConc = []
+    mConc.append(planet.Crust.Ironium)
+    mConc.append(planet.Crust.Boranium)
+    mConc.append(planet.Crust.Germanium)
     sConc.append(planet.Mined.Ironium)
     sConc.append(planet.Mined.Boranium)
     sConc.append(planet.Mined.Germanium)
-    black = QColor(0, 0, 0)
-    white = QColor(255, 255, 255)
+    textPen = QPen(QColor(255, 255, 255))
+    caret = QPolygonF()
+    dy = self.yWidth / 12.0
+    caret << QPointF(0, 0) << QPointF(dy, dy)
+    caret << QPointF(0, dy + dy) << QPointF(-dy, dy)
+    deltaY = self.yWidth / 17
+    yp = self.yMinerals + 2 * deltaY
+    for n in (0, 1, 2):
+      xlen = self.xWidth * sConc[n] / 5000.0
+      xp = self.xWidth * mConc[n] / 100.0
+      show = False
+      if xlen > self.xWidth:
+        show = True
+        xlen = self.xWidth
+      box = QRectF(self.xMinerals, yp, xlen, 3 * deltaY)
+      mark = caret.translated(xp, yp)
+      self.sConc.append(self.addRect(box, self.pen[n + 3], self.brush[n + 3]))
+      self.mConc.append(self.addPolygon(mark, self.pen[n + 9], self.brush[n + 9]))
+      label = self.addSimpleText(str(sConc[n]))
+      label.setPos(self.xMinerals + self.xOffset, yp + self.TextOffset)
+      label.setPen(textPen)
+      label.setVisible(show)
+      self.sText.append(label)
+      yp += 5 * deltaY
+
+
+  def UpdateMinerals(self, planet):
+    sConc = []
+    mConc = []
+    mConc.append(planet.Crust.Ironium / 100.0)
+    mConc.append(planet.Crust.Boranium / 100.0)
+    mConc.append(planet.Crust.Germanium / 100.0)
+    sConc.append(planet.Mined.Ironium)
+    sConc.append(planet.Mined.Boranium)
+    sConc.append(planet.Mined.Germanium)
+    deltaY = self.yWidth / 17
+    yp = self.yMinerals + 2 * deltaY
+    for n in (0, 1, 2):
+      caret = self.mConc[n].polygon()
+      dx = self.xWidth * mConc[n] - caret.first().x()
+      caret.translate(dx, 0)
+      self.mConc[n].setPolygon(caret)
+      show = False
+      xlen = self.xWidth * sConc[n] / 5000.0
+      if xlen > self.xWidth:
+        show = True
+        xlen = self.xWidth - 1
+      self.sConc[n].setRect(self.xMinerals, yp, xlen, 3 * deltaY)
+      self.sText[n].setVisible(show)
+      self.sText[n].setText(str(sConc[n]))
+      yp += 5 * deltaY
+
+
+  def UpdateBiome(self, planet):
+    Data = []
+    Data.append(0.5 + math.log2(planet.Gravity) / 6.0)
+    Data.append(0.5 + planet.Temperature / 400.0)
+    Data.append(planet.Radioactivity / 100.0)
+    for n in (0, 1, 2):
+      caret = self.Biome[n].polygon()
+      dx = self.xWidth * Data[n] - caret.first().x()
+      caret.translate(dx, 0)
+      self.Biome[n].setPolygon(caret)
+
+
+  def SetupColors(self):
+    blue = QColor(0, 0, 255, 120)
+    green = QColor(0, 255, 0, 140)
+    yellow = QColor(255, 255, 0, 160)
+    red = QColor(255, 0, 0, 180)
+    self.pen = [QPen(blue), QPen(red), QPen(green), QPen(blue), QPen(green), QPen(yellow)]
+    self.brush = [QBrush(blue), QBrush(red), QBrush(green), QBrush(blue), QBrush(green), QBrush(yellow)]
     blue = QColor(0, 0, 255)
     green = QColor(0, 255, 0)
     yellow = QColor(255, 255, 0)
+    red = QColor(255, 0, 0)
+    self.pen.append(QPen(blue))
+    self.pen.append(QPen(red))
+    self.pen.append(QPen(green))
+    self.pen.append(QPen(blue))
+    self.pen.append(QPen(green))
+    self.pen.append(QPen(yellow))
+    self.brush.append(QBrush(blue))
+    self.brush.append(QBrush(red))
+    self.brush.append(QBrush(green))
+    self.brush.append(QBrush(blue))
+    self.brush.append(QBrush(green))
+    self.brush.append(QBrush(yellow))
+
+
+  def PaintBackdrop(self, race):
+    black = QColor(0, 0, 0)
+    white = QColor(255, 255, 255, 150)
     whitePen = QPen(white)
     blackPen = QPen(black)
-    tpen = (QPen(white), blackPen, blackPen)
-    pen = (QPen(blue), QPen(green), QPen(yellow))
-    brush = (QBrush(blue), QBrush(green), QBrush(yellow))
-    caret = QPolygon()
     blackBrush = QBrush(black)
     whitePen.setWidth(2)
     deltaX = self.xWidth / 10
-    deltaY = self.yWidth / 17
-    Minerals = QRectF(self.xMinerals, self.yMinerals, self.xWidth, self.yWidth)
-
-    Info = QRectF(self.xInfo, self.yInfo, self.xWidth, 3 * deltaY)
+    deltaY = self.yWidth / 3
+    Info = QRectF(self.xInfo, self.yInfo, self.xWidth, self.yWidth)
     self.addRect(Info, blackPen, blackBrush)
     xp = self.xInfo + self.xWidth
-    yp = self.yInfo + 3 * deltaY + 2
+    yp = self.yInfo + deltaY
     self.addLine(self.xInfo, yp, xp, yp, whitePen)
-    yp += 2
-    Info = QRectF(self.xInfo, yp, self.xWidth, 3 * deltaY)
-    self.addRect(Info, blackPen, blackBrush)
-    yp += 2 + 3 * deltaY
+    yp += deltaY
     self.addLine(self.xInfo, yp, xp, yp, whitePen)
-    yp += 2
-    Info = QRectF(self.xInfo, yp, self.xWidth, 3 * deltaY)
-    self.addRect(Info, blackPen, blackBrush)
-
+    Minerals = QRectF(self.xMinerals, self.yMinerals, self.xWidth, self.yWidth)
     self.addRect(Minerals, blackPen, blackBrush)
     xp = self.xMinerals
     yp = self.yMinerals + self.yWidth
     for n in range(0, 10):
       xp += deltaX
       self.addLine(xp, self.yMinerals, xp, yp, whitePen)
-    yp = self.yMinerals + 2 * deltaY
+    MinVal = []
+    MaxVal = []
+    MinVal.append(0.5 + math.log2(race.MinGravity) / 6.0)
+    MinVal.append(0.5 + race.MinTemperatur / 400.0)
+    MinVal.append(race.MinRadioactivity / 100.0)
+    MaxVal.append(0.5 + math.log2(race.MaxGravity) / 6.0)
+    MaxVal.append(0.5 + race.MaxTemperatur / 400.0)
+    MaxVal.append(race.MaxRadioactivity / 100.0)
+    deltaY = self.yWidth / 12
+    yp = self.yInfo + deltaY
     for n in (0, 1, 2):
-      xlen = self.xWidth * sConc[n] / 5000.0
-      show = False
-      if xlen > self.xWidth:
-        show = True
-        xlen = self.xWidth
-      box = QRectF(self.xMinerals, yp, xlen, 3 * deltaY)
-      self.sConc.append( self.addRect(box, pen[n], brush[n]))
-      label = self.addSimpleText(str(sConc[n]))
-      label.setPos(self.xMinerals + self.xOffset, yp + self.TextOffset)
-      label.setPen(tpen[n])
-      label.setVisible(show)
-      self.sText.append(label)
-      yp += 5 * deltaY
-      
-      
-  def Update(self, planet):
-    sConc = []
-    sConc.append(planet.Mined.Ironium)
-    sConc.append(planet.Mined.Boranium)
-    sConc.append(planet.Mined.Germanium)
-    deltaY = self.yWidth / 17
-    yp = self.yMinerals + 2 * deltaY
-    for n in (0, 1, 2):
-      xlen = self.xWidth * sConc[n] / 5000.0
-      show = False
-      if xlen > self.xWidth:
-        show = True
-        xlen = self.xWidth
-      self.sConc[n].setRect(self.xMinerals, yp, xlen, 3 * deltaY)
-      self.sText[n].setVisible(show)
-      self.sText[n].setText(str(sConc[n]))
-      yp += 5 * deltaY
-      
-    
+      xp = self.xInfo + self.xWidth * MinVal[n]
+      xlen = self.xWidth * (MaxVal[n] - MinVal[n])
+      box = QRectF(xp, yp, xlen, 2 * deltaY)
+      self.addRect(box, self.pen[n], self.brush[n])
+      yp += 4 * deltaY
