@@ -1,6 +1,6 @@
 
 from PyQt6.QtCore import QRectF, QPointF
-from PyQt6.QtGui import QPen, QBrush, QColor, QPolygonF
+from PyQt6.QtGui import QPen, QBrush, QColor, QPolygonF, QFont
 from PyQt6.QtWidgets import QGraphicsScene
 
 import math
@@ -9,14 +9,17 @@ import math
 
 class Inspector(QGraphicsScene):
 
-  xInfo = 0
+  xInfo = 130
   yInfo = 0
-  xMinerals = 0
+  xMinerals = 130
   yMinerals = 120
   xWidth = 1000
   yWidth = 100
   xOffset = 40
   TextOffset = 1
+  LeftOffset = 5
+  BottomOffset = 5
+
 
   def __init__(self, planet, race):
     super(self.__class__, self).__init__()
@@ -35,6 +38,50 @@ class Inspector(QGraphicsScene):
     self.PaintBackdrop(race)
     self.InitBiome(planet)
     self.InitMinerals(planet)
+    self.AddStaticText()
+
+
+  def AddStaticText(self):
+    deltaY = self.yWidth / 3
+    font = QFont('Segoe', pointSize=16, weight=400)
+    Gravity = self.addSimpleText("Gravity", font)
+    width = Gravity.boundingRect().width() + self.LeftOffset
+    height = self.yWidth - 3 * Gravity.boundingRect().height()
+    yp = self.yInfo + height / 6.0
+    Gravity.moveBy(self.xInfo - width, yp)
+    yp += deltaY
+    Temperature = self.addSimpleText("Temperature", font)
+    width = Temperature.boundingRect().width() + self.LeftOffset
+    Temperature.moveBy(self.xInfo - width, yp)
+    yp += deltaY
+    Radiation = self.addSimpleText("Radiation", font)
+    width = Radiation.boundingRect().width() + self.LeftOffset
+    Radiation.moveBy(self.xInfo - width, yp)
+    deltaY = self.yWidth / 17
+    yp = self.yMinerals + deltaY
+    Ironium = self.addSimpleText("Ironium", font)
+    width = Ironium.boundingRect().width() + self.LeftOffset
+    Ironium.moveBy(self.xMinerals - width, yp)
+    yp += 5 * deltaY
+    Boranium = self.addSimpleText("Boranium", font)
+    width = Boranium.boundingRect().width() + self.LeftOffset
+    Boranium.moveBy(self.xMinerals - width, yp)
+    yp += 5 * deltaY
+    Germanium = self.addSimpleText("Germanium", font)
+    width = Germanium.boundingRect().width() + self.LeftOffset
+    Germanium.moveBy(self.xMinerals - width, yp)
+    kt = 0
+    xp = self.xMinerals
+    yp = self.yMinerals + self.yWidth + self.BottomOffset
+    for i in range(11):
+      label = self.addSimpleText(str(kt), font)
+      kt += 500
+      dx = label.boundingRect().width() / 2
+      label.moveBy(xp - dx, yp)
+      xp += self.xWidth / 10
+    label = self.addSimpleText("kt", font)
+    xp = label.boundingRect().width() + 3 * self.LeftOffset
+    label.moveBy(self.xMinerals - xp, yp)
 
 
   def InitBiome(self, planet):
