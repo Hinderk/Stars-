@@ -1348,7 +1348,7 @@ ine points=\x22 135\
 0000\x22 stroke-wid\
 th=\x228px\x22/>\x0a</g>\x0a\
 </svg>\x0a\
-\x00\x00\x02m\
+\x00\x00\x03*\
 <\
 ?xml version=\x221.\
 0\x22 encoding=\x22UTF\
@@ -1357,8 +1357,8 @@ no\x22?>\x0a<!-- Creat\
 or: fig2dev Vers\
 ion 3.2.8b -->\x0a<\
 !-- CreationDate\
-: 2024-07-28 17:\
-51:57 -->\x0a<!-- M\
+: 2024-08-03 11:\
+28:31 -->\x0a<!-- M\
 agnification: 1.\
 05 -->\x0a<svg\x09xmln\
 s=\x22http://www.w3\
@@ -1373,22 +1373,197 @@ x=\x22-1822 -1822 3\
 ll=\x22none\x22>\x0a<!-- \
 Line -->\x0a<polyli\
 ne points=\x22 1800\
-,1800 1607,1706 \
-1369,1602 1068,1\
-506 866,1450 657\
-,1409 444,1377 2\
-38,1359\x0a 18,1348\
- -183,1357 -451,\
-1379 -723,1417 -\
-961,1473 -1197,1\
-544 -1391,1611 -\
-1615,1706\x0a -1800\
-,1800 0,-1800 18\
-00,1800\x22 fill=\x22#\
-ffff00\x22\x0a\x09stroke=\
-\x22#ffd600\x22 stroke\
--width=\x2215px\x22/>\x0a\
-</g>\x0a</svg>\x0a\
+,1800 1705,1752 \
+1606,1704 1491,1\
+653 1388,1612 12\
+94,1576 1220,155\
+1 1140,1525\x0a 106\
+2,1502 969,1475 \
+866,1450 771,142\
+9 685,1412 608,1\
+399 538,1388 443\
+,1377 339,1365\x0a \
+237,1357 125,135\
+2 16,1350 -83,13\
+51 -186,1355 -32\
+5,1364 -453,1377\
+ -593,1395 -723,\
+1417\x0a -854,1444 \
+-962,1473 -1084,\
+1508 -1199,1543 \
+-1298,1577 -1391\
+,1611 -1504,1658\
+ -1617,1707\x0a -17\
+19,1757 -1800,18\
+00 0,-1800 1800,\
+1800\x22 fill=\x22#ffd\
+600\x22\x0a\x09stroke=\x22#f\
+f0000\x22 stroke-wi\
+dth=\x2215px\x22/>\x0a</g\
+>\x0a</svg>\x0a\
+\x00\x00\x0a\x09\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22UTF\
+-8\x22 standalone=\x22\
+no\x22?>\x0a<!-- Creat\
+or: fig2dev Vers\
+ion 3.2.8b -->\x0a<\
+!-- CreationDate\
+: 2024-08-03 11:\
+55:15 -->\x0a<!-- M\
+agnification: 1.\
+05 -->\x0a<svg\x09xmln\
+s=\x22http://www.w3\
+.org/2000/svg\x22\x0a\x09\
+xmlns:xlink=\x22htt\
+p://www.w3.org/1\
+999/xlink\x22\x0a\x09widt\
+h=\x22250pt\x22 height\
+=\x22249pt\x22\x0a\x09viewBo\
+x=\x22-1983 -1974 3\
+964 3947\x22>\x0a<g fi\
+ll=\x22none\x22>\x0a<!-- \
+Circle -->\x0a<circ\
+le cx=\x220\x22 cy=\x220\x22\
+ r=\x221786\x22\x0a\x09strok\
+e=\x22#000000\x22 stro\
+ke-width=\x2275px\x22/\
+>\x0a<!-- Circle --\
+>\x0a<circle cx=\x22-6\
+95\x22 cy=\x22-1619\x22 r\
+=\x22290\x22 fill=\x22#00\
+8f8f\x22\x0a\x09stroke=\x22#\
+000000\x22 stroke-w\
+idth=\x2275px\x22/>\x0a<!\
+-- Circle -->\x0a<c\
+ircle cx=\x22-1620\x22\
+ cy=\x22-675\x22 r=\x2231\
+8\x22 fill=\x22#008f8f\
+\x22\x0a\x09stroke=\x22#0000\
+00\x22 stroke-width\
+=\x2275px\x22/>\x0a<!-- C\
+ircle -->\x0a<circl\
+e cx=\x22-1637\x22 cy=\
+\x22692\x22 r=\x22288\x22 fi\
+ll=\x22#008f8f\x22\x0a\x09st\
+roke=\x22#000000\x22 s\
+troke-width=\x2275p\
+x\x22/>\x0a<!-- Circle\
+ -->\x0a<circle cx=\
+\x22-695\x22 cy=\x221623\x22\
+ r=\x22305\x22 fill=\x22#\
+008f8f\x22\x0a\x09stroke=\
+\x22#000000\x22 stroke\
+-width=\x2275px\x22/>\x0a\
+<!-- Circle -->\x0a\
+<circle cx=\x221618\
+\x22 cy=\x22693\x22 r=\x2231\
+8\x22 fill=\x22#008f8f\
+\x22\x0a\x09stroke=\x22#0000\
+00\x22 stroke-width\
+=\x2275px\x22/>\x0a<!-- C\
+ircle -->\x0a<circl\
+e cx=\x22694\x22 cy=\x22-\
+1620\x22 r=\x22309\x22 fi\
+ll=\x22#008f8f\x22\x0a\x09st\
+roke=\x22#000000\x22 s\
+troke-width=\x2275p\
+x\x22/>\x0a<!-- Circle\
+ -->\x0a<circle cx=\
+\x221618\x22 cy=\x22-689\x22\
+ r=\x22317\x22 fill=\x22#\
+008f8f\x22\x0a\x09stroke=\
+\x22#000000\x22 stroke\
+-width=\x2275px\x22/>\x0a\
+<!-- Circle -->\x0a\
+<circle cx=\x22700\x22\
+ cy=\x221624\x22 r=\x2230\
+2\x22 fill=\x22#008f8f\
+\x22\x0a\x09stroke=\x22#0000\
+00\x22 stroke-width\
+=\x2275px\x22/>\x0a<!-- L\
+ine -->\x0a<polylin\
+e points=\x22 -1260\
+,-1035 990,1215 \
+1215,990 -1035,-\
+1260 -1260,-1035\
+\x22 fill=\x22#008f8f\x22\
+\x0a\x09stroke=\x22#00000\
+0\x22 stroke-width=\
+\x2275px\x22/>\x0a<!-- Li\
+ne -->\x0a<polyline\
+ points=\x22 1035,-\
+1215 -1215,1035 \
+-990,1260 1260,-\
+990 1035,-1215\x22 \
+fill=\x22#008f8f\x22\x0a\x09\
+stroke=\x22#000000\x22\
+ stroke-width=\x227\
+5px\x22/>\x0a<!-- Circ\
+le -->\x0a<circle c\
+x=\x220\x22 cy=\x220\x22 r=\x22\
+1620\x22\x0a\x09stroke=\x22#\
+008f8f\x22 stroke-w\
+idth=\x22285px\x22/>\x0a<\
+!-- Arc -->\x0a<pat\
+h d=\x22M -918,-111\
+2 A 1447 1447 0 \
+0 1 936 -1100\x22\x0a\x09\
+stroke=\x22#000000\x22\
+ stroke-width=\x227\
+5px\x22/>\x0a<!-- Arc \
+-->\x0a<path d=\x22M -\
+1104,925 A 1418 \
+1418 0 0 1 -1116\
+ -915\x22\x0a\x09stroke=\x22\
+#000000\x22 stroke-\
+width=\x2275px\x22/>\x0a<\
+!-- Arc -->\x0a<pat\
+h d=\x22M 1121,912 \
+A 1408 1408 0 0 \
+0 1146 -876\x22\x0a\x09st\
+roke=\x22#000000\x22 s\
+troke-width=\x2275p\
+x\x22/>\x0a<!-- Arc --\
+>\x0a<path d=\x22M -87\
+9,1149 A 1460 14\
+60 0 0 0 917 111\
+9\x22\x0a\x09stroke=\x22#000\
+000\x22 stroke-widt\
+h=\x2275px\x22/>\x0a<!-- \
+Arc -->\x0a<path d=\
+\x22M -401,-170 A 4\
+56 456 0 0 0 -37\
+8 194\x22\x0a\x09stroke=\x22\
+#000000\x22 stroke-\
+width=\x2275px\x22/>\x0a<\
+!-- Arc -->\x0a<pat\
+h d=\x22M -177,-388\
+ A 443 443 0 0 1\
+ 203 -378\x22\x0a\x09stro\
+ke=\x22#000000\x22 str\
+oke-width=\x2275px\x22\
+/>\x0a<!-- Arc -->\x0a\
+<path d=\x22M 396,-\
+141 A 323 323 0 \
+0 1 392 163\x22\x0a\x09st\
+roke=\x22#000000\x22 s\
+troke-width=\x2275p\
+x\x22/>\x0a<!-- Arc --\
+>\x0a<path d=\x22M -13\
+3,401 A 373 373 \
+0 0 0 168 389\x22\x0a\x09\
+stroke=\x22#000000\x22\
+ stroke-width=\x227\
+5px\x22/>\x0a<!-- Circ\
+le -->\x0a<circle c\
+x=\x220\x22 cy=\x220\x22 r=\x22\
+360\x22 fill=\x22#008f\
+8f\x22\x0a\x09stroke=\x22#00\
+8f8f\x22 stroke-wid\
+th=\x2275px\x22/>\x0a</g>\
+\x0a</svg>\x0a\
 \x00\x00\x02\xfe\
 \x00\
 \x00\x01\x00\x01\x00  \x10\x00\x00\x00\x00\x00\xe8\x02\x00\
@@ -1518,6 +1693,10 @@ qt_resource_name = b"\
 \x08\xf8IE\
 \x00T\
 \x00r\x00i\x00a\x00n\x00g\x00l\x00e\
+\x00\x08\
+\x0a\x88\x83\xd5\
+\x00S\
+\x00t\x00a\x00r\x00b\x00a\x00s\x00e\
 \x00\x05\
 \x00Z\xa8\x93\
 \x00S\
@@ -1527,7 +1706,7 @@ qt_resource_name = b"\
 qt_resource_struct = b"\
 \x00\x00\x00\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00\x01\
 \x00\x00\x00\x00\x00\x00\x00\x00\
-\x00\x00\x00\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00\x13\
+\x00\x00\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00\x13\
 \x00\x00\x00\x00\x00\x00\x00\x00\
 \x00\x00\x00\x10\x00\x02\x00\x00\x00\x10\x00\x00\x00\x03\
 \x00\x00\x00\x00\x00\x00\x00\x00\
@@ -1563,10 +1742,12 @@ qt_resource_struct = b"\
 \x00\x00\x01\x90\xaf\x05\xb3\xff\
 \x00\x00\x004\x00\x00\x00\x00\x00\x01\x00\x00\x03a\
 \x00\x00\x01\x90\xad\x1c)`\
-\x00\x00\x01r\x00\x00\x00\x00\x00\x01\x00\x00T\x1a\
+\x00\x00\x01\x88\x00\x00\x00\x00\x00\x01\x00\x00^\xe4\
 \x00\x00\x01\x90h\xf2\xeb\xf6\
 \x00\x00\x01\x5c\x00\x00\x00\x00\x00\x01\x00\x00Q\xa9\
-\x00\x00\x01\x90\xfa\x0a\x9ck\
+\x00\x00\x01\x91\x17\x91\xb6;\
+\x00\x00\x01r\x00\x00\x00\x00\x00\x01\x00\x00T\xd7\
+\x00\x00\x01\x91\x17\xaa3\x87\
 "
 
 def qInitResources():

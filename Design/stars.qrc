@@ -22,5 +22,6 @@
   <qresource prefix="Icons">
     <file alias="Stars">Images/Icons/stars.ico</file>
     <file alias="Triangle">Images/Icons/switch.svg</file>
+    <file alias="Starbase">Images/Icons/starbase.svg</file>
   </qresource>
 </RCC>
