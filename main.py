@@ -43,7 +43,9 @@ def main():
     Terra.Crust.Boranium = 55.0
     PlanetInfo.UpdateMinerals(Terra)
 
-    Terra.Gravity = 0.5
+    Terra.Gravity = 1 / 8
+    Terra.Temperature = -120.6
+    Terra.Radioactivity = 80.75
 
     PlanetInfo.UpdateBiome(Terra)
 

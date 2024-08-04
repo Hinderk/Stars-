@@ -10,15 +10,17 @@ import math
 class Inspector(QGraphicsScene):
 
   xInfo = 130
-  yInfo = 0
+  yInfo = 60
   xMinerals = 130
-  yMinerals = 120
+  yMinerals = 180
   xWidth = 1000
   yWidth = 100
   xOffset = 40
   TextOffset = 1
-  LeftOffset = 5
+  LeftOffset = 10
   BottomOffset = 5
+  RightOffset = 10
+  TopOffset = 5
 
 
   def __init__(self, planet, race):
@@ -34,29 +36,43 @@ class Inspector(QGraphicsScene):
     Data.append(0.5 + planet.Temperature / 400.0)
     Data.append(planet.Radioactivity / 100.0)
 
+    self.AddStaticText()
     self.SetupColors()
     self.PaintBackdrop(race)
     self.InitBiome(planet)
     self.InitMinerals(planet)
-    self.AddStaticText()
 
 
   def AddStaticText(self):
-    deltaY = self.yWidth / 3
     font = QFont('Segoe', pointSize=16, weight=400)
+    self.ReportAge = self.addSimpleText("Report is current.", font)
+    self.ReportAge.moveBy(self.xInfo, (self.yInfo-self.TopOffset) / 2 )
+    self.PlanetValue = self.addSimpleText("Value: 100%", font)
+    self.PlanetValue.moveBy(self.xInfo, 0)
+    self.Population = self.addSimpleText("Uninhabited", font)
+    width = self.xWidth - self.Population.boundingRect().width()
+    self.Population.moveBy(self.xInfo + width, 0)
+    xp = self.xInfo + self.xWidth + self.RightOffset
+    deltaY = self.yWidth / 3
     Gravity = self.addSimpleText("Gravity", font)
     width = Gravity.boundingRect().width() + self.LeftOffset
     height = self.yWidth - 3 * Gravity.boundingRect().height()
     yp = self.yInfo + height / 6.0
     Gravity.moveBy(self.xInfo - width, yp)
+    self.Gravity = self.addSimpleText("8.00g", font)
+    self.Gravity.moveBy(xp, yp)
     yp += deltaY
     Temperature = self.addSimpleText("Temperature", font)
     width = Temperature.boundingRect().width() + self.LeftOffset
     Temperature.moveBy(self.xInfo - width, yp)
+    self.Temperature = self.addSimpleText("250\u00B0C", font)
+    self.Temperature.moveBy(xp, yp)
     yp += deltaY
     Radiation = self.addSimpleText("Radiation", font)
     width = Radiation.boundingRect().width() + self.LeftOffset
     Radiation.moveBy(self.xInfo - width, yp)
+    self.Radiation = self.addSimpleText("100mR", font)
+    self.Radiation.moveBy(xp, yp)
     deltaY = self.yWidth / 17
     yp = self.yMinerals + deltaY
     Ironium = self.addSimpleText("Ironium", font)
@@ -150,7 +166,7 @@ class Inspector(QGraphicsScene):
     for n in (0, 1, 2):
       caret = self.mConc[n].polygon()
       dx = self.xWidth * mConc[n] - caret.first().x()
-      caret.translate(dx, 0)
+      caret.translate(self.xMinerals + dx, 0)
       self.mConc[n].setPolygon(caret)
       show = False
       xlen = self.xWidth * sConc[n] / 5000.0
@@ -171,8 +187,14 @@ class Inspector(QGraphicsScene):
     for n in (0, 1, 2):
       caret = self.Biome[n].polygon()
       dx = self.xWidth * Data[n] - caret.first().x()
-      caret.translate(dx, 0)
+      caret.translate(self.xInfo + dx, 0)
       self.Biome[n].setPolygon(caret)
+    g = int(planet.Gravity * 100 + 0.5) / 100
+    t = int(planet.Temperature + 300.5) - 300
+    r = int(planet.Radioactivity + 0.5)
+    self.Gravity.setText(str(g) + "g")
+    self.Temperature.setText(str(t) + "\u00B0C")
+    self.Radiation.setText(str(r) + "mR")
 
 
   def SetupColors(self):
