@@ -26,7 +26,7 @@ class Design:
                  padding: 5px 10px 5px 10px;
                  font-size: 18pt;
                  font-weight: 600;
-                 background-color: white;
+                 background-color: transparent;
              }
 
              QPushButton {

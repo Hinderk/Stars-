@@ -23,7 +23,7 @@ class Inspector(QGraphicsScene):
   TopOffset = 5
 
 
-  def __init__(self, planet, race):
+  def __init__(self, people):
     super(self.__class__, self).__init__()
 
     self.mConc = []
@@ -31,16 +31,16 @@ class Inspector(QGraphicsScene):
     self.sText = []
     self.Biome = []
 
-    Data = []
-    Data.append(0.5 + math.log2(planet.Gravity) / 3.0)
-    Data.append(0.5 + planet.Temperature / 400.0)
-    Data.append(planet.Radioactivity / 100.0)
+#    Data = []
+#    Data.append(0.5 + math.log2(planet.Gravity) / 3.0)
+#    Data.append(0.5 + planet.Temperature / 400.0)
+#    Data.append(planet.Radioactivity / 100.0)
 
     self.AddStaticText()
     self.SetupColors()
-    self.PaintBackdrop(race)
-    self.InitBiome(planet)
-    self.InitMinerals(planet)
+    self.PaintBackdrop(people)
+    self.InitBiome()
+    self.InitMinerals()
 
 
   def AddStaticText(self):
@@ -62,10 +62,10 @@ class Inspector(QGraphicsScene):
     self.Gravity = self.addSimpleText("8.00g", font)
     self.Gravity.moveBy(xp, yp)
     yp += deltaY
-    Temperature = self.addSimpleText("Temperature", font)
+    Temperature = self.addSimpleText(" Temperature", font)
     width = Temperature.boundingRect().width() + self.LeftOffset
     Temperature.moveBy(self.xInfo - width, yp)
-    self.Temperature = self.addSimpleText("250\u00B0C", font)
+    self.Temperature = self.addSimpleText("-250\u00B0CC", font)
     self.Temperature.moveBy(xp, yp)
     yp += deltaY
     Radiation = self.addSimpleText("Radiation", font)
@@ -100,32 +100,20 @@ class Inspector(QGraphicsScene):
     label.moveBy(self.xMinerals - xp, yp)
 
 
-  def InitBiome(self, planet):
-    Data = []
-    Data.append(0.5 + math.log2(planet.Gravity) / 3.0)
-    Data.append(0.5 + planet.Temperature / 400.0)
-    Data.append(planet.Radioactivity / 100.0)
+  def InitBiome(self):
     caret = QPolygonF()
     dy = self.yWidth / 12.0
     caret << QPointF(0, 0) << QPointF(dy, dy)
     caret << QPointF(0, dy + dy) << QPointF(-dy, dy)
     yp = self.yInfo + dy
     for n in (0, 1, 2):
-      xp = self.xWidth * Data[n]
+      xp = self.xWidth * 0.5
       mark = caret.translated(xp, yp)
       self.Biome.append(self.addPolygon(mark, self.pen[n + 6], self.brush[n + 6]))
       yp += 4 * dy
 
 
-  def InitMinerals(self, planet):
-    mConc = []
-    sConc = []
-    mConc.append(planet.Crust.Ironium)
-    mConc.append(planet.Crust.Boranium)
-    mConc.append(planet.Crust.Germanium)
-    sConc.append(planet.Mined.Ironium)
-    sConc.append(planet.Mined.Boranium)
-    sConc.append(planet.Mined.Germanium)
+  def InitMinerals(self):
     textPen = QPen(QColor(255, 255, 255))
     caret = QPolygonF()
     dy = self.yWidth / 12.0
@@ -134,8 +122,8 @@ class Inspector(QGraphicsScene):
     deltaY = self.yWidth / 17
     yp = self.yMinerals + 2 * deltaY
     for n in (0, 1, 2):
-      xlen = self.xWidth * sConc[n] / 5000.0
-      xp = self.xWidth * mConc[n] / 100.0
+      xlen = self.xWidth / 2
+      xp = self.xWidth
       show = False
       if xlen > self.xWidth:
         show = True
@@ -144,7 +132,7 @@ class Inspector(QGraphicsScene):
       mark = caret.translated(xp, yp)
       self.sConc.append(self.addRect(box, self.pen[n + 3], self.brush[n + 3]))
       self.mConc.append(self.addPolygon(mark, self.pen[n + 9], self.brush[n + 9]))
-      label = self.addSimpleText(str(sConc[n]))
+      label = self.addSimpleText(str(1000))
       label.setPos(self.xMinerals + self.xOffset, yp + self.TextOffset)
       label.setPen(textPen)
       label.setVisible(show)
@@ -222,7 +210,7 @@ class Inspector(QGraphicsScene):
     self.brush.append(QBrush(yellow))
 
 
-  def PaintBackdrop(self, race):
+  def PaintBackdrop(self, people):
     black = QColor(0, 0, 0)
     white = QColor(255, 255, 255, 150)
     whitePen = QPen(white)
@@ -247,12 +235,12 @@ class Inspector(QGraphicsScene):
       self.addLine(xp, self.yMinerals, xp, yp, whitePen)
     MinVal = []
     MaxVal = []
-    MinVal.append(0.5 + math.log2(race.MinGravity) / 6.0)
-    MinVal.append(0.5 + race.MinTemperatur / 400.0)
-    MinVal.append(race.MinRadioactivity / 100.0)
-    MaxVal.append(0.5 + math.log2(race.MaxGravity) / 6.0)
-    MaxVal.append(0.5 + race.MaxTemperatur / 400.0)
-    MaxVal.append(race.MaxRadioactivity / 100.0)
+    MinVal.append(0.5 + math.log2(people.MinGravity) / 6.0)
+    MinVal.append(0.5 + people.MinTemperatur / 400.0)
+    MinVal.append(people.MinRadioactivity / 100.0)
+    MaxVal.append(0.5 + math.log2(people.MaxGravity) / 6.0)
+    MaxVal.append(0.5 + people.MaxTemperatur / 400.0)
+    MaxVal.append(people.MaxRadioactivity / 100.0)
     deltaY = self.yWidth / 12
     yp = self.yInfo + deltaY
     for n in (0, 1, 2):
