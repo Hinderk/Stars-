@@ -1,10 +1,13 @@
 
 from PyQt6 import QtWidgets, QtGui, QtCore
-from PyQt6.QtWidgets import QWidget
+from PyQt6.QtWidgets import QWidget, QStackedLayout
+from PyQt6.QtWidgets import QGraphicsView, QVBoxLayout
 from design import Design
 from menubar import Menu
 from toolbar import ToolBar
+from ruleset import Ruleset
 from inspector import Inspector
+from universe import Universe
 
 #import stars_rc
 #import os
@@ -31,43 +34,44 @@ class Gui(QtWidgets.QMainWindow):
         design = Design()
         self.setStyleSheet(design.getStyle())
         self.Action = dict()
-        self.SetupUI(design, people)
+        self.SetupUI(design, people, Ruleset())
 
 
-    def SetupUI(self, design, people):
+    def SetupUI(self, design, people, rules):
 
-        ExpandSize = QtWidgets.QSizePolicy.Policy.Expanding
-        MaxSize = QtWidgets.QSizePolicy.Policy.Maximum
-        MinSize = QtWidgets.QSizePolicy.Policy.Minimum
-        FixedSize = QtWidgets.QSizePolicy.Policy.Fixed
-
-        self.resize(1800, 1350)
+        self.resize(1800, 1300)                        # TODO: Query design!
         self.setWindowTitle("My Stars!")
         Icon = QtGui.QIcon()
         Icon.addPixmap(QtGui.QPixmap(":/Icons/Stars"))
         self.setWindowIcon(Icon)
         self.CentralWidget = QWidget(self)
         self.setCentralWidget(self.CentralWidget)
-        self.CentralWidget.setMinimumSize(640, 480)  # TODO: Query design!
+        self.CentralWidget.setMinimumSize(1800, 1200)  # TODO: Query design!
 
         GridLayout = QtWidgets.QGridLayout(self.CentralWidget)
         GroupBox = QtWidgets.QGroupBox(self.CentralWidget)
         GridLayout.addWidget(GroupBox, 0, 0, 1, 1)
-        self.Universe = QtWidgets.QGraphicsView(self.CentralWidget)
+        self.Universe = Universe(rules)
         GridLayout.addWidget(self.Universe, 0, 1, 1, 1)
         GridLayout.addLayout(self.SetupNewsReader(), 1, 0, 1, 1)
 #
         self.PlanetInfo = Inspector(people)
         h = int(self.PlanetInfo.sceneRect().height() + 1.5)
         w = int(self.PlanetInfo.sceneRect().width() + 4.5)
-        Iview = QtWidgets.QGraphicsView(self.CentralWidget)
-        Iview.setMinimumSize(QtCore.QSize(w, h))
-        Iview.setScene(self.PlanetInfo)
-        Inspector_VL = QtWidgets.QVBoxLayout()
-        Inspector_VL.addStretch()
+        InspectorView = QGraphicsView(self.CentralWidget)
+        InspectorView.setMinimumSize(QtCore.QSize(w, h))
+        InspectorView.setScene(self.PlanetInfo)
+        Inspector_VL = QVBoxLayout()
         Inspector_VL.addLayout(self.SetupInspectorTitle(w - 5))
-        Inspector_VL.addWidget(Iview)
-        GridLayout.addLayout(Inspector_VL, 1, 1, 1, 1)
+        Inspector_VL.addWidget(InspectorView)
+        Inspector_VL.addStretch()
+
+        self.ItemInfo = QStackedLayout(self.CentralWidget)
+        PlanetProperties = QWidget()
+        PlanetProperties.setLayout(Inspector_VL)
+        self.ItemInfo.addWidget(PlanetProperties)
+
+        GridLayout.addLayout(self.ItemInfo, 1, 1, 1, 1)
 #
         self.Buttons = ToolBar(self)
 #       self.Buttons.setAutoFillBackground(True)
@@ -102,7 +106,7 @@ class Gui(QtWidgets.QMainWindow):
         Filter_HL.addStretch()
         Filter_HL.addSpacing(25)
         self.CurrentMessage = QtWidgets.QPlainTextEdit(self.CentralWidget)
-        self.CurrentMessage.setMinimumSize(QtCore.QSize(400, 315))
+        self.CurrentMessage.setMinimumSize(QtCore.QSize(400, 320))
         self.CurrentMessage.setReadOnly(True)
         NewsButtons_VL = QtWidgets.QVBoxLayout()
         NewsButtons_VL.addStretch()
@@ -123,11 +127,11 @@ class Gui(QtWidgets.QMainWindow):
         self.NextMessage.setStatusTip("Read the next message ...")
         NewsButtons_VL.addSpacing(10)
         NewsButtons_VL.addWidget(self.NextMessage)
-        NewsButtons_VL.addStretch()
         News_GL = QtWidgets.QGridLayout(self.CentralWidget)
         News_GL.addLayout(Filter_HL, 0, 0, 1, 1)
         News_GL.addWidget(self.CurrentMessage, 1, 0, 1, 1)
         News_GL.addLayout(NewsButtons_VL, 1, 1, 1, 1)
+        NewsButtons_VL.addStretch()
         return News_GL
 
 
@@ -140,10 +144,10 @@ class Gui(QtWidgets.QMainWindow):
         self.SelectedObject.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.SelectedObject.setText("Selected Object")
         SelectedObject_HL.addWidget(self.SelectedObject)
-        self.ShowAlienBase = _CreateButton(":/Icons/Starbase")
+        self.ShowAlienBase = _CreateButton(":/Icons/Fortress")
         self.ShowStarBase = _CreateButton(":/Icons/Starbase")
-        self.SelectNextEnemy = _CreateButton(":/Icons/Triangle")
-        self.SelectNextFleet = _CreateButton(":/Icons/Triangle")
+        self.SelectNextEnemy = _CreateButton(":/Icons/Enemies")
+        self.SelectNextFleet = _CreateButton(":/Icons/Fleets")
         SelectedObject_HL.addStretch()
         SelectedObject_HL.addWidget(self.ShowAlienBase)
         SelectedObject_HL.addWidget(self.ShowStarBase)
@@ -154,7 +158,9 @@ class Gui(QtWidgets.QMainWindow):
 
 
 
-    def ChangeInspectorTitle(self, titel, starbase=False, fleets=False):
+    def ChangeInspectorTitle(self, titel, b1=False, b2=False, b3=False, b4=False):
         self.SelectedObject.setText(titel)
-        self.SelectNextFleet.setVisible(fleets)
-        self.ShowStarBase.setVisible(starbase)
+        self.ShowAlienBase.setVisible(b1)
+        self.ShowStarBase.setVisible(b2)
+        self.SelectNextEnemy.setVisible(b3)
+        self.SelectNextFleet.setVisible(b4)

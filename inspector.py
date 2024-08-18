@@ -31,11 +31,6 @@ class Inspector(QGraphicsScene):
     self.sText = []
     self.Biome = []
 
-#    Data = []
-#    Data.append(0.5 + math.log2(planet.Gravity) / 3.0)
-#    Data.append(0.5 + planet.Temperature / 400.0)
-#    Data.append(planet.Radioactivity / 100.0)
-
     self.AddStaticText()
     self.SetupColors()
     self.PaintBackdrop(people)
