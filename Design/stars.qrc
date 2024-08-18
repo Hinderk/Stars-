@@ -25,5 +25,7 @@
     <file alias="Enemies">Images/Icons/enemies.svg</file>
     <file alias="Fortress">Images/Icons/alienbase.svg</file>
     <file alias="Starbase">Images/Icons/starbase.svg</file>
+    <file alias="ShowNews">Images/Icons/showme.svg</file>
+    <file alias="NoNews">Images/Icons/ignore.svg</file>
   </qresource>
 </RCC>
