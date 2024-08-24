@@ -32,10 +32,14 @@ def main():
     Terra.Temperature = -120.6
     Terra.Radioactivity = 80.75
 
+    Terra.TemperatureRate = 15.0
+    Terra.GravityRate = 1 / 40
+    Terra.RadioactivityRate = -7.0
+
     form.PlanetInfo.UpdateBiome(Terra)
 
-    form.ChangeInspectorTitle("Proxima Centauri", True, True)
-#    form.ChangeInspectorTitle("Tau Ceti", False, True)
+#    form.ChangeInspectorTitle("Proxima Centauri", True, True, True, True)
+    form.ChangeInspectorTitle("Tau Ceti", False, True)
 
 
     form.show()                         # Show the form

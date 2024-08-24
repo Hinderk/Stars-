@@ -9,12 +9,12 @@ class Design:
              }
 
              QCheckBox::indicator {
-                 width: 20px;
-                 height: 20px;
+                 width: 30px;
+                 height: 30px;
              }
 
              QPlainTextEdit {
-                 padding: 10px 10px 10px 10px;
+                 padding: 5px 10px 5px 10px;
                  border: 1px solid rgb(120,120,120);
                  border-radius: 6px;
                  font-size: 16pt;

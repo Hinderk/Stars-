@@ -4,14 +4,14 @@ from PyQt6.QtGui import QPen, QBrush, QColor, QPolygonF, QFont
 from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene
 
 import math
+
+from PyQt6 import QtWidgets
+
 ##from ruleset import Ruleset
 
 
 
 class Universe(QGraphicsView):
-
-  Width = 1024
-  Height = 768
 
   def __init__(self, rules):
     super(self.__class__, self).__init__()
@@ -30,7 +30,10 @@ class Universe(QGraphicsView):
     blackBrush = QBrush(black)
     self.Scene.setBackgroundBrush(blackBrush)
     self.setScene(self.Scene)
-    self.setMinimumSize(QSize(800, 850))
+    policy = QtWidgets.QSizePolicy()
+    policy.setHorizontalPolicy(policy.Policy.MinimumExpanding)
+    policy.setVerticalPolicy(policy.Policy.MinimumExpanding)
+    self.setSizePolicy(policy)
 
 
   def ColonizePlanets(self, rules):

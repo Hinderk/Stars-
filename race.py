@@ -9,6 +9,3 @@ class Race:
     self.MaxGravity = 2.5
     self.MinTemperatur = -40.0
     self.MaxTemperatur = 50.0
-        
-
-        

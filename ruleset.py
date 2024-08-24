@@ -3,11 +3,6 @@
 
 class Ruleset :
 
-  Name = 'Standard'
-
-  Planet = 'dummy'
-  Surface = "dummy"
-
   def Random(self, MinVal, MaxVal, Optimum):
     return(Optimum)
 
@@ -28,3 +23,9 @@ class Ruleset :
 
   def PlanetCount(self):
     return 20
+
+  def Xmax(self):
+    return 400.0
+
+  def Ymax(self):
+    return 400.0

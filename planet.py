@@ -28,6 +28,10 @@ class Planet:
     self.Gravity = 64.0 ** Rules.Random(-0.5, 0.5, 0)  # terraforming technologies and influence
     self.Temperature = Rules.Random(-200, 200, 0)      # population density & growth
 
+    self.RadioactivityRate = 0.0                       # TODO: Create a viable terraforming
+    self.GravityRate = 0.0                             # model to compute this rates.
+    self.TemperatureRate = 0.0
+
     self.Crust = Minerals(Rules)                       # Create a random amount of minerals
     self.Explored = Minerals()                         # inside the planet's crust and - for
     self.Mined = Minerals()                            # the homeworld - on its surface
