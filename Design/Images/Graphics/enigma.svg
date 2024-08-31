@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+<!-- CreationDate: 2024-08-31 17:11:29 -->
+<!-- Magnification: 1.05 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="571pt" height="573pt"
+	viewBox="-4530 -4544 9060 9088">
+<g fill="none">
+<!-- Circle -->
+<circle cx="0" cy="0" r="4500" fill="#803000"
+	stroke="#a14000" stroke-width="8px"/>
+<!-- Arc -->
+<defs>
+<path d="M -1,-4497 A 4458 4458 0 0 1 2795 -3515" id="p0"/>
+<pattern id="tile0" patternUnits="userSpaceOnUse"
+	x="0" y="0" width="134" height="67">
+<g stroke-width="7.5" stroke="#ff0000" fill="none">
+<path d="M -7,30 73,70 M 61,-3 141,37"/>
+</g>
+</pattern>
+</defs>
+<use xlink:href="#p0" fill="#ff0000"/>
+<use xlink:href="#p0" fill="url(#tile0)"
+	stroke="#ff0000" stroke-width="15px"/>
+<!-- Line -->
+<defs>
+<polyline points=" 0,-4493 0,0 2799,-3521 97,-4497 4,-4489" id="p1"/>
+<pattern id="tile1" patternUnits="userSpaceOnUse"
+	x="0" y="0" width="134" height="67">
+<g stroke-width="7.5" stroke="#ff0000" fill="none">
+<path d="M -7,30 73,70 M 61,-3 141,37"/>
+</g>
+</pattern>
+</defs>
+<use xlink:href="#p1" fill="#ff0000"/>
+<use xlink:href="#p1" fill="url(#tile1)"
+	stroke="#ff0000" stroke-width="15px"/>
+<!-- Arc -->
+<defs>
+<path d="M 2797,-3521 A 4375 4375 0 0 1 4040 -1976" id="p2"/>
+<pattern id="tile2" patternUnits="userSpaceOnUse"
+	x="0" y="0" width="134" height="67">
+<g stroke-width="7.5" stroke="#ffffff" fill="none">
+<path d="M -7,30 73,70 M 61,-3 141,37"/>
+</g>
+</pattern>
+</defs>
+<use xlink:href="#p2" fill="#ffffff"/>
+<use xlink:href="#p2" fill="url(#tile2)"
+	stroke="#ffffff" stroke-width="15px"/>
+<!-- Line -->
+<defs>
+<polyline points=" 2795,-3517 0,0 4038,-1973 3337,-2937 2805,-3514" id="p3"/>
+<pattern id="tile3" patternUnits="userSpaceOnUse"
+	x="0" y="0" width="134" height="67">
+<g stroke-width="7.5" stroke="#ffffff" fill="none">
+<path d="M -7,30 73,70 M 61,-3 141,37"/>
+</g>
+</pattern>
+</defs>
+<use xlink:href="#p3" fill="#ffffff"/>
+<use xlink:href="#p3" fill="url(#tile3)"
+	stroke="#ffffff" stroke-width="15px"/>
+<!-- Arc -->
+<defs>
+<path d="M 3778,2432 A 4432 4432 0 0 0 4042 -1974" id="p4"/>
+<pattern id="tile4" patternUnits="userSpaceOnUse"
+	x="0" y="0" width="134" height="67">
+<g stroke-width="7.5" stroke="#ffff00" fill="none">
+<path d="M -7,30 73,70 M 61,-3 141,37"/>
+</g>
+</pattern>
+</defs>
+<use xlink:href="#p4" fill="#ffff00"/>
+<use xlink:href="#p4" fill="url(#tile4)"
+	stroke="#ffff00" stroke-width="15px"/>
+<!-- Line -->
+<defs>
+<polyline points=" 4046,-1974 0,0 3782,2433 4069,-1933" id="p5"/>
+<pattern id="tile5" patternUnits="userSpaceOnUse"
+	x="0" y="0" width="134" height="67">
+<g stroke-width="7.5" stroke="#ffff00" fill="none">
+<path d="M -7,30 73,70 M 61,-3 141,37"/>
+</g>
+</pattern>
+</defs>
+<use xlink:href="#p5" fill="#ffff00"/>
+<use xlink:href="#p5" fill="url(#tile5)"
+	stroke="#ffff00" stroke-width="15px"/>
+<!-- Arc -->
+<path d="M 1,4500 A 3995 3995 0 0 0 1530 4230" fill="#0000ff"/>
+<!-- Line -->
+<polyline points=" 2,4502 4,-2 1525,4233" fill="#0000ff"/>
+<!-- Arc -->
+<path d="M 1521,4235 A 4242 4242 0 0 0 3777 2423" fill="#00ff00"/>
+<!-- Line -->
+<polyline points=" 1528,4231 3776,2424 -7,-8" fill="#00ff00"
+	stroke="#00ff00" stroke-width="8px"/>
+<!-- Line -->
+<polyline points=" 0,0 1530,4230"
+	stroke="#a14000" stroke-width="45px"/>
+<!-- Line -->
+<polyline points=" 0,0 3780,2430"
+	stroke="#a14000" stroke-width="45px"/>
+<!-- Line -->
+<polyline points=" 0,0 0,-4500"
+	stroke="#a14000" stroke-width="45px"/>
+<!-- Line -->
+<polyline points=" 0,0 2790,-3510"
+	stroke="#a14000" stroke-width="45px"/>
+<!-- Line -->
+<polyline points=" 0,0 0,4500"
+	stroke="#a14000" stroke-width="45px"/>
+<!-- Line -->
+<polyline points=" 0,0 4050,-1980"
+	stroke="#a14000" stroke-width="45px"/>
+<!-- Circle -->
+<circle cx="0" cy="0" r="2250"
+	stroke="#a14000" stroke-width="45px"/>
+<!-- Circle -->
+<circle cx="0" cy="0" r="270"
+	stroke="#a14000" stroke-width="45px"/>
+<!-- Circle -->
+<circle cx="0" cy="0" r="810"
+	stroke="#a14000" stroke-width="45px"/>
+<!-- Circle -->
+<circle cx="0" cy="0" r="4500"
+	stroke="#a14000" stroke-width="45px"/>
+<!-- Text -->
+<text xml:space="preserve" x="0" y="1170" fill="#000000" font-family="Courier" font-style="normal" font-weight="bold" font-size="4080" text-anchor="middle">?</text>
+</g>
+</svg>

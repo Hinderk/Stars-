@@ -19,6 +19,9 @@
     <file alias="Mine">Images/Toolbar/mine.svg</file>
     <file alias="People">Images/Toolbar/growth.svg</file>
   </qresource>
+  <qresource prefix="Graphics">
+    <file alias="Enigma">Images/Graphics/enigma.svg</file>
+  </qresource>
   <qresource prefix="Icons">
     <file alias="Stars">Images/Icons/stars.ico</file>
     <file alias="Fleets">Images/Icons/fleets.svg</file>
