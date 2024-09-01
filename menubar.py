@@ -1,5 +1,5 @@
 
-from PyQt6 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui
 
 
 
@@ -222,6 +222,7 @@ class Menu(QtWidgets.QMenuBar):
         self.addAction(MenuCommands.menuAction())
         self.addAction(MenuReport.menuAction())
         self.addAction(MenuHelp.menuAction())
+
 
     def DefineZoomLevel(self, Menu, LevelSet):
 

@@ -8,6 +8,8 @@ from gui import Gui
 from planet import Planet
 from ruleset import Ruleset
 from race import Race
+from fleet import Fleet
+from ship import Ship
 
 
 
@@ -37,9 +39,25 @@ def main():
     Terra.RadioactivityRate = -7.0
 
     form.PlanetInfo.UpdateBiome(Terra)
+    
+    ship = Ship()
+    ship.CargoSpace = 200
+    ship.Settlers = 60
+    ship.Boranium = 10
+    ship.Germanium = 30
+    ship.Ironium = 20
+    ship.Fuel = 75
+    ship.TotalFuel = 150
+    ship.Name = "Explorer"
+    ship.Type = "Scout"
+
+    fleet = Fleet(ship)
+    form.FleetInfo.UpdateCargo(fleet)
 
 #    form.ChangeInspectorTitle("Proxima Centauri", True, True, True, True)
     form.ChangeInspectorTitle("Tau Ceti", False, True)
+    
+    form.ItemInfo.setCurrentIndex(1)
 
 
     form.show()                         # Show the form

@@ -1,12 +1,14 @@
 
+from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6 import QtWidgets, QtGui, QtCore
 from PyQt6.QtWidgets import QWidget, QStackedLayout
-from PyQt6.QtWidgets import QGraphicsView, QVBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from design import Design
 from menubar import Menu
 from toolbar import ToolBar
 from ruleset import Ruleset
 from inspector import Inspector
+from fleetdata import Fleetdata
 from universe import Universe
 
 #import stars_rc
@@ -86,6 +88,19 @@ class Gui(QtWidgets.QMainWindow):
         self.ItemInfo = QStackedLayout()
         self.PlanetInfo = Inspector(people)
         self.ItemInfo.addWidget(self.PlanetInfo)
+
+        self.FleetInfo = Fleetdata()
+        self.ItemInfo.addWidget(self.FleetInfo)
+
+        Enigma = QWidget()
+        Enigma_HL = QHBoxLayout(Enigma)
+        Enigma_HL.addStretch()
+        Image = QSvgWidget(":/Graphics/Enigma")
+        Image.setMaximumSize(300, 300)
+        Enigma_HL.addWidget(Image)
+        Enigma_HL.addStretch()
+        self.ItemInfo.addWidget(Enigma)
+
         Info_VL.addLayout(self.ItemInfo)
         Layout_VL.addWidget(InfoBox)
 
