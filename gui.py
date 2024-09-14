@@ -208,7 +208,14 @@ class Gui(QtWidgets.QMainWindow):
         self.SelectNextFleet = _CreateButton(":/Icons/Fleets")
         ButtonLayout_HL.addWidget(self.SelectNextFleet)
         SelectedObject_HL.addWidget(ButtonBox)
-        SelectedObject_HL.addSpacing(70)
+        SwitchBox = QtWidgets.QWidget()
+        SwitchBox.setMaximumWidth(70)
+        SwitchLayout_HL = QtWidgets.QHBoxLayout(SwitchBox)
+        SwitchLayout_HL.setSpacing(0)
+        SwitchLayout_HL.addStretch(0)
+        self.ShowPlanet = _CreateButton(":/Icons/Planet")
+        SwitchLayout_HL.addWidget(self.ShowPlanet)
+        SelectedObject_HL.addWidget(SwitchBox)
         Title.setMaximumHeight(70)
         return Title
 

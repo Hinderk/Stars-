@@ -4,6 +4,8 @@ from PyQt6.QtGui import QPen, QBrush, QColor, QFont
 from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene
 from PyQt6 import QtSvgWidgets
 
+from colours import Brush
+
 
 
 class Fleetdata(QGraphicsView):
@@ -21,12 +23,10 @@ class Fleetdata(QGraphicsView):
 
 
   def __init__(self):
+
     super(self.__class__, self).__init__()
-
     self.Freight = []
-
     self.Scene = QGraphicsScene(self)
-
     self.AddStaticText()
     self.AddInfoText()
     self.SetupColors()
@@ -37,6 +37,7 @@ class Fleetdata(QGraphicsView):
 
 
   def AddStaticText(self):
+
     font = QFont('Segoe', pointSize=16, weight=400)
     ShipCount = self.Scene.addSimpleText("Ship count:", font)
     xpos = self.xOffset
@@ -71,6 +72,7 @@ class Fleetdata(QGraphicsView):
 
 
   def AddInfoText(self):
+
     font = QFont('Segoe', pointSize=16, weight=400)
     self.ShipCount = self.Scene.addSimpleText("1", font)
     xpos = self.xOffset + self.DataOffset
@@ -92,38 +94,39 @@ class Fleetdata(QGraphicsView):
 
 
   def InitCargo(self):
+
     font = QFont('Segoe', pointSize=14, weight=800)
     pen = QPen(QColor(0, 0, 0))
-    pen.setWidthF(2.3)
+    brush = QBrush(QColor(200, 200, 200))
+    pen.setWidthF(2.0)
     xp = self.xOffset + self.xText
     yp = self.yDelta + 5
+    box = QRectF(xp, yp, self.xWidth, self.ySize)
+    self.Scene.addRect(box, pen, brush)
     box = QRectF(xp, yp, self.xWidth / 2, self.ySize)
-    self.Fuel = self.Scene.addRect(box, QPen(), self.brush[4])
-    self.FuelWeight = self.Scene.addSimpleText("50 of 100kT", font)
+    self.Fuel = self.Scene.addRect(box, pen, self.brush[4])
+    self.FuelWeight = self.Scene.addSimpleText("50 of 100mg", font)
     x = self.xWidth - self.FuelWeight.boundingRect().width()
     self.FuelWeight.setPos(xp + x / 2, yp + 2)
-    box = QRectF(xp, yp, self.xWidth, self.ySize)
-    self.Scene.addRect(box, pen)
     yp += self.yDelta + 2
-    width = self.xWidth
+    box = QRectF(xp, yp, self.xWidth, self.ySize)
+    self.Scene.addRect(box, pen, brush)
     for n in (0, 1, 2, 3):
-      width *= 0.75
-      box = QRectF(xp, yp, width, self.ySize)
-      self.Freight.append(self.Scene.addRect(box, QPen(), self.brush[n]))
+      box = QRectF(xp, yp, self.xWidth, self.ySize)
+      self.Freight.append(self.Scene.addRect(box, pen, self.brush[n]))
     self.Cargo = self.Scene.addSimpleText("75 of 100kT", font)
     x = self.xWidth - self.Cargo.boundingRect().width()
     self.Cargo.setPos(xp + x / 2, yp + 2)
-    box = QRectF(xp, yp, self.xWidth, self.ySize)
-    self.Scene.addRect(box, pen)
 
 
   def UpdateCargo(self, fleet):
+
     fraction = []
     fuel = self.xWidth * fleet.Fuel / fleet.TotalFuel
     xp = self.xOffset + self.xText
     yp = self.yDelta + 5
     self.Fuel.setRect(xp, yp, fuel, self.ySize)
-    self.FuelWeight.setText(str(fleet.Fuel) + " of " + str(fleet.TotalFuel) + "kT")
+    self.FuelWeight.setText(str(fleet.Fuel) + " of " + str(fleet.TotalFuel) + "mg")
     x = self.xWidth - self.FuelWeight.boundingRect().width()
     self.FuelWeight.setPos(xp + x / 2, yp + 2)
     fraction.append(fleet.Ironium / fleet.CargoSpace)
@@ -131,6 +134,7 @@ class Fleetdata(QGraphicsView):
     fraction.append(fleet.Germanium / fleet.CargoSpace)
     fraction.append(fleet.Settlers / fleet.CargoSpace)
     total = fleet.Germanium + fleet.Boranium + fleet.Ironium + fleet.Settlers
+    self.Mass.setText(str(total + fleet.TotalWeight))
     for n in (1, 2, 3):
       fraction[n] += fraction[n - 1]
     text = " of " + str(fleet.CargoSpace) + "kT"
@@ -144,11 +148,7 @@ class Fleetdata(QGraphicsView):
 
   def SetupColors(self):
     blue = QColor(40, 40, 255)
-    green = QColor(0, 255, 0)
-    yellow = QColor(255, 255, 0)
-    red = QColor(255, 0, 0)
-    white = QColor(255, 255, 255)
-    self.brush = [QBrush(white), QBrush(yellow), QBrush(green), QBrush(blue), QBrush(red)]
+    self.brush = [Brush.white, Brush.yellow, Brush.green, QBrush(blue), Brush.red]
 
 
   def AddLogos(self):

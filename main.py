@@ -41,12 +41,13 @@ def main():
     form.PlanetInfo.UpdateBiome(Terra)
     
     ship = Ship()
+    ship.TotalWeight = 25
     ship.CargoSpace = 200
     ship.Settlers = 60
     ship.Boranium = 10
     ship.Germanium = 30
     ship.Ironium = 20
-    ship.Fuel = 75
+    ship.Fuel = 130
     ship.TotalFuel = 150
     ship.Name = "Explorer"
     ship.Type = "Scout"
@@ -55,9 +56,19 @@ def main():
     form.FleetInfo.UpdateCargo(fleet)
 
 #    form.ChangeInspectorTitle("Proxima Centauri", True, True, True, True)
-    form.ChangeInspectorTitle("Tau Ceti", False, True)
-    
+    form.ChangeInspectorTitle("Tau Ceti", True, False, True)
+
     form.ItemInfo.setCurrentIndex(1)
+
+    form.Universe.planets[2].AddFriends(2020)
+    form.Universe.planets[2].AddFriends(-2000)
+    form.Universe.planets[2].AddOthers(2)
+    form.Universe.planets[2].AddOthers(23)
+    form.Universe.planets[2].AddFoes(-2000)
+    form.Universe.planets[2].AddFoes(8)
+    form.Universe.planets[2].AddFoes(18)
+
+    form.Universe.planets[0].BuildStarbase()
 
 
     form.show()                         # Show the form

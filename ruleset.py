@@ -1,4 +1,8 @@
 
+import random
+import math
+
+
 # This class facilities the generation of a random "Stars!" universe ...
 
 class Ruleset:
@@ -99,11 +103,47 @@ class Ruleset:
                "Golganis", "Targus", "Vione", "Kronac", "Draconis"]
 
 
+  def __init__(self, seed=128):
+    self.Location = []
+    self.PlanetNames = list(self.NameList)
+    self.Orcacle = random.Random(seed)
+
+
+  def _FindClosest(self, x0, y0):
+    dist = 1e20
+    for [x, y] in self.Location:
+      d = (x - x0) * (x - x0) + (y - y0) * (y - y0)
+      if d < dist:
+        dist = d
+    return math.sqrt(dist)
+
+
   def Random(self, MinVal, MaxVal, Optimum):
     return(Optimum)
 
+
   def FindName(self):
-    return 'No Name'
+    try:
+      name = self.Orcacle.choice(self.PlanetNames)
+      self.PlanetNames.remove(name)
+      return name
+    except:
+      return None
+
+
+  def FindPosition(self):
+    xlim = self.Xmax()
+    ylim = self.Ymax()
+    Retries = 0
+    while Retries < 128:
+      x = self.Orcacle.uniform(-xlim, xlim)
+      y = self.Orcacle.uniform(-ylim, ylim)
+      r = self._FindClosest(x, y)
+      if r > self.Rmin():
+        self.Location.append([x, y])
+        return [x, y]
+    return None
+
 
   def FirstYear(self):
     return 2400
@@ -118,10 +158,13 @@ class Ruleset:
     return 70.0
 
   def PlanetCount(self):
-    return 20
+    return 5
 
   def Xmax(self):
     return 400.0
 
   def Ymax(self):
     return 400.0
+
+  def Rmin(self):
+    return 5.0
