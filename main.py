@@ -39,7 +39,10 @@ def main():
     Terra.RadioactivityRate = -7.0
 
     form.PlanetInfo.UpdateBiome(Terra)
-    
+
+    Terra.Discovered = True
+    Terra.Name = 'Tau Ceti'
+
     ship = Ship()
     ship.TotalWeight = 25
     ship.CargoSpace = 200
@@ -55,20 +58,36 @@ def main():
     fleet = Fleet(ship)
     form.FleetInfo.UpdateCargo(fleet)
 
-#    form.ChangeInspectorTitle("Proxima Centauri", True, True, True, True)
-    form.ChangeInspectorTitle("Tau Ceti", True, False, True)
+    form.InspectPlanet(Terra)
 
-    form.ItemInfo.setCurrentIndex(1)
+    form.Map.Universe.planets[2].UpdateFriends(2020)
+    form.Map.Universe.planets[2].UpdateFriends(-2000)
+    form.Map.Universe.planets[2].UpdateOthers(2)
+    form.Map.Universe.planets[2].UpdateOthers(23)
+    form.Map.Universe.planets[2].UpdateFoes(-2000)
+    form.Map.Universe.planets[2].UpdateFoes(8)
+    form.Map.Universe.planets[2].UpdateFoes(18)
 
-    form.Universe.planets[2].AddFriends(2020)
-    form.Universe.planets[2].AddFriends(-2000)
-    form.Universe.planets[2].AddOthers(2)
-    form.Universe.planets[2].AddOthers(23)
-    form.Universe.planets[2].AddFoes(-2000)
-    form.Universe.planets[2].AddFoes(8)
-    form.Universe.planets[2].AddFoes(18)
+    form.Map.Universe.planets[0].BuildStarbase()
+    form.Map.Universe.planets[0].Friendly = True
+    form.Map.Universe.planets[0].Colonists = 24000
 
-    form.Universe.planets[0].BuildStarbase()
+    form.Map.Universe.planets[5].Surface.Ironium = 20.0
+    form.Map.Universe.planets[5].Surface.Boranium = 130.0
+    form.Map.Universe.planets[5].Surface.Germanium = 100.0
+    form.Map.Universe.planets[5].Crust.Ironium = 70.0
+    form.Map.Universe.planets[5].Crust.Boranium = 30.0
+    form.Map.Universe.planets[5].Crust.Germanium = 90.0
+    form.Map.Universe.planets[5].Explore(2400)
+    form.Map.Universe.planets[5].Colonists = 4000
+
+#    form.Map.Universe.ShowCrustDiagram(form.Map.Universe.planets[5])
+    form.Map.Universe.ShowSurfaceDiagram(form.Map.Universe.planets[5])
+
+    form.Map.Universe.ComputeTurn()
+
+    for p in form.Map.Universe.planets:
+        p.ShowNormalView()
 
 
     form.show()                         # Show the form

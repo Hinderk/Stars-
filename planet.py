@@ -32,14 +32,17 @@ class Planet:
     self.GravityRate = 0.0                             # model to compute this rates.
     self.TemperatureRate = 0.0
 
-    self.orbit = None                                  # The followin class members will be
+    self.orbit = None                                  # The following class members will be
     self.starbase = None                               # used to render planets on the star
     self.neutral = None                                # map in different ways depending on
     self.foes = None                                   # player choices & the game state ...
     self.friends = None
     self.attackers = None
+    self.core = None
+    self.body = None
     self.ships = None
     self.others = None
+    self.flag = None
     self.diagram = None
 
     self.TotalFriends = 0
@@ -48,11 +51,16 @@ class Planet:
     self.TotalOrbit = 0
     self.Colonists = 0
 
-    self.Discovered = False
+    self.Discovered = HomeWorld                      # Obviously, the home world is settled
+    self.ShipTracking = HomeWorld                    # from the first turn of the game ...
+
+    self.Friendly = HomeWorld
+    self.Hostile = False
+    self.SpaceStation = False
 
     self.Crust=Minerals(Rules)                       # Create a random amount of minerals
     self.Explored=Minerals()                         # inside the planet's crust and - for
-    self.Mined=Minerals()                            # the homeworld - on its surface
+    self.Mined = Minerals()                          # the home world - on its surface
     if HomeWorld:
       self.Surface=Minerals(Rules, 0.1)
       self.Explore(Rules.FirstYear())                # Start with the first game year ...
@@ -71,7 +79,7 @@ class Planet:
     self.Discovered = True
 
 
-  def AddFriends(self, count):
+  def UpdateFriends(self, count=0):
     self.TotalFriends += count
     self.TotalOrbit += count
     if self.TotalFriends > 0:
@@ -84,26 +92,28 @@ class Planet:
       self.ships.setX(x0 - w + w0)
       self.ships.setVisible(True)
     else:
-      self.ships.setVisible(False)
       self.TotalFriends = 0
+      self.ships.setVisible(False)
       self.friends.setVisible(False)
     if self.TotalOrbit < 1:
       self.TotalOrbit = 0
       self.orbit.setVisible(False)
+    else:
+      self.orbit.setVisible(self.ShipTracking)
 
 
-  def AddFoes(self, count):
+  def UpdateFoes(self, count=0):
     self.TotalFoes += count
     self.TotalOrbit += count
     if self.TotalFoes > 0:
-      self.foes.setVisible(True)
-      self.orbit.setVisible(True)
+      self.foes.setVisible(self.ShipTracking)
+      self.orbit.setVisible(self.ShipTracking)
       w0 = self.attackers.boundingRect().width()
       x0 = self.attackers.x()
       self.attackers.setText(str(self.TotalFoes))
       w = self.attackers.boundingRect().width()
       self.attackers.setX(x0 - w + w0)
-      self.attackers.setVisible(True)
+      self.attackers.setVisible(self.ShipTracking)
     else:
       self.TotalFoes = 0
       self.attackers.setVisible(False)
@@ -111,16 +121,18 @@ class Planet:
     if self.TotalOrbit < 1:
       self.TotalOrbit = 0
       self.orbit.setVisible(False)
+    else:
+      self.orbit.setVisible(self.ShipTracking)
 
 
-  def AddOthers(self, count):
+  def UpdateOthers(self, count=0):
     self.TotalOthers += count
     self.TotalOrbit += count
     if self.TotalOthers > 0:
-      self.neutral.setVisible(True)
-      self.orbit.setVisible(True)
+      self.neutral.setVisible(self.ShipTracking)
+      self.orbit.setVisible(self.ShipTracking)
       self.others.setText(str(self.TotalOthers))
-      self.others.setVisible(True)
+      self.others.setVisible(self.ShipTracking)
     else:
       self.TotalOthers = 0
       self.others.setVisible(False)
@@ -128,15 +140,30 @@ class Planet:
     if self.TotalOrbit < 1:
       self.TotalOrbit = 0
       self.orbit.setVisible(False)
+    else:
+      self.orbit.setVisible(self.ShipTracking)
+
+
+  def RevealStarbase(self):
+    show = self.ShipTracking and self.SpaceStation
+    self.orbit.setVisible(show)
+    self.starbase.setVisible(show)
 
 
   def BuildStarbase(self):
-    self.orbit.setVisible(True)
-    self.starbase.setVisible(True)
+    if not self.SpaceStation:
+      self.TotalOrbit += 1
+      self.SpaceStation = True
+    self.RevealStarbase()
 
 
   def DestroyStarbase(self):
-    self.orbit.setVisible(False)
+    if self.OrbitingBase:
+      self.TotalOrbit -= 1
+      self.OrbitingBase = False
+    if self.TotalOrbit < 1:
+      self.TotalOrbit = 0
+      self.orbit.setVisible(False)
     self.starbase.setVisible(False)
 
 
@@ -145,5 +172,15 @@ class Planet:
       element.setVisible(False)
 
 
-  def ShowDiagram(self):
-    print("todo")
+  def ShowNormalView(self):
+    self.RevealStarbase()
+    self.UpdateFoes()
+    self.UpdateOthers()
+    self.UpdateFriends()
+    self.core.setVisible(self.Friendly)
+    if self.Friendly:
+      self.body.setVisible(self.TotalOrbit < 1)
+    else:
+      self.body.setVisible(False)
+    self.flag.setVisible(False)
+    self.HideDiagram()

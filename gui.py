@@ -3,32 +3,31 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6 import QtWidgets, QtGui, QtCore
 from PyQt6.QtWidgets import QWidget, QStackedLayout
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt6.QtWidgets import QMainWindow
+
 from design import Design
 from menubar import Menu
 from toolbar import ToolBar
 from ruleset import Ruleset
 from inspector import Inspector
 from fleetdata import Fleetdata
-from universe import Universe
-
-#import stars_rc
-#import os
+from starmap import Starmap
 
 
 
 def _CreateButton(name):
-  Style = "padding: 5px 5px 5px 5px;border-width: 0px;background-color: transparent"
-  Icon = QtGui.QIcon(name)
-  Button = QtWidgets.QPushButton()
-  Button.setIcon(Icon)
-  Button.setIconSize(QtCore.QSize(30, 30))
-  Button.setStyleSheet(Style)
-  Button.setVisible(True)
-  return Button
+    Style = "padding: 5px 5px 5px 5px;border-width: 0px;background-color: transparent"
+    Icon = QtGui.QIcon(name)
+    Button = QtWidgets.QPushButton()
+    Button.setIcon(Icon)
+    Button.setIconSize(QtCore.QSize(30, 30))
+    Button.setStyleSheet(Style)
+    Button.setVisible(True)
+    return Button
 
 
 
-class Gui(QtWidgets.QMainWindow):
+class Gui(QMainWindow):
 
     def __init__(self, people):
 
@@ -37,6 +36,7 @@ class Gui(QtWidgets.QMainWindow):
         self.setStyleSheet(design.getStyle())
         self.Action = dict()
         self.SetupUI(design, people, Ruleset())
+        self.Map.Universe.ChangeFocus.connect(self.InspectPlanet)
 
 
     def SetupUI(self, design, people, rules):
@@ -104,9 +104,9 @@ class Gui(QtWidgets.QMainWindow):
         Info_VL.addLayout(self.ItemInfo)
         Layout_VL.addWidget(InfoBox)
 
-        self.Universe = Universe(rules)
+        self.Map = Starmap(rules)
         Layout_HL.addWidget(LeftSide)
-        Layout_HL.addWidget(self.Universe)
+        Layout_HL.addWidget(self.Map)
 
         self.Menu = Menu(self)
         self.setMenuBar(self.Menu)
@@ -116,7 +116,7 @@ class Gui(QtWidgets.QMainWindow):
         self.Buttons.UpdateFriendlyDesigns([])
         self.Buttons.UpdateEnemyDesigns(
             ['Colony Ships', 'Freighters', 'Scouts', 'Warships', 'Utility Ships',
-              'Bombers', 'Mining Ships', 'Fuel Transports']
+             'Bombers', 'Mining Ships', 'Fuel Transports']
         )
 
 
@@ -192,7 +192,6 @@ class Gui(QtWidgets.QMainWindow):
         SelectedObject_HL.addSpacing(250)
         self.SelectedObject = QtWidgets.QLabel()
         self.SelectedObject.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.SelectedObject.setText("Selected Object")
         SelectedObject_HL.addWidget(self.SelectedObject)
         ButtonBox = QtWidgets.QWidget()
         ButtonBox.setMaximumWidth(180)
@@ -220,9 +219,22 @@ class Gui(QtWidgets.QMainWindow):
         return Title
 
 
-    def ChangeInspectorTitle(self, titel, b1=False, b2=False, b3=False, b4=False):
-        self.SelectedObject.setText(titel)
-        self.ShowAlienBase.setVisible(b1)
-        self.ShowStarBase.setVisible(b2)
-        self.SelectNextEnemy.setVisible(b3)
-        self.SelectNextFleet.setVisible(b4)
+    def InspectPlanet(self, p):
+        if p.Discovered:
+            self.ItemInfo.setCurrentIndex(0)
+            self.PlanetInfo.UpdateMinerals(p)
+            self.PlanetInfo.UpdateBiome(p)
+        else:
+            self.ItemInfo.setCurrentIndex(2)
+        if p.ShipTracking:
+            self.SelectNextEnemy.setVisible(p.TotalFoes > 0)
+        else:
+            self.SelectNextEnemy.setVisible(False)
+        if p.Friendly:
+            self.ShowAlienBase.setVisible(False)
+            self.ShowStarBase.setVisible(p.SpaceStation)
+        else:
+            self.ShowStarBase.setVisible(False)
+            self.ShowAlienBase.setVisible(p.SpaceStation)
+        self.SelectedObject.setText(p.Name + ' - Summary')
+        self.SelectNextFleet.setVisible(p.TotalFriends > 0)
