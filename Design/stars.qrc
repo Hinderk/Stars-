@@ -28,8 +28,10 @@
     <file alias="Neutrals">Images/Icons/neutrals.svg</file>
     <file alias="Enemies">Images/Icons/enemies.svg</file>
     <file alias="Fortress">Images/Icons/alienbase.svg</file>
+    <file alias="Tradehub">Images/Icons/tradehub.svg</file>
     <file alias="Starbase">Images/Icons/starbase.svg</file>
     <file alias="ShowNews">Images/Icons/showme.svg</file>
     <file alias="NoNews">Images/Icons/ignore.svg</file>
+    <file alias="Planet">Images/Icons/planet.svg</file>
   </qresource>
 </RCC>
