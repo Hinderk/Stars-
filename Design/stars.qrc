@@ -19,6 +19,28 @@
     <file alias="Mine">Images/Toolbar/mine.svg</file>
     <file alias="People">Images/Toolbar/growth.svg</file>
   </qresource>
+  <qresource prefix="Factions">
+    <file alias="F01">Images/Factions/faction-01.svg</file>
+    <file alias="F02">Images/Factions/faction-02.svg</file>
+    <file alias="F03">Images/Factions/faction-03.svg</file>
+    <file alias="F04">Images/Factions/faction-04.svg</file>
+    <file alias="F05">Images/Factions/faction-05.svg</file>
+    <file alias="F06">Images/Factions/faction-06.svg</file>
+    <file alias="F07">Images/Factions/faction-07.svg</file>
+    <file alias="F08">Images/Factions/faction-08.svg</file>
+    <file alias="F09">Images/Factions/faction-09.svg</file>
+    <file alias="F10">Images/Factions/faction-10.svg</file>
+    <file alias="F11">Images/Factions/faction-11.svg</file>
+    <file alias="F12">Images/Factions/faction-12.svg</file>
+    <file alias="F13">Images/Factions/faction-13.svg</file>
+    <file alias="F14">Images/Factions/faction-14.svg</file>
+    <file alias="F15">Images/Factions/faction-15.svg</file>
+    <file alias="F16">Images/Factions/faction-16.svg</file>
+    <file alias="F17">Images/Factions/faction-17.svg</file>
+    <file alias="F18">Images/Factions/faction-18.svg</file>
+    <file alias="F19">Images/Factions/faction-19.svg</file>
+    <file alias="F20">Images/Factions/faction-20.svg</file>
+  </qresource>
   <qresource prefix="Graphics">
     <file alias="Enigma">Images/Graphics/enigma.svg</file>
   </qresource>
