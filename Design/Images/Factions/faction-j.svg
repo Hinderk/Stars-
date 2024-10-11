@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+<!-- CreationDate: 2024-10-11 22:22:40 -->
+<!-- Magnification: 1.05 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="570pt" height="570pt"
+	viewBox="-4523 -4522 9046 9044">
+<g fill="none">
+<!-- Circle -->
+<circle cx="0" cy="0" r="4500" fill="#00b000"
+	stroke="#ffffff" stroke-width="30px"/>
+<!-- Arc -->
+<path d="M -4500,0 A 4500 4500 0 0 0 0 4500" fill="#ffffff"
+	stroke="#ffffff" stroke-width="15px"/>
+<!-- Arc -->
+<path d="M 0,-4500 A 4500 4500 0 0 1 4500 0" fill="#ffffff"
+	stroke="#ffffff" stroke-width="15px"/>
+<!-- Arc -->
+<path d="M 0,4500 A 4500 4500 0 0 0 4500 0" fill="#ffffff"
+	stroke="#ffffff" stroke-width="15px"/>
+<!-- Arc -->
+<path d="M -4500,0 A 4500 4500 0 0 1 0 -4500" fill="#ffffff"
+	stroke="#ffffff" stroke-width="15px"/>
+<!-- Line -->
+<polyline points=" 0,-4500 0,0 4500,0" fill="#ffff00"
+	stroke="#ffff00" stroke-width="15px"/>
+<!-- Line -->
+<polyline points=" -4500,0 0,0 0,4500" fill="#ffff00"
+	stroke="#ffff00" stroke-width="15px"/>
+</g>
+</svg>
