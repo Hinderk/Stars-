@@ -1,11 +1,18 @@
 
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6 import QtWidgets, QtGui, QtCore
-from PyQt6.QtWidgets import QWidget, QStackedLayout
-from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
-from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtCore import QSize
+from PyQt6.QtWidgets import QWidget, QStackedLayout, QSizePolicy
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel
+from PyQt6.QtWidgets import QMainWindow, QPushButton, QToolButton
+from PyQt6.QtWidgets import QStatusBar, QGroupBox, QCheckBox
+from PyQt6.QtWidgets import QPlainTextEdit
+
+from PyQt6.QtCore import Qt
+# from PyQt6.QtCore import pyqtSignal as QSignal
 
 from design import Design
+from defines import Stance
 from menubar import Menu
 from toolbar import ToolBar
 from ruleset import Ruleset
@@ -16,11 +23,11 @@ from starmap import Starmap
 
 
 def _CreateButton(name):
-    Style = "padding: 5px 5px 5px 5px;border-width: 0px;background-color: transparent"
-    Icon = QtGui.QIcon(name)
-    Button = QtWidgets.QPushButton()
+    Style = "padding: 0px 2px 0px 2px;border-width: 0px;background-color: transparent"
+    Icon = QIcon(name)
+    Button = QPushButton()
     Button.setIcon(Icon)
-    Button.setIconSize(QtCore.QSize(30, 30))
+    Button.setIconSize(QSize(30, 30))
     Button.setStyleSheet(Style)
     Button.setVisible(True)
     return Button
@@ -29,49 +36,60 @@ def _CreateButton(name):
 
 class Gui(QMainWindow):
 
-    def __init__(self, people):
-
+    def __init__(self, people, rules):
         super(self.__class__, self).__init__()
+        self.CurrentYear = rules.FirstYear()
+        self.SelectedPlanet = None
+        self.EnemyFleetIndex = 0
+        self.NeutralFleetIndex = 0
+        self.FleetIndex = 0
+        self.EnemyFleetOffset = 0
+        self.NeutralFleetOffset = 0
+        self.FleetOffset = 0
         design = Design()
         self.setStyleSheet(design.getStyle())
         self.Action = dict()
-        self.SetupUI(design, people, Ruleset())
+        self.SetupUI(design, people, rules)
         self.Map.Universe.ChangeFocus.connect(self.InspectPlanet)
+        self.ShowPlanet.clicked.connect(self.InspectPlanets)
+        self.SelectNextEnemy.clicked.connect(self.InspectEnemyFleets)
+        self.SelectNextNeutral.clicked.connect(self.InspectNeutralFleets)
+        self.SelectNextFleet.clicked.connect(self.InspectFleets)
 
 
     def SetupUI(self, design, people, rules):
 
         self.resize(2400, 1350)                        # TODO: Query design!
         self.setWindowTitle("My Stars!")
-        Icon = QtGui.QIcon()
-        Icon.addPixmap(QtGui.QPixmap(":/Icons/Stars"))
+        Icon = QIcon()
+        Icon.addPixmap(QPixmap(":/Icons/Stars"))
         self.setWindowIcon(Icon)
         self.CentralWidget = QWidget(self)
         self.setCentralWidget(self.CentralWidget)
         self.CentralWidget.setMinimumSize(2400, 1350)  # TODO: Query design!
 
-        LeftSide = QtWidgets.QWidget()
+        LeftSide = QWidget()
         LeftSide.setMaximumWidth(875)
 
-        Layout_HL = QtWidgets.QHBoxLayout(self.CentralWidget)
+        Layout_HL = QHBoxLayout(self.CentralWidget)
         Layout_HL.setSpacing(0)
-        Layout_VL = QtWidgets.QVBoxLayout(LeftSide)
+        Layout_VL = QVBoxLayout(LeftSide)
         Layout_VL.setSpacing(0)
 
         self.Buttons = ToolBar(self)
         self.Buttons.setAutoFillBackground(True)
         self.Buttons.setMovable(False)
-        self.Buttons.setIconSize(QtCore.QSize(40, 40))
+        self.Buttons.setIconSize(QSize(40, 40))
         Layout_VL.addWidget(self.Buttons)
 
-        InfoBox = QtWidgets.QGroupBox()
-        policy = QtWidgets.QSizePolicy()
+        InfoBox = QGroupBox()
+        policy = QSizePolicy()
         policy.setHorizontalPolicy(policy.Policy.MinimumExpanding)
         policy.setVerticalPolicy(policy.Policy.MinimumExpanding)
         InfoBox.setSizePolicy(policy)
-        Data_VL = QtWidgets.QVBoxLayout(InfoBox)
-        Label_A = QtWidgets.QLabel("Test-A")
-        Label_B = QtWidgets.QLabel("Test-B")
+        Data_VL = QVBoxLayout(InfoBox)
+        Label_A = QLabel("Test-A")
+        Label_B = QLabel("Test-B")
         Data_VL.addWidget(Label_A)
         Data_VL.addStretch()
         Data_VL.addWidget(Label_B)
@@ -79,7 +97,7 @@ class Gui(QMainWindow):
         Layout_VL.addWidget(InfoBox)
         Layout_VL.addWidget(self.SetupNewsReader())
 #
-        InfoBox = QtWidgets.QGroupBox()
+        InfoBox = QGroupBox()
         InfoBox.setMinimumHeight(420)
         InfoBox.setMaximumHeight(420)
         Info_VL = QVBoxLayout(InfoBox)
@@ -110,7 +128,7 @@ class Gui(QMainWindow):
 
         self.Menu = Menu(self)
         self.setMenuBar(self.Menu)
-        self.Status = QtWidgets.QStatusBar(self)
+        self.Status = QStatusBar(self)
         self.setStatusBar(self.Status)
 #
         self.Buttons.UpdateFriendlyDesigns([])
@@ -121,120 +139,183 @@ class Gui(QMainWindow):
 
 
     def SetupNewsReader(self):
-
-        Filter_HL = QtWidgets.QHBoxLayout()
+        Filter_HL = QHBoxLayout()
         Filter_HL.setSpacing(0)
-        self.FilterMessage = QtWidgets.QCheckBox()
+        self.FilterMessage = QCheckBox()
         self.FilterMessage.setToolTip("Show the likes of the current message ...")
         self.FilterMessage.setStatusTip("Show the likes of the current message ...")
         self.FilterMessage.setChecked(True)
         Filter_HL.addWidget(self.FilterMessage)
         Filter_HL.addStretch()
-        self.CurrentGameYear = QtWidgets.QLabel(self.CentralWidget)
-        self.CurrentGameYear.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.CurrentGameYear = QLabel(self.CentralWidget)
+        self.CurrentGameYear.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.CurrentGameYear.setToolTip("Current Age of the Galaxy ...")
         self.CurrentGameYear.setText("Year 2400 - Message: 1 of 9999")
         Filter_HL.addWidget(self.CurrentGameYear)
         Filter_HL.addStretch()
-        Icon = QtGui.QIcon()
-        Show = QtGui.QPixmap(":/Icons/ShowNews")
-        NoShow = QtGui.QPixmap(":/Icons/NoNews")
-        Icon.addPixmap(NoShow, QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-        Icon.addPixmap(Show, QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.On)
-        Filter = QtWidgets.QToolButton(self.CentralWidget)
+        Icon = QIcon()
+        Show = QPixmap(":/Icons/ShowNews")
+        NoShow = QPixmap(":/Icons/NoNews")
+        Icon.addPixmap(NoShow, QIcon.Mode.Normal, QIcon.State.Off)
+        Icon.addPixmap(Show, QIcon.Mode.Normal, QIcon.State.On)
+        Filter = QToolButton(self.CentralWidget)
         Filter.setCheckable(True)
         Filter.setIcon(Icon)
         Filter.setAutoRepeat(False)
         Filter.setToolTip("Show the likes of the current message ...")
         Filter.setStatusTip("Show the likes of the current message ...")
-        Filter.setIconSize(QtCore.QSize(30, 30))
+        Filter.setIconSize(QSize(30, 30))
         Filter_HL.addWidget(Filter)
-        self.CurrentMessage = QtWidgets.QPlainTextEdit(self.CentralWidget)
+        self.CurrentMessage = QPlainTextEdit(self.CentralWidget)
         self.CurrentMessage.setReadOnly(True)
         self.CurrentMessage.setPlainText("This is a very important message ...")  # DELETE ME!
-        NewsButtons_VL = QtWidgets.QVBoxLayout()
+        NewsButtons_VL = QVBoxLayout()
         NewsButtons_VL.addStretch()
-        self.PreviousMessage = QtWidgets.QPushButton()
+        self.PreviousMessage = QPushButton()
         self.PreviousMessage.setText("Prev")
         self.PreviousMessage.setToolTip("Read previous message ...")
         self.PreviousMessage.setStatusTip("Read the previous message ...")
         NewsButtons_VL.addWidget(self.PreviousMessage)
-        self.FollowMessage = QtWidgets.QPushButton()
+        self.FollowMessage = QPushButton()
         self.FollowMessage.setText("Goto")
         self.FollowMessage.setToolTip("Follow up on current message ...")
         self.FollowMessage.setStatusTip("Follow up on the current message ...")
         NewsButtons_VL.addWidget(self.FollowMessage)
-        self.NextMessage = QtWidgets.QPushButton()
+        self.NextMessage = QPushButton()
         self.NextMessage.setText("Next")
         self.NextMessage.setToolTip("Read next message ...")
         self.NextMessage.setStatusTip("Read the next message ...")
         NewsButtons_VL.addWidget(self.NextMessage)
         NewsButtons_VL.addStretch()
-        News_HL = QtWidgets.QHBoxLayout()
+        News_HL = QHBoxLayout()
         News_HL.setSpacing(5)
         News_HL.addWidget(self.CurrentMessage)
         News_HL.addLayout(NewsButtons_VL)
-        News_VL = QtWidgets.QVBoxLayout()
+        News_VL = QVBoxLayout()
         News_VL.addLayout(Filter_HL)
         News_VL.addLayout(News_HL)
         News_VL.addSpacing(5)
-        NewsReader = QtWidgets.QGroupBox()
+        NewsReader = QGroupBox()
         NewsReader.setLayout(News_VL)
         NewsReader.setMaximumHeight(190)
         return NewsReader
 
 
     def SetupInspectorTitle(self):
-
-        Title = QtWidgets.QWidget()
-        SelectedObject_HL = QtWidgets.QHBoxLayout(Title)
+        Title = QWidget()
+        SelectedObject_HL = QHBoxLayout(Title)
         SelectedObject_HL.setSpacing(0)
         SelectedObject_HL.addSpacing(250)
-        self.SelectedObject = QtWidgets.QLabel()
-        self.SelectedObject.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.SelectedObject = QLabel()
+        self.SelectedObject.setAlignment(Qt.AlignmentFlag.AlignCenter)
         SelectedObject_HL.addWidget(self.SelectedObject)
-        ButtonBox = QtWidgets.QWidget()
+        ButtonBox = QWidget()
         ButtonBox.setMaximumWidth(180)
-        ButtonLayout_HL = QtWidgets.QHBoxLayout(ButtonBox)
+        ButtonLayout_HL = QHBoxLayout(ButtonBox)
         ButtonLayout_HL.setSpacing(0)
         ButtonLayout_HL.addStretch()
         self.ShowAlienBase = _CreateButton(":/Icons/Fortress")
         ButtonLayout_HL.addWidget(self.ShowAlienBase)
+        self.ShowNeutralBase = _CreateButton(":/Icons/Tradehub")
+        ButtonLayout_HL.addWidget(self.ShowNeutralBase)
         self.ShowStarBase = _CreateButton(":/Icons/Starbase")
         ButtonLayout_HL.addWidget(self.ShowStarBase)
         self.SelectNextEnemy = _CreateButton(":/Icons/Enemies")
         ButtonLayout_HL.addWidget(self.SelectNextEnemy)
+        self.SelectNextNeutral = _CreateButton(":/Icons/Neutrals")
+        ButtonLayout_HL.addWidget(self.SelectNextNeutral)
         self.SelectNextFleet = _CreateButton(":/Icons/Fleets")
         ButtonLayout_HL.addWidget(self.SelectNextFleet)
         SelectedObject_HL.addWidget(ButtonBox)
-        SwitchBox = QtWidgets.QWidget()
+        SwitchBox = QWidget()
         SwitchBox.setMaximumWidth(70)
-        SwitchLayout_HL = QtWidgets.QHBoxLayout(SwitchBox)
+        SwitchLayout_HL = QHBoxLayout(SwitchBox)
         SwitchLayout_HL.setSpacing(0)
         SwitchLayout_HL.addStretch(0)
         self.ShowPlanet = _CreateButton(":/Icons/Planet")
         SwitchLayout_HL.addWidget(self.ShowPlanet)
         SelectedObject_HL.addWidget(SwitchBox)
-        Title.setMaximumHeight(70)
+        Title.setMinimumHeight(65)
         return Title
 
 
     def InspectPlanet(self, p):
+        self.SelectedPlanet = p
+        self.ShowPlanet.setVisible(False)
+        self.EnemyFleetOffset = 0
+        self.NeutralFleetOffset = 0
+        self.FleetOffset = 0
         if p.Discovered:
             self.ItemInfo.setCurrentIndex(0)
             self.PlanetInfo.UpdateMinerals(p)
             self.PlanetInfo.UpdateBiome(p)
+            self.PlanetInfo.UpdateText(self.CurrentYear, p)
         else:
             self.ItemInfo.setCurrentIndex(2)
         if p.ShipTracking:
             self.SelectNextEnemy.setVisible(p.TotalFoes > 0)
+            self.SelectNextNeutral.setVisible(p.TotalOthers > 0)
         else:
             self.SelectNextEnemy.setVisible(False)
+            self.SelectNextNeutral.setVisible(False)
         if p.Friendly:
+            self.ShowNeutralBase.setVisible(False)
             self.ShowAlienBase.setVisible(False)
             self.ShowStarBase.setVisible(p.SpaceStation)
-        else:
+        elif p.Hostile:
+            self.ShowNeutralBase.setVisible(False)
             self.ShowStarBase.setVisible(False)
-            self.ShowAlienBase.setVisible(p.SpaceStation)
-        self.SelectedObject.setText(p.Name + ' - Summary')
+            self.ShowAlienBase.setVisible(p.SpaceStation and p.ShipTracking)
+        else:
+            self.ShowAlienBase.setVisible(False)
+            self.ShowStarBase.setVisible(False)
+            self.ShowNeutralBase.setVisible(p.SpaceStation and p.ShipTracking)
         self.SelectNextFleet.setVisible(p.TotalFriends > 0)
+        self.SelectedObject.setText(p.Name + ' - Summary')
+
+
+    def InspectNextFleet(self, index, offset, fof):
+        self.ShowPlanet.setVisible(True)
+        self.ItemInfo.setCurrentIndex(1)
+        nmax = len(self.SelectedPlanet.fleets_in_orbit)
+        n = (index + offset) % nmax
+        while n < nmax:
+            f = self.SelectedPlanet.fleets_in_orbit[n]
+            if f.FriendOrFoe == fof:
+                self.SelectedObject.setText(f.Name + ' - Summary')
+                self.FleetInfo.UpdateCargo(f)
+                return n
+            n += 1
+        n = 0
+        while n <= index:
+            f = self.SelectedPlanet.fleets_in_orbit[n]
+            if f.FriendOrFoe == fof:
+                self.SelectedObject.setText(f.Name + ' - Summary')
+                self.FleetInfo.UpdateCargo(f)
+                return n
+            n += 1
+
+
+    def InspectEnemyFleets(self, event):
+        self.EnemyFleetIndex = self.InspectNextFleet(self.EnemyFleetIndex, self.EnemyFleetOffset, Stance.hostile)
+        self.EnemyFleetOffset = 1
+        self.NeutralFleetOffset = 0
+        self.FleetOffset = 0
+
+
+    def InspectNeutralFleets(self, event):
+        self.NeutralFleetIndex = self.InspectNextFleet(self.NeutralFleetIndex, self.NeutralFleetOffset, Stance.neutral)
+        self.EnemyFleetOffset = 0
+        self.NeutralFleetOffset = 1
+        self.FleetOffset = 0
+
+
+    def InspectFleets(self, event):
+        self.FleetIndex = self.InspectNextFleet(self.FleetIndex, self.FleetOffset, Stance.friendly)
+        self.EnemyFleetOffset = 0
+        self.NeutralFleetOffset = 0
+        self.FleetOffset = 1
+
+
+    def InspectPlanets(self, event):
+        self.InspectPlanet(self.SelectedPlanet)

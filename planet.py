@@ -1,24 +1,12 @@
 
-class Minerals:
+from minerals import Minerals
+from planetdata import PlanetData
 
-  def __init__(self, Rules=None, Scale=1.0):
-    if Rules:
-      MinVal = Scale * Rules.GetMinResources()
-      MaxVal = Scale * Rules.GetMaxResources()
-      OptVal = Scale * Rules.GetResources()
-      self.Ironium = Rules.Random(MinVal, MaxVal, OptVal)
-      self.Boranium = Rules.Random(MinVal, MaxVal, OptVal)
-      self.Germanium = Rules.Random(MinVal, MaxVal, OptVal)
-    else:
-      self.Ironium = 0      # Three types of resources are Mined. These
-      self.Boranium = 0     # stand in for minerals, energy and food.
-      self.Germanium = 0
-      
 
 # This class represents the solar systems of the Stars universe each of
 # which is represented by just one of its planets and named after its sun.
 
-class Planet:
+class Planet(PlanetData):
 
   def __init__(self, Rules, HomeWorld=False):
 
@@ -45,6 +33,8 @@ class Planet:
     self.flag = None
     self.diagram = None
 
+    self.fleets_in_orbit = []
+
     self.TotalFriends = 0
     self.TotalFoes = 0
     self.TotalOthers = 0
@@ -58,25 +48,23 @@ class Planet:
     self.Hostile = False
     self.SpaceStation = False
 
-    self.Crust=Minerals(Rules)                       # Create a random amount of minerals
-    self.Explored=Minerals()                         # inside the planet's crust and - for
-    self.Mined = Minerals()                          # the home world - on its surface
-    if HomeWorld:
-      self.Surface=Minerals(Rules, 0.1)
+    self.Crust = Minerals(Rules)                     # Create a random amount of minerals
+    self.Explored = PlanetData()                     # inside the planet's crust and - for
+    if HomeWorld:                                    # the home world - on its surface
+      self.Surface = Minerals(Rules, 0.1)
       self.Explore(Rules.FirstYear())                # Start with the first game year ...
     else:
       self.Surface = Minerals()
 
 
   def Explore(self, year):
-    self.Mined.Boranium = self.Surface.Boranium
-    self.Mined.Ironium = self.Surface.Ironium
-    self.Mined.Germanium = self.Surface.Germanium
-    self.Explored.Boranium = self.Crust.Boranium
-    self.Explored.Ironium = self.Crust.Ironium
-    self.Explored.Germanium = self.Crust.Germanium
+    self.Explored = self
     self.LastVisit = year
     self.Discovered = True
+
+
+  def Value(self):  # TODO : Compute the planet value ...
+    return 0.9
 
 
   def UpdateFriends(self, count=0):

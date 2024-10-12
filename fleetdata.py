@@ -23,7 +23,6 @@ class Fleetdata(QGraphicsView):
 
 
   def __init__(self):
-
     super(self.__class__, self).__init__()
     self.Freight = []
     self.Scene = QGraphicsScene(self)
@@ -34,10 +33,10 @@ class Fleetdata(QGraphicsView):
     self.AddLogos()
     self.setScene(self.Scene)
     self.setMaximumHeight(325)
+    self.CurrentFaction = None
 
 
   def AddStaticText(self):
-
     font = QFont('Segoe', pointSize=16, weight=400)
     ShipCount = self.Scene.addSimpleText("Ship count:", font)
     xpos = self.xOffset
@@ -72,7 +71,6 @@ class Fleetdata(QGraphicsView):
 
 
   def AddInfoText(self):
-
     font = QFont('Segoe', pointSize=16, weight=400)
     self.ShipCount = self.Scene.addSimpleText("1", font)
     xpos = self.xOffset + self.DataOffset
@@ -94,7 +92,6 @@ class Fleetdata(QGraphicsView):
 
 
   def InitCargo(self):
-
     font = QFont('Segoe', pointSize=14, weight=800)
     pen = QPen(QColor(0, 0, 0))
     brush = QBrush(QColor(200, 200, 200))
@@ -120,7 +117,10 @@ class Fleetdata(QGraphicsView):
 
 
   def UpdateCargo(self, fleet):
-
+    if self.CurrentFaction:
+      self.FactionBanner[self.CurrentFaction].setVisible(False)
+    self.CurrentFaction = fleet.Faction - 1
+    self.FactionBanner[self.CurrentFaction].setVisible(True)
     fraction = []
     fuel = self.xWidth * fleet.Fuel / fleet.TotalFuel
     xp = self.xOffset + self.xText
@@ -158,9 +158,14 @@ class Fleetdata(QGraphicsView):
     yp = self.TopOffset
     self.FleetImage.setPos(0, yp)
     self.Scene.addItem(self.FleetImage)
-    self.FlagImage = QtSvgWidgets.QGraphicsSvgItem(":/Graphics/Enigma")
-    width = self.FlagImage.boundingRect().width()
-    self.FlagImage.setScale(0.5 * self.IconWidth / width)
     yp += self.FlagOffset + self.IconWidth
-    self.FlagImage.setPos(0.25 * self.IconWidth, yp)
-    self.Scene.addItem(self.FlagImage)
+    self.FactionBanner = []
+    for ext in "ABCDEFGHIJKLMNOPQRST":
+      resource = ":/Factions/Faction-" + ext
+      banner = QtSvgWidgets.QGraphicsSvgItem(resource)
+      width = banner.boundingRect().width()
+      banner.setScale(0.5 * self.IconWidth / width)
+      banner.setPos(0.25 * self.IconWidth, yp)
+      banner.setVisible(False)
+      self.Scene.addItem(banner)
+      self.FactionBanner.append(banner)

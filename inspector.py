@@ -146,12 +146,12 @@ class Inspector(QGraphicsView):
   def UpdateMinerals(self, planet):
     sConc = []
     mConc = []
-    mConc.append(planet.Crust.Ironium / 100.0)
-    mConc.append(planet.Crust.Boranium / 100.0)
-    mConc.append(planet.Crust.Germanium / 100.0)
-    sConc.append(planet.Mined.Ironium)
-    sConc.append(planet.Mined.Boranium)
-    sConc.append(planet.Mined.Germanium)
+    mConc.append(planet.Explored.Crust.Ironium / 100.0)
+    mConc.append(planet.Explored.Crust.Boranium / 100.0)
+    mConc.append(planet.Explored.Crust.Germanium / 100.0)
+    sConc.append(planet.Explored.Surface.Ironium)
+    sConc.append(planet.Explored.Surface.Boranium)
+    sConc.append(planet.Explored.Surface.Germanium)
     deltaY = self.yWidth / 17
     yp = self.yMinerals + 2 * deltaY
     for n in (0, 1, 2):
@@ -196,6 +196,21 @@ class Inspector(QGraphicsView):
     self.Gravity.setText(str(g) + "g")
     self.Temperature.setText(str(t) + "\u00B0C")
     self.Radiation.setText(str(r) + "mR")
+
+
+  def UpdateText(self, year, planet):
+    age = year - planet.LastVisit
+    self.ReportAge.setText('Report is ' + str(age) + ' years old.')
+    val = round(100 * planet.Value())
+    self.PlanetValue.setText('Value: ' + str(val))
+    pos = self.Population.pos()
+    if planet.Colonists > 0:
+      self.Population.setText('Population: ' + str(planet.Colonists))
+    else:
+      self.Population.setText('Uninhabited')
+    width = self.xWidth - self.Population.boundingRect().width()
+    pos.setX(self.xInfo + width)
+    self.Population.setPos(pos)
 
 
   def SetupColors(self):

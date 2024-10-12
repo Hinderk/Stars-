@@ -5,7 +5,7 @@ import math
 
 # This class facilities the generation of a random "Stars!" universe ...
 
-class Ruleset:
+class Ruleset(random.Random):
 
   NameList = ["Aarhus", "Abderhalden", "Aberdonia", "Abilunon", "Abkhazia",
                "Achaemenides", "Adachi", "Adelheid", "Admetos", "Adonis",
@@ -104,9 +104,10 @@ class Ruleset:
 
 
   def __init__(self, seed=128):
+    super(self.__class__, self).__init__(seed)
+    self.Seed = seed
     self.Location = []
     self.PlanetNames = list(self.NameList)
-    self.Orcacle = random.Random(seed)
 
 
   def _FindClosest(self, x0, y0):
@@ -119,12 +120,12 @@ class Ruleset:
 
 
   def Random(self, MinVal, MaxVal, Optimum):
-    return(Optimum)
+    return self.triangular(MinVal, MaxVal, Optimum)
 
 
   def FindName(self):
     try:
-      name = self.Orcacle.choice(self.PlanetNames)
+      name = self.choice(self.PlanetNames)
       self.PlanetNames.remove(name)
       return name
     except:
@@ -136,8 +137,8 @@ class Ruleset:
     ylim = self.Ymax()
     Retries = 0
     while Retries < 128:
-      x = self.Orcacle.uniform(-xlim, xlim)
-      y = self.Orcacle.uniform(-ylim, ylim)
+      x = self.uniform(-xlim, xlim)
+      y = self.uniform(-ylim, ylim)
       r = self._FindClosest(x, y)
       if r > self.Rmin():
         self.Location.append([x, y])
@@ -158,7 +159,7 @@ class Ruleset:
     return 70.0
 
   def PlanetCount(self):
-    return 5
+    return 15
 
   def Xmax(self):
     return 400.0
@@ -167,4 +168,4 @@ class Ruleset:
     return 400.0
 
   def Rmin(self):
-    return 5.0
+    return 100.0

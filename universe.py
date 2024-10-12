@@ -5,7 +5,7 @@ from PyQt6.QtGui import QPolygonF, QFont
 from PyQt6.QtCore import QPointF, QLineF, QRectF
 from PyQt6.QtWidgets import QGraphicsScene
 
-from PyQt6.QtCore import pyqtSignal as Signal
+from PyQt6.QtCore import pyqtSignal as QSignal
 
 from planet import Planet
 from colours import Pen
@@ -31,7 +31,7 @@ class Universe(QGraphicsScene):
   scale_length = 30
   pointer_size = 20
 
-  ChangeFocus = Signal(Planet)
+  ChangeFocus = QSignal(Planet)
 
 
   def __init__(self, rules):
@@ -51,7 +51,7 @@ class Universe(QGraphicsScene):
 
   def ColonizePlanets(self, rules):
     for p in self.planets:
-      print(p)
+      pass
 
 
   def mousePressEvent(self, mouseClick):
@@ -169,33 +169,33 @@ class Universe(QGraphicsScene):
 
 
   def ShowCrustDiagram(self, planet):
-    minerals = planet.Explored.Ironium + planet.Explored.Boranium + planet.Explored.Germanium
+    minerals = planet.Explored.Crust.Ironium + planet.Explored.Crust.Boranium + planet.Explored.Crust.Germanium
     if planet.Discovered and minerals > 0:
       for element in planet.diagram:
         element.setVisible(True)
       box = planet.diagram[0].rect()
-      box.setBottom(-self.scale_length * planet.Explored.Ironium / 100.0)
+      box.setBottom(-self.scale_length * planet.Explored.Crust.Ironium / 100.0)
       planet.diagram[0].setRect(box)
       box = planet.diagram[1].rect()
-      box.setBottom(-self.scale_length * planet.Explored.Boranium / 100.0)
+      box.setBottom(-self.scale_length * planet.Explored.Crust.Boranium / 100.0)
       planet.diagram[1].setRect(box)
       box = planet.diagram[2].rect()
-      box.setBottom(-self.scale_length * planet.Explored.Germanium / 100.0)
+      box.setBottom(-self.scale_length * planet.Explored.Crust.Germanium / 100.0)
       planet.diagram[2].setRect(box)
 
 
   def ShowSurfaceDiagram(self, planet):
-    minerals = planet.Mined.Ironium + planet.Mined.Boranium + planet.Mined.Germanium
+    minerals = planet.Explored.Surface.Ironium + planet.Explored.Surface.Boranium + planet.Explored.Surface.Germanium
     if planet.Discovered and minerals > 0:
       for element in planet.diagram:
         element.setVisible(True)
       val = [1.2, 1.2, 1.2]
-      if planet.Mined.Ironium < 120:
-        val[0] = planet.Mined.Ironium / 100.0
-      if planet.Mined.Boranium < 120:
-        val[1] = planet.Mined.Boranium / 100.0
-      if planet.Mined.Germanium < 120:
-        val[2] = planet.Mined.Germanium / 100.0
+      if planet.Explored.Surface.Ironium < 120:
+        val[0] = planet.Explored.Surface.Ironium / 100.0
+      if planet.Explored.Surface.Boranium < 120:
+        val[1] = planet.Explored.Surface.Boranium / 100.0
+      if planet.Explored.Surface.Germanium < 120:
+        val[2] = planet.Explored.Surface.Germanium / 100.0
       for n in (0, 1, 2):
         box = planet.diagram[n].rect()
         box.setBottom(-self.scale_length * val[n])
@@ -205,8 +205,10 @@ class Universe(QGraphicsScene):
   def CheckShipTracking(self, p):
     if p.Friendly:
       p.ShipTracking = p.SpaceStation or p.Colonists > 0
+      p.Discovered = True
     if p.TotalFriends > 0:
-      p.ShipTracking = True
+      p.Discovered = True
+      p.ShipTracking = True   # FIXME: requires a scanner on board the ships!
 
 
   def ComputeTurn(self):

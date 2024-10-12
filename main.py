@@ -5,6 +5,7 @@ import stars_rc
 from PyQt6.QtWidgets import QApplication
 
 from gui import Gui
+from defines import Stance
 from planet import Planet
 from ruleset import Ruleset
 from race import Race
@@ -17,18 +18,17 @@ def main():
     app = QApplication(sys.argv)
 
     Rules = Ruleset()
-    Terra = Planet(Rules)
     People = Race()
 
-    form = Gui(People)                 # Create the main user interface
+    form = Gui(People, Rules)            # Create the main user interface
 
     form.Buttons.UpdateFriendlyDesigns(['A - This is a very long name ...', 'B', 'C'])
 
-    Terra.Mined.Ironium = 45000
-    Terra.Mined.Boranium = 2500
-    Terra.Mined.Germanium = 15000
+    Terra = Planet(Rules)
+    Terra.Surface.Ironium = 45000
+    Terra.Surface.Boranium = 2500
+    Terra.Surface.Germanium = 15000
     Terra.Crust.Boranium = 55.0
-    form.PlanetInfo.UpdateMinerals(Terra)
 
     Terra.Gravity = 1 / 8
     Terra.Temperature = -120.6
@@ -38,9 +38,8 @@ def main():
     Terra.GravityRate = 1 / 40
     Terra.RadioactivityRate = -7.0
 
-    form.PlanetInfo.UpdateBiome(Terra)
+    Terra.Explore(2390)
 
-    Terra.Discovered = True
     Terra.Name = 'Tau Ceti'
 
     ship = Ship()
@@ -55,8 +54,16 @@ def main():
     ship.Name = "Explorer"
     ship.Type = "Scout"
 
-    fleet = Fleet(ship)
-    form.FleetInfo.UpdateCargo(fleet)
+    fleet_0 = Fleet(ship, 4, Stance.friendly)
+    fleet_1 = Fleet(ship, 2, Stance.neutral)
+    fleet_2 = Fleet(ship, 8, Stance.hostile)
+
+    ship.Name = "Hauler"
+    ship.Type = "Freighter"
+
+    fleet_3 = Fleet(ship, 6, Stance.friendly)
+    fleet_4 = Fleet(ship, 3, Stance.neutral)
+    fleet_5 = Fleet(ship, 9, Stance.hostile)
 
     form.InspectPlanet(Terra)
 
@@ -67,6 +74,13 @@ def main():
     form.Map.Universe.planets[2].UpdateFoes(-2000)
     form.Map.Universe.planets[2].UpdateFoes(8)
     form.Map.Universe.planets[2].UpdateFoes(18)
+
+    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_0)
+    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_1)
+    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_2)
+    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_3)
+    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_4)
+    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_5)
 
     form.Map.Universe.planets[0].BuildStarbase()
     form.Map.Universe.planets[0].Friendly = True
@@ -87,6 +101,8 @@ def main():
     form.Map.Universe.ComputeTurn()
 
     for p in form.Map.Universe.planets:
+        p.BuildStarbase()
+        p.Explore(2390)
         p.ShowNormalView()
 
 
