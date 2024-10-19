@@ -43,6 +43,7 @@
   </qresource>
   <qresource prefix="Graphics">
     <file alias="Enigma">Images/Graphics/enigma.svg</file>
+    <file alias="Frigate">Images/Graphics/ship-a.svg</file>
   </qresource>
   <qresource prefix="Icons">
     <file alias="Stars">Images/Icons/stars.ico</file>
