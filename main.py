@@ -83,7 +83,7 @@ def main():
     form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_5)
 
     form.Map.Universe.planets[0].BuildStarbase()
-    form.Map.Universe.planets[0].Friendly = True
+    form.Map.Universe.planets[0].Relation = Stance.neutral
     form.Map.Universe.planets[0].Colonists = 24000
 
     form.Map.Universe.planets[5].Surface.Ironium = 20.0
@@ -93,17 +93,15 @@ def main():
     form.Map.Universe.planets[5].Crust.Boranium = 30.0
     form.Map.Universe.planets[5].Crust.Germanium = 90.0
     form.Map.Universe.planets[5].Explore(2400)
-    form.Map.Universe.planets[5].Colonists = 4000
-
-#    form.Map.Universe.ShowCrustDiagram(form.Map.Universe.planets[5])
-    form.Map.Universe.ShowSurfaceDiagram(form.Map.Universe.planets[5])
+    form.Map.Universe.planets[5].Colonists = 400000
+    form.Map.Universe.planets[5].Relation = Stance.allied
 
     form.Map.Universe.ComputeTurn()
 
     for p in form.Map.Universe.planets:
         p.BuildStarbase()
         p.Explore(2390)
-        p.ShowNormalView()
+        p.UpdatePlanetView()
 
 
     form.show()                         # Show the form

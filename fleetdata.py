@@ -1,8 +1,10 @@
 
 from PyQt6.QtCore import QRectF
-from PyQt6.QtGui import QPen, QBrush, QColor, QFont
+from PyQt6.QtGui import QPen, QBrush, QColor, QFont # , QPixmap
 from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene
-from PyQt6 import QtSvgWidgets
+# from PyQt6.QtWidgets import QGraphicsPixmapItem
+from PyQt6.QtSvgWidgets import QGraphicsSvgItem
+
 
 from colours import Brush
 
@@ -152,17 +154,26 @@ class Fleetdata(QGraphicsView):
 
 
   def AddLogos(self):
-    self.FleetImage = QtSvgWidgets.QGraphicsSvgItem(":/Graphics/Enigma")
-    width = self.FleetImage.boundingRect().width()
-    self.FleetImage.setScale(self.IconWidth / width)
+    self.FleetImage = []
     yp = self.TopOffset
-    self.FleetImage.setPos(0, yp)
-    self.Scene.addItem(self.FleetImage)
+    rectangle = QRectF(1, yp + 1, self.IconWidth - 2, self.IconWidth - 2)
+    self.backdrop = self.Scene.addRect(rectangle)
+    self.backdrop.setBrush(QBrush(QColor(200, 200, 255)))
+    for ext in "abcdefg":
+      resource = "Design/Images/Graphics/ship-" + ext + ".svg"
+      image = QGraphicsSvgItem(resource)
+      width = image.boundingRect().width()
+      if width > 0:
+        image.setScale(self.IconWidth / width)
+        image.setPos(0, yp)
+#        image.setVisible(False)
+        self.Scene.addItem(image)
+        self.FleetImage.append(image)
     yp += self.FlagOffset + self.IconWidth
     self.FactionBanner = []
-    for ext in "ABCDEFGHIJKLMNOPQRST":
-      resource = ":/Factions/Faction-" + ext
-      banner = QtSvgWidgets.QGraphicsSvgItem(resource)
+    for faction in "ABCDEFGHIJKLMNOPQRST":
+      resource = ":/Factions/Faction-" + faction
+      banner = QGraphicsSvgItem(resource)
       width = banner.boundingRect().width()
       banner.setScale(0.5 * self.IconWidth / width)
       banner.setPos(0.25 * self.IconWidth, yp)

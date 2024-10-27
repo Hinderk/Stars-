@@ -1,5 +1,6 @@
 
 from minerals import Minerals
+from defines import Stance
 
 
 
@@ -17,7 +18,7 @@ class PlanetData:
 
     self.Colonists = 0
 
-    self.Hostile = False
+    self.Relation = Stance.neutral
     self.SpaceStation = False
 
     self.Crust = Minerals()

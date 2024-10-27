@@ -15,7 +15,8 @@ from design import Design
 from defines import Stance
 from menubar import Menu
 from toolbar import ToolBar
-from ruleset import Ruleset
+# from defines import MapView
+# from ruleset import Ruleset
 from inspector import Inspector
 from fleetdata import Fleetdata
 from starmap import Starmap
@@ -46,10 +47,20 @@ class Gui(QMainWindow):
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
+#        self.ViewMode = MapView.MINIMAL
         design = Design()
         self.setStyleSheet(design.getStyle())
         self.Action = dict()
         self.SetupUI(design, people, rules)
+        self.Buttons.actionRadarView.toggled.connect(self.Map.Universe.ShowScannerRanges)
+        self.Buttons.actionPlanetNames.toggled.connect(self.Map.Universe.ShowPlanetNames)
+        self.Buttons.actionConcentrationView.toggled.connect(self.ShowCrustDiagrams)
+        self.Buttons.actionSurfaceMineralView.toggled.connect(self.ShowSurfaceDiagrams)
+        self.Buttons.actionDefaultView.toggled.connect(self.ShowDefaultView)
+        self.Buttons.actionPopulationView.toggled.connect(self.ShowPopulationView)
+        self.Buttons.actionNoInfoView.toggled.connect(self.ShowMinimalView)
+        self.Buttons.actionPercentView.toggled.connect(self.ShowPercentageView)
+        self.Buttons.actionNoInfoView.setChecked(True)
         self.Map.Universe.ChangeFocus.connect(self.InspectPlanet)
         self.ShowPlanet.clicked.connect(self.InspectPlanets)
         self.SelectNextEnemy.clicked.connect(self.InspectEnemyFleets)
@@ -69,6 +80,7 @@ class Gui(QMainWindow):
         self.CentralWidget.setMinimumSize(2400, 1350)  # TODO: Query design!
 
         LeftSide = QWidget()
+        LeftSide.setMinimumWidth(875)        # Minimal feasible value ...
         LeftSide.setMaximumWidth(875)
 
         Layout_HL = QHBoxLayout(self.CentralWidget)
@@ -258,11 +270,11 @@ class Gui(QMainWindow):
         else:
             self.SelectNextEnemy.setVisible(False)
             self.SelectNextNeutral.setVisible(False)
-        if p.Friendly:
+        if p.Relation == Stance.allied:
             self.ShowNeutralBase.setVisible(False)
             self.ShowAlienBase.setVisible(False)
             self.ShowStarBase.setVisible(p.SpaceStation)
-        elif p.Hostile:
+        elif p.Relation == Stance.hostile:
             self.ShowNeutralBase.setVisible(False)
             self.ShowStarBase.setVisible(False)
             self.ShowAlienBase.setVisible(p.SpaceStation and p.ShipTracking)
@@ -319,3 +331,37 @@ class Gui(QMainWindow):
 
     def InspectPlanets(self, event):
         self.InspectPlanet(self.SelectedPlanet)
+
+
+    def ShowCrustDiagrams(self, event):
+        if event:
+            self.Map.Universe.ShowCrustDiagrams()
+        else:
+            self.Map.Universe.RemoveDiagrams()
+
+
+    def ShowSurfaceDiagrams(self, event):
+        if event:
+            self.Map.Universe.ShowSurfaceDiagrams()
+        else:
+            self.Map.Universe.RemoveDiagrams()
+
+
+    def ShowPopulationView(self, event):
+        if event:
+            self.Map.Universe.ShowPopulationView()
+
+
+    def ShowDefaultView(self, event):
+        if event:
+            self.Map.Universe.ShowDefaultView()
+
+
+    def ShowMinimalView(self, event):
+        if event:
+            self.Map.Universe.ShowMinimalView()
+
+
+    def ShowPercentageView(self, event):
+        if event:
+            self.Map.Universe.ShowPercentageView()

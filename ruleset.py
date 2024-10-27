@@ -1,6 +1,6 @@
 
-import random
-import math
+import random, math
+from scanner import Model
 
 
 # This class facilities the generation of a random "Stars!" universe ...
@@ -149,6 +149,10 @@ class Ruleset(random.Random):
   def FirstYear(self):
     return 2400
 
+  def FirstScanner(self):
+#    return Model.Scoper150
+    return Model.Snooper500X
+
   def GetMaxResources(self):
     return 100.0
 
@@ -162,10 +166,10 @@ class Ruleset(random.Random):
     return 15
 
   def Xmax(self):
-    return 400.0
+    return 800.0
 
   def Ymax(self):
-    return 400.0
+    return 800.0
 
   def Rmin(self):
     return 100.0
