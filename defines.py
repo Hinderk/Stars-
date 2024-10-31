@@ -1,5 +1,7 @@
 
+from PyQt6.QtGui import QFont
 from enum import Enum
+
 
 
 class MapView(Enum):
@@ -50,3 +52,22 @@ class Perks(Enum):
     RSH = 14         # Regenerating shields
     ROB = 15         # Steal freight
     HIDE = 16        # Improve ship cloaking
+
+
+class GuiProps:
+
+    fontsize = 14
+    mapFont = QFont('Courier', pointSize=fontsize, weight=50)
+
+    Xscale = 1.0
+
+    dy_label = 10
+    dy_pointer = 20
+    d_radius = 8
+    p_radius = 8
+    flag_height = 25
+    flag_width = 10
+    flag_stem = 2
+    center_size = 4
+    scale_length = 30
+    pointer_size = 20

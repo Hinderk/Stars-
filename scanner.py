@@ -44,13 +44,13 @@ class Scanner:
   def __init__(self, x, y, model, scene):
     r = model.value[0] * scene.Xscale
     self.range = r
-    self.xo = x + scene.p_radius /2
-    self.yo = y + scene.p_radius /2
+    self.xo = x + scene.p_radius
+    self.yo = y + scene.p_radius
     if r > 0:
       box = QRectF(self.xo - r, self.yo - r, r + r, r + r)
-      self.range = scene.addEllipse(box, Pen.red_s, Brush.red_s)
-      self.range.setZValue(-10)
-      self.range.setVisible(False)
+      self.detection = scene.addEllipse(box, Pen.red_s, Brush.red_s)
+      self.detection.setZValue(-10)
+      self.detection.setVisible(False)
     else:
       self.range = None
     r = model.value[1] * scene.Xscale
@@ -58,7 +58,7 @@ class Scanner:
     if r > 0:
       box = QRectF(self.xo - r, self.yo - r, r + r, r + r)
       self.penetration = scene.addEllipse(box, Pen.yellow_s, Brush.yellow_s)
-      self.penetration.setZValue(-5)
+      self.penetration.setZValue(-8)
       self.penetration.setVisible(False)
     else:
       self.penetration = None
@@ -67,5 +67,16 @@ class Scanner:
   def ShowRanges(self, toggle):
     if self.penetration:
       self.penetration.setVisible(toggle)
-    if self.range:
-      self.range.setVisible(toggle)
+    if self.detection:
+      self.detection.setVisible(toggle)
+
+
+  def ScaleRanges(self, factor):
+    if self.detection:
+      r = factor * self.range
+      box = QRectF(self.xo - r, self.yo - r, r + r, r + r)
+      self.detection.setRect(box)
+    if self.penetration:
+      r = factor * self.penrange
+      box = QRectF(self.xo - r, self.yo - r, r + r, r + r)
+      self.penetration.setRect(box)

@@ -149,6 +149,11 @@ class Ruleset(random.Random):
   def FirstYear(self):
     return 2400
 
+
+  def GetPopulationCeiling(self):
+    return 400000                    # TODO: Species dependent model
+
+
   def FirstScanner(self):
 #    return Model.Scoper150
     return Model.Snooper500X

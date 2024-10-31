@@ -11,6 +11,8 @@ from ruleset import Ruleset
 from race import Race
 from fleet import Fleet
 from ship import Ship
+from minefield import Minefield
+from minefield import Model as M
 
 
 
@@ -95,6 +97,13 @@ def main():
     form.Map.Universe.planets[5].Explore(2400)
     form.Map.Universe.planets[5].Colonists = 400000
     form.Map.Universe.planets[5].Relation = Stance.allied
+
+    x = -300
+    y = -300
+
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 1, M.Normal, Stance.allied))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 100, y + 500, 1, M.Normal, Stance.friendly))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 500, y - 100, 1, M.Normal, Stance.hostile))
 
     form.Map.Universe.ComputeTurn()
 

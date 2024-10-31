@@ -5,14 +5,20 @@ from PyQt6.QtGui import QActionGroup
 from PyQt6.QtGui import QIcon, QAction
 from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QSize
+from PyQt6.QtCore import pyqtSignal as QSignal
+
 
 
 
 class ToolBar(QToolBar):
 
-    def __init__(self, form):
+    ChangeZoom = QSignal(bool, float)
+
+
+    def __init__(self):
 
         super(self.__class__, self).__init__()
+
         self.EnemyDesigns = dict()
         self.FriendlyDesigns = dict()
         Instant = QToolButton.ToolButtonPopupMode.InstantPopup
@@ -147,12 +153,7 @@ class ToolBar(QToolBar):
         Zoom.setAutoRepeat(False)
         Zoom.setToolTip("Define the level of magnification ...")
         Zoom.setStatusTip("Define the level of magnification ...")
-        self.actionZoom = dict()
-        Menu = QMenu(self)
-        Menu.setStyleSheet("QMenu::item { padding: 5px 30px 5px 0px }")
-        self.DefineZoomLevel(Menu, ['25%', '50%', '75%', '100%', '125%', '150%', '200%', '400%'])
-        Zoom.setMenu(Menu)
-        self.actionZoom['100%'].setChecked(True)
+        self.DefineZoomMenu(Zoom, [25, 50, 75, 100, 125, 150, 200, 400])
 
         Icon = QIcon(":/Toolbar/Paths")
         self.actionPathOverlay = QAction(self)
@@ -243,11 +244,29 @@ class ToolBar(QToolBar):
             self.EnemyDesigns[NewDesign] = NewAction
 
 
-    def DefineZoomLevel(self, Menu, LevelSet):
+    def DefineZoomMenu(self, Zoom, LevelSet):
 
-        for Level in LevelSet:
-            NewAction = Menu.addAction(Level)
+        class ZoomAction(QAction):
+
+            def __init__(self, level):
+                super(self.__class__, self).__init__()
+                self.ZoomLevel = level
+
+        zoomActions = QActionGroup(Zoom)
+        Menu = QMenu(self)
+        for level in LevelSet:
+            NewAction = ZoomAction(level)
+            Menu.addAction(NewAction)
             NewAction.setCheckable( True )
-            NewAction.setText(Level)
-            NewAction.setToolTip('Set magnification level: ' + Level)
-            self.actionZoom[Level] = NewAction
+            label = str(level) + '%'
+            NewAction.setText(label)
+            NewAction.setToolTip('Set magnification level: ' + label)
+            zoomActions.addAction(NewAction)
+            NewAction.setChecked(level == 100)
+            NewAction.toggled.connect(self.ResizeStarmap)
+        Menu.setStyleSheet("QMenu::item { padding: 5px 30px 5px 0px }")
+        Zoom.setMenu(Menu)
+
+
+    def ResizeStarmap(self, event):
+        self.ChangeZoom.emit(event, self.sender().ZoomLevel)

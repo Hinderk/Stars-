@@ -15,8 +15,6 @@ from design import Design
 from defines import Stance
 from menubar import Menu
 from toolbar import ToolBar
-# from defines import MapView
-# from ruleset import Ruleset
 from inspector import Inspector
 from fleetdata import Fleetdata
 from starmap import Starmap
@@ -47,7 +45,6 @@ class Gui(QMainWindow):
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
-#        self.ViewMode = MapView.MINIMAL
         design = Design()
         self.setStyleSheet(design.getStyle())
         self.Action = dict()
@@ -61,6 +58,8 @@ class Gui(QMainWindow):
         self.Buttons.actionNoInfoView.toggled.connect(self.ShowMinimalView)
         self.Buttons.actionPercentView.toggled.connect(self.ShowPercentageView)
         self.Buttons.actionNoInfoView.setChecked(True)
+        self.Buttons.RadarRange.valueChanged.connect(self.Map.Universe.ScaleRadarRanges)
+        self.Buttons.ChangeZoom.connect(self.Map.ResizeStarmap)
         self.Map.Universe.ChangeFocus.connect(self.InspectPlanet)
         self.ShowPlanet.clicked.connect(self.InspectPlanets)
         self.SelectNextEnemy.clicked.connect(self.InspectEnemyFleets)
@@ -88,7 +87,7 @@ class Gui(QMainWindow):
         Layout_VL = QVBoxLayout(LeftSide)
         Layout_VL.setSpacing(0)
 
-        self.Buttons = ToolBar(self)
+        self.Buttons = ToolBar()
         self.Buttons.setAutoFillBackground(True)
         self.Buttons.setMovable(False)
         self.Buttons.setIconSize(QSize(40, 40))

@@ -11,26 +11,11 @@ from scanner import Scanner
 from planet import Planet
 from colours import Pen
 from colours import Brush
-from defines import Stance
+from defines import Stance, GuiProps
 
 
 
-class Universe(QGraphicsScene):
-
-  fontsize = 14
-  font = QFont('Courier', pointSize=fontsize, weight=50)
-
-  Xscale = 1.0
-
-  dy_label = 10
-  dy_pointer = 20
-  d_radius = 8
-  p_radius = 8
-  flag_height = 25
-  flag_width = 10
-  flag_stem = 2
-  scale_length = 30
-  pointer_size = 20
+class Universe(QGraphicsScene, GuiProps):
 
   ChangeFocus = QSignal(Planet)
 
@@ -43,7 +28,7 @@ class Universe(QGraphicsScene):
     self.minefields = []
     self.debris = []
 
-    self.PopulationCeiling = 400000  # TODO: query rules for this number
+    self.PopulationCeiling = rules.GetPopulationCeiling()
 
     self.CreateIndicator()
     self.NamesVisible = False
@@ -159,6 +144,17 @@ class Universe(QGraphicsScene):
     self.update()
 
 
+  def ScaleRadarRanges(self, factor):
+    f = factor / 100.0
+    for p in self.planets:
+      if p.scanner:
+        p.scanner.ScaleRanges(f)
+    for f in self.fleets:
+      if f.scanner:
+        f.scanner.ScaleRanges(f)
+    self.update()
+
+
   def ShowPercentageView(self):
     for p in self.planets:
       p.ShowPercentageView()
@@ -209,7 +205,7 @@ class Universe(QGraphicsScene):
 
 
   def CreateOrbitLabel(self, x, y):
-    label = self.addSimpleText("", self.font)
+    label = self.addSimpleText("", self.mapFont)
     label.setPen(Pen.white)
     label.setBrush(Brush.white)
     label.setPos(x, y)
@@ -266,7 +262,7 @@ class Universe(QGraphicsScene):
     p.neutral.setVisible(False)
     p.foes.setVisible(False)
     p.friends.setVisible(False)
-    p.label = self.addSimpleText(p.Name, self.font)
+    p.label = self.addSimpleText(p.Name, self.mapFont)
     p.label.setPen(Pen.white_l)
     p.label.setBrush(Brush.white_l)
     p.label.setVisible(False)
