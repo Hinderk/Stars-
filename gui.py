@@ -60,6 +60,8 @@ class Gui(QMainWindow):
         self.Buttons.actionNoInfoView.setChecked(True)
         self.Buttons.RadarRange.valueChanged.connect(self.Map.Universe.ScaleRadarRanges)
         self.Buttons.ChangeZoom.connect(self.Map.ResizeStarmap)
+        self.Buttons.Mines.toggled.connect(self.Map.Universe.ShowFields)
+        self.Buttons.ShowMines.connect(self.Map.Universe.ShowMines)
         self.Map.Universe.ChangeFocus.connect(self.InspectPlanet)
         self.ShowPlanet.clicked.connect(self.InspectPlanets)
         self.SelectNextEnemy.clicked.connect(self.InspectEnemyFleets)

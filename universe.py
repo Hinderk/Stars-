@@ -28,6 +28,13 @@ class Universe(QGraphicsScene, GuiProps):
     self.minefields = []
     self.debris = []
 
+    self.FieldsVisible = False
+    self.ShowField = dict()
+    self.ShowField[Stance.allied] = True
+    self.ShowField[Stance.friendly] = True
+    self.ShowField[Stance.neutral] = True
+    self.ShowField[Stance.hostile] = True
+
     self.PopulationCeiling = rules.GetPopulationCeiling()
 
     self.CreateIndicator()
@@ -76,6 +83,26 @@ class Universe(QGraphicsScene, GuiProps):
       self.pointer.setPos(p.x + self.p_radius, yp)
     self.LastPlanet = p
     self.ChangeFocus.emit(p)
+
+
+  def ShowMines(self, switch, fof):
+    old = self.ShowField[fof]
+    self.ShowField[fof] = switch
+    if self.FieldsVisible and old != switch:
+      self.ShowFields(True)
+
+
+  def ShowFields(self, show):
+    if show:
+      for field in self.minefields:
+        switch = self.ShowField[field.fof]
+        field.area.setVisible(switch)
+        field.center.setVisible(switch)
+    else:
+      for field in self.minefields:
+        field.area.setVisible(False)
+        field.center.setVisible(False)
+    self.FieldsVisible = show
 
 
   def ShowScannerRanges(self, switch):
@@ -141,6 +168,7 @@ class Universe(QGraphicsScene, GuiProps):
         p.body.setRect(QRectF(x, y, w, w))
         p.body.setPen(Pen.brown)
         p.body.setBrush(Brush.brown)
+        p.population.setText(str(p.Colonists))
     self.update()
 
 
@@ -206,8 +234,8 @@ class Universe(QGraphicsScene, GuiProps):
 
   def CreateOrbitLabel(self, x, y):
     label = self.addSimpleText("", self.mapFont)
-    label.setPen(Pen.white)
-    label.setBrush(Brush.white)
+    label.setPen(Pen.white_l)
+    label.setBrush(Brush.white_l)
     label.setPos(x, y)
     label.setVisible(False)
     return label
@@ -271,6 +299,7 @@ class Universe(QGraphicsScene, GuiProps):
     p.ships = self.CreateOrbitLabel(x - c / 2, y + w - self.fontsize)
     p.attackers = self.CreateOrbitLabel(x - c / 2, y - self.fontsize / 2)
     p.others = self.CreateOrbitLabel(x + w + c / 2, y + w - self.fontsize)
+    p.population = self.CreateOrbitLabel(x + w + c / 2, y - self.fontsize / 2)
     flag = QPolygonF()
     flag << QPointF(0, 0) << QPointF(0, - self.flag_height - self.flag_width)
     flag << QPointF(self.flag_width + self.flag_stem, -self.flag_height - self.flag_width)

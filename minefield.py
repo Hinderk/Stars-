@@ -55,5 +55,5 @@ class Minefield:
     self.center.setBrush(brush)
     self.center.setZValue(2)
     self.center.setPos(x, y)
-    self.area.setVisible(True)
-    self.center.setVisible(True)
+    self.area.setVisible(False)
+    self.center.setVisible(False)

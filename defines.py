@@ -14,10 +14,12 @@ class MapView(Enum):
 
 
 class Stance(Enum):
-    allied = 0
-    friendly = 1
-    neutral = 2
-    hostile = 3
+    none = 0
+    allied = 1
+    friendly = 2
+    neutral = 4
+    hostile = 8
+    accept = 15
 
 
 class Traits(Enum):

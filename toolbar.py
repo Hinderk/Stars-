@@ -7,12 +7,18 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QSize
 from PyQt6.QtCore import pyqtSignal as QSignal
 
+from defines import Stance
+
+
+Instant = QToolButton.ToolButtonPopupMode.InstantPopup
+Delayed = QToolButton.ToolButtonPopupMode.DelayedPopup
 
 
 
 class ToolBar(QToolBar):
 
     ChangeZoom = QSignal(bool, float)
+    ShowMines = QSignal(bool, Stance)
 
 
     def __init__(self):
@@ -21,36 +27,20 @@ class ToolBar(QToolBar):
 
         self.EnemyDesigns = dict()
         self.FriendlyDesigns = dict()
-        Instant = QToolButton.ToolButtonPopupMode.InstantPopup
-
-        MineFilter = QMenu(self)
-        MineFilter.setStyleSheet("QMenu::item{padding: 5px 40px 5px 0px}")
-        self.AllMines = MineFilter.addAction('   All Mine Fields')
-        self.NoMines = MineFilter.addAction('   No Mine Fields')
-        MineFilter.addSeparator()
-        self.YourMines = MineFilter.addAction('Mine Fields of Yours')
-        self.FriendlyMines = MineFilter.addAction('Mine Fields of Friends')
-        self.NeutralMines = MineFilter.addAction('Mine Fields of Neutrals')
-        self.EnemyMines = MineFilter.addAction('Mine Fields of Enemies')
-        self.YourMines.setCheckable(True)
-        self.FriendlyMines.setCheckable(True)
-        self.NeutralMines.setCheckable(True)
-        self.EnemyMines.setCheckable(True)
-        self.YourMines.setChecked(True)
-        self.FriendlyMines.setChecked(True)
-        self.NeutralMines.setChecked(True)
-        self.EnemyMines.setChecked(True)
+        self.MineFilter = dict()
+        self.MineFilter[Stance.allied] = True
+        self.MineFilter[Stance.friendly] = True
+        self.MineFilter[Stance.neutral] = True
+        self.MineFilter[Stance.hostile] = True
 
         Icon = QIcon(":/Toolbar/Mine")
-        self.MineOverlay = QToolButton(self)
-        self.MineOverlay.setIcon(Icon)
-        self.MineOverlay.setPopupMode(Instant)
-        self.MineOverlay.setCheckable(False)
-        self.MineOverlay.setChecked(True)
-        self.MineOverlay.setAutoRepeat(False)
-        self.MineOverlay.setMenu(MineFilter)
-        self.MineOverlay.setToolTip('Show mine fields ...')
-        self.MineOverlay.setStatusTip('Show mine fields ...')
+        self.Mines = QToolButton(self)
+        self.Mines.setIcon(Icon)
+        self.Mines.setCheckable(True)
+        self.Mines.setAutoRepeat(False)
+        self.Mines.setToolTip('Show mine fields ...')
+        self.Mines.setStatusTip('Show mine fields ...')
+        self.DefineMineMenu(self.Mines)
 
         Icon = QIcon(":/Toolbar/Default")
         self.actionDefaultView = QAction(self)
@@ -204,7 +194,7 @@ class ToolBar(QToolBar):
         self.addAction(self.actionAddWaypoint)
         self.addAction(self.actionRadarView)
         self.addWidget(self.RadarRange)
-        self.addWidget(self.MineOverlay)
+        self.addWidget(self.Mines)
         self.addAction(self.actionPathOverlay)
         self.addAction(self.actionPlanetNames)
         self.addAction(self.actionShipCount)
@@ -270,3 +260,67 @@ class ToolBar(QToolBar):
 
     def ResizeStarmap(self, event):
         self.ChangeZoom.emit(event, self.sender().ZoomLevel)
+
+
+    def DefineMineMenu(self, Mines):
+
+        class MineAction(QAction):
+
+            def __init__(self, stance):
+                super(self.__class__, self).__init__()
+                self.MineView = stance
+
+        @staticmethod
+        def addAction(menu, action, label, tick=True):
+            action.setText(label)
+            action.setCheckable(tick)
+            action.setChecked(True)
+            if tick:
+                action.toggled.connect(self.ShowMinefields)
+            else:
+                action.triggered.connect(self.ChangeMineDisplay)
+            menu.addAction(action)
+
+        Menu = QMenu(self)
+        Menu.setStyleSheet("QMenu::item{padding: 5px 40px 5px 0px}")
+        self.AllMines = MineAction(Stance.accept)
+        self.NoMines = MineAction(Stance.none)
+        self.AlliedMines = MineAction(Stance.allied)
+        self.FriendlyMines = MineAction(Stance.friendly)
+        self.NeutralMines = MineAction(Stance.neutral)
+        self.HostileMines = MineAction(Stance.hostile)
+        addAction(Menu, self.AllMines, '   All Mine Fields', False)
+        addAction(Menu, self.NoMines, '   No Mine Fields', False)
+        Menu.addSeparator()
+        addAction(Menu, self.AlliedMines, 'Mine Fields of Yours')
+        addAction(Menu, self.FriendlyMines, 'Mine Fields of Friends')
+        addAction(Menu, self.NeutralMines, 'Mine Fields of Neutrals')
+        addAction(Menu, self.HostileMines, 'Mine Fields of Enemies')
+        Mines.setMenu(Menu)
+
+
+    def ChangeMineDisplay(self, event):
+        show = (self.sender().MineView == Stance.accept)
+        if not show:
+            self.Mines.setChecked(False)
+        self.AlliedMines.setChecked(show)
+        self.FriendlyMines.setChecked(show)
+        self.NeutralMines.setChecked(show)
+        self.HostileMines.setChecked(show)
+
+
+    def ShowMinefields(self, event):
+        fof = self.sender().MineView
+        self.MineFilter[fof] = event
+        show = False
+        for b in self.MineFilter.values():
+            show = show or b
+        if show:
+            self.Mines.setCheckable(True)
+            self.Mines.setChecked(True)
+            self.Mines.setPopupMode(Delayed)
+        else:
+            self.Mines.setChecked(False)
+            self.Mines.setCheckable(False)
+            self.Mines.setPopupMode(Instant)
+        self.ShowMines.emit(event, fof)

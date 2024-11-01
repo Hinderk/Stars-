@@ -36,6 +36,7 @@ class Planet(PlanetData):
     self.ships = None
     self.others = None
     self.flag = None
+    self.population = None
 
     self.scanner = None
     self.diagram = Diagram()
@@ -208,6 +209,7 @@ class Planet(PlanetData):
     self.ships.setVisible(self.friendsVisible)
     self.attackers.setVisible(self.attackersVisible)
     self.others.setVisible(self.neutralVisible)
+    self.population.setVisible(False)
     self.flag.setVisible(False)
 
 
@@ -223,6 +225,7 @@ class Planet(PlanetData):
     self.ships.setVisible(False)
     self.attackers.setVisible(False)
     self.others.setVisible(False)
+    self.population.setVisible(False)
     self.flag.setVisible(False)
 
 
@@ -238,6 +241,7 @@ class Planet(PlanetData):
     self.ships.setVisible(False)
     self.attackers.setVisible(False)
     self.others.setVisible(False)
+    self.population.setVisible(False)
     self.flag.setVisible(self.flagVisible)
 
 
@@ -253,4 +257,5 @@ class Planet(PlanetData):
     self.ships.setVisible(False)
     self.attackers.setVisible(False)
     self.others.setVisible(False)
+    self.population.setVisible(self.bodyVisible)
     self.flag.setVisible(False)
