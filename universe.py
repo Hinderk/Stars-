@@ -52,8 +52,8 @@ class Universe(QGraphicsScene, GuiProps):
 
   def mousePressEvent(self, mouseClick):
     pos = mouseClick.scenePos()
-    xo = pos.x()
-    yo = pos.y()
+    xo = pos.x() / self.Xscale
+    yo = pos.y() / self.Xscale
     po = None
     dist = 1e20
     for p in self.planets:
@@ -79,8 +79,9 @@ class Universe(QGraphicsScene, GuiProps):
       p.label.setPen(Pen.white)
       p.label.setBrush(Brush.white)
     else:
-      yp = p.y + 2 * self.p_radius + self.dy_pointer
-      self.pointer.setPos(p.x + self.p_radius, yp)
+      xp = self.Xscale * p.x
+      yp = self.Xscale * p.y + self.p_radius + self.dy_pointer
+      self.pointer.setPos(xp, yp)
     self.LastPlanet = p
     self.ChangeFocus.emit(p)
 
@@ -162,8 +163,8 @@ class Universe(QGraphicsScene, GuiProps):
         if q > 1.0:
           q = 1.0
         rnew = self.p_radius * (1 + q) / 2 + q * self.d_radius
-        x = p.x + self.p_radius - rnew
-        y = p.y + self.p_radius - rnew
+        x = self.Xscale * p.x - rnew
+        y = self.Xscale * p.y - rnew
         w = 2 * rnew
         p.body.setRect(QRectF(x, y, w, w))
         p.body.setPen(Pen.brown)
@@ -177,9 +178,9 @@ class Universe(QGraphicsScene, GuiProps):
     for p in self.planets:
       if p.scanner:
         p.scanner.ScaleRanges(f)
-    for f in self.fleets:
-      if f.scanner:
-        f.scanner.ScaleRanges(f)
+    for fleet in self.fleets:
+      if fleet.scanner:
+        fleet.scanner.ScaleRanges(f)
     self.update()
 
 
@@ -201,8 +202,8 @@ class Universe(QGraphicsScene, GuiProps):
           p.body.setBrush(Brush.green)
           q = 3 * (q - 0.66)
         rnew = self.p_radius * (1 + q) / 2 + q * self.d_radius
-        x = p.x + self.p_radius - rnew
-        y = p.y + self.p_radius - rnew
+        x = self.Xscale * p.x - rnew
+        y = self.Xscale * p.y - rnew
         w = 2 * rnew
         p.body.setRect(QRectF(x, y, w, w))
       if p.flagVisible:
@@ -222,14 +223,57 @@ class Universe(QGraphicsScene, GuiProps):
 
 
   def CreatePlanets(self, rules):
+    x = []
+    y = []
     n = rules.PlanetCount()
     while n > 0:
       n -= 1
       p = self.CreatePlanet(rules, n < 1)
+      x.append(p.x)
+      y.append(p.y)
       self.planets.append(p)
-    p.scanner = Scanner(p.x, p.y, rules.FirstScanner(), self)
+    xmin = self.Xscale * min(x) - self.map_frame
+    xmax = self.Xscale * max(x) + self.map_frame
+    ymin = self.Xscale * min(y) - self.map_frame
+    ymax = self.Xscale * max(y) + self.map_frame
+    self.setSceneRect(xmin, ymin, xmax - xmin, ymax - ymin)
+    model = rules.FirstScanner()
+    if model:
+      p.scanner = self.CreateScanner(p.x, p.y, model.value)
     self.LastPlanet = p
     self.HighlightPlanet(p)
+
+
+  def CreateScanner(self, xo, yo, ranges):
+    s = Scanner(xo, yo, ranges)
+    r = ranges[0] * self.Xscale
+    x = self.Xscale * xo
+    y = self.Xscale * yo
+    if r > 0:
+      box = QRectF(x - r, y - r, r + r, r + r)
+      s.detection = self.addEllipse(box, Pen.red_s, Brush.red_s)
+      s.detection.setZValue(-10)
+      s.detection.setVisible(False)
+    r = ranges[1] * self.Xscale
+    if r > 0:
+      box = QRectF(x - r, y - r, r + r, r + r)
+      s.penetration = self.addEllipse(box, Pen.yellow_s, Brush.yellow_s)
+      s.penetration.setZValue(-8)
+      s.penetration.setVisible(False)
+    return s
+
+
+  def RegisterFleet(self, fleet, p, y=None):
+    r = fleet.MaxRange
+    if y:
+      if fleet.FriendOrFoe == Stance.allied and r > 0:
+        fleet.scanner = self.CreateScanner(p, y, [r, fleet.PenRange])
+    else:
+      if fleet.FriendOrFoe == Stance.allied and r > 0:
+        fleet.scanner = self.CreateScanner(p.x, p.y, [r, fleet.PenRange])
+      p.fleets_in_orbit.append(fleet)
+      p.EnterOrbit(fleet)
+    self.fleets.append(fleet)
 
 
   def CreateOrbitLabel(self, x, y):
@@ -264,18 +308,18 @@ class Universe(QGraphicsScene, GuiProps):
 
   def CreatePlanet(self, rules, homeworld):
     p = Planet(rules, homeworld)
-    [x, y] = rules.FindPosition()
-    p.x = x * self.Xscale
-    p.y = y * self.Xscale
+    [p.x, p.y] = rules.FindPosition()
     w = self.p_radius
-    x = p.x + w / 2
-    y = p.y + w / 2
+    xo = p.x * self.Xscale - w
+    yo = p.y * self.Xscale - w
+    x = xo + w / 2
+    y = yo + w / 2
     p.center = self.addEllipse(x, y, w, w, Pen.white, Brush.white)
     w += self.p_radius
-    p.core = self.addEllipse(p.x, p.y, w, w, Pen.brown, Brush.brown)
+    p.core = self.addEllipse(xo, yo, w, w, Pen.brown, Brush.brown)
     p.core.setVisible(False)
-    x = p.x - self.d_radius
-    y = p.y - self.d_radius
+    x = xo - self.d_radius
+    y = yo - self.d_radius
     w += 2 * self.d_radius
     c = 0.3 * w
     dc = w - 7 * c / 8

@@ -12,6 +12,8 @@ from diagram import Diagram
 
 class Planet(PlanetData):
 
+  GameYear = 2400                  # Modify this date prior to creating the user interface ...
+
   def __init__(self, Rules, HomeWorld=False):
 
     self.Name = Rules.FindName()                       # The name of the solar system
@@ -45,16 +47,15 @@ class Planet(PlanetData):
     self.starbaseVisible = False
     self.foesVisible = False
     self.friendsVisible = False
-    self.attackersVisible = False
+    self.othersVisible = False
     self.coreVisible = False
     self.bodyVisible = False
-    self.shipsVisible = False
-    self.othersVisible = False
     self.flagVisible = False
 
     self.fleets_in_orbit = []
 
     self.TotalFriends = 0
+    self.IdleFriends = 0
     self.TotalFoes = 0
     self.TotalOthers = 0
     self.TotalOrbit = 0
@@ -62,6 +63,8 @@ class Planet(PlanetData):
 
     self.Discovered = HomeWorld                      # Obviously, the home world is settled
     self.ShipTracking = HomeWorld                    # from the first turn of the game ...
+    self.showIdleOnly = False
+    self.strengthVisible = False
 
     self.SpaceStation = False
 
@@ -69,7 +72,7 @@ class Planet(PlanetData):
     self.Explored = PlanetData()                     # inside the planet's crust and - for
     if HomeWorld:                                    # the home world - on its surface
       self.Surface = Minerals(Rules, 0.1)
-      self.Explore(Rules.FirstYear())                # Start with the first game year ...
+      self.Explore(Planet.GameYear)                  # Start with the first game year ...
       self.Relation = Stance.allied
     else:
       self.Surface = Minerals()
@@ -87,18 +90,35 @@ class Planet(PlanetData):
     return random.triangular(0.0, 1.0, 0.5)
 
 
-  def UpdateShipTracking(self):  # FIXME:   Use Explore to set Discovered ...
+  def UpdateShipTracking(self):
     if self.Relation == Stance.allied:
-      self.ShipTracking = self.SpaceStation or self.Colonists > 0   # FIXME: Don't set value, use or operator instead!
-      self.Discovered = True
+      if self.SpaceStation or self.Colonists > 0:
+        self.ShipTracking = True
     if self.TotalFriends > 0:
-      self.Discovered = True
-      self.ShipTracking = True   # FIXME: requires a scanner on board the ships!
+      for f in self.fleets_in_orbit:
+        if f.FriendOrFoe == Stance.allied:
+          self.ShipTracking = True
+          break
+    if self.ShipTracking:
+      self.Explore(Planet.GameYear)
+
+
+  def EnterOrbit(self, fleet):
+    ships = len(fleet.ShipList)
+    if ships > 0:
+      if fleet.FriendOrFoe == Stance.allied:
+        self.UpdateFriends(ships)
+      elif fleet.FriendOrFoe == Stance.hostile:
+        self.UpdateFoes(ships)
+      else:
+        self.UpdateOthers(ships)
 
 
   def UpdateFriends(self, count=0):
     self.TotalFriends += count
     self.TotalOrbit += count
+    if self.TotalOrbit < 1:
+      self.TotalOrbit = 0
     if self.TotalFriends > 0:
       self.friendsVisible = True
       self.orbitVisible = True
@@ -107,71 +127,45 @@ class Planet(PlanetData):
       self.ships.setText(str(self.TotalFriends))
       w = self.ships.boundingRect().width()
       self.ships.setX(x0 - w + w0)
-      self.shipsVisible = True
     else:
       self.TotalFriends = 0
-      self.shipsVisible = False
       self.friendsVisible = False
-    if self.TotalOrbit < 1:
-      self.TotalOrbit = 0
-      self.orbitVisible = False
-    else:
-      self.orbitVisible = self.ShipTracking
 
 
   def UpdateFoes(self, count=0):
     self.TotalFoes += count
     self.TotalOrbit += count
+    if self.TotalOrbit < 1:
+      self.TotalOrbit = 0
     if self.TotalFoes > 0:
-      self.foesVisible = self.ShipTracking
-      self.orbitVisible = self.ShipTracking
+      self.foesVisible |= self.ShipTracking
       w0 = self.attackers.boundingRect().width()
       x0 = self.attackers.x()
       self.attackers.setText(str(self.TotalFoes))
       w = self.attackers.boundingRect().width()
       self.attackers.setX(x0 - w + w0)
-      self.attackersVisible = self.ShipTracking
     else:
       self.TotalFoes = 0
-      self.attackersVisible = False
       self.foesVisible = False
-    if self.TotalOrbit < 1:
-      self.TotalOrbit = 0
-      self.orbitVisible = False
-    else:
-      self.orbitVisible = self.ShipTracking
 
 
   def UpdateOthers(self, count=0):
     self.TotalOthers += count
     self.TotalOrbit += count
+    if self.TotalOrbit < 1:
+      self.TotalOrbit = 0
     if self.TotalOthers > 0:
-      self.neutralVisible = self.ShipTracking
-      self.orbitVisible = self.ShipTracking
+      self.othersVisible |= self.ShipTracking
       self.others.setText(str(self.TotalOthers))
-      self.othersVisible = self.ShipTracking
     else:
       self.TotalOthers = 0
       self.othersVisible = False
-      self.neutralVisible = False
-    if self.TotalOrbit < 1:
-      self.TotalOrbit = 0
-      self.orbitVisible = False
-    else:
-      self.orbitVisible = self.ShipTracking
-
-
-  def RevealStarbase(self):
-    show = self.ShipTracking and self.SpaceStation
-    self.orbitVisible = show
-    self.starbaseVisible = show
 
 
   def BuildStarbase(self):
     if not self.SpaceStation:
       self.TotalOrbit += 1
       self.SpaceStation = True
-    self.RevealStarbase()
 
 
   def DestroyStarbase(self):
@@ -185,10 +179,16 @@ class Planet(PlanetData):
 
 
   def UpdatePlanetView(self):
-    self.RevealStarbase()
+    self.UpdateShipTracking()
     self.UpdateFoes()
     self.UpdateOthers()
     self.UpdateFriends()
+    if self.SpaceStation:
+      self.starbaseVisible = self.ShipTracking
+    if self.TotalOrbit < 1:
+      self.orbitVisible = False
+    else:
+      self.orbitVisible |= self.ShipTracking
     self.coreVisible = self.ShipTracking or self.Discovered
     if self.Colonists > 0:
       self.bodyVisible = (self.Relation == Stance.allied)
@@ -203,12 +203,12 @@ class Planet(PlanetData):
     self.body.setVisible(False)
     self.orbit.setVisible(self.orbitVisible)
     self.starbase.setVisible(self.starbaseVisible)
-    self.neutral.setVisible(self.neutralVisible)
+    self.neutral.setVisible(self.othersVisible)
     self.foes.setVisible(self.foesVisible)
     self.friends.setVisible(self.friendsVisible)
     self.ships.setVisible(self.friendsVisible)
-    self.attackers.setVisible(self.attackersVisible)
-    self.others.setVisible(self.neutralVisible)
+    self.attackers.setVisible(self.foesVisible)
+    self.others.setVisible(self.othersVisible)
     self.population.setVisible(False)
     self.flag.setVisible(False)
 

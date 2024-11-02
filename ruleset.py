@@ -1,11 +1,46 @@
 
-import random, math
+import random
+import math
+from defines import GuiProps
 from scanner import Model
+from faction import Faction
 
 
 # This class facilities the generation of a random "Stars!" universe ...
 
 class Ruleset(random.Random):
+
+  fID0 = 0   # Define the index of the faction controlled by the player ...
+
+
+  def MinefieldDecay(fID):
+    return 0.02
+
+
+  def CloakingRatio(Cloaking, Weight):
+    cloak = Cloaking / Weight
+    if cloak <= 100:
+      c = cloak / 2
+    else:
+      cloak -= 100
+      if cloak <= 200:
+        c = 50 + cloak / 8
+      else:
+        cloak -= 200
+        if cloak <= 312:
+          c = 75 + cloak / 24
+        else:
+          cloak -= 312
+          if cloak <= 512:
+            c = 88 + cloak / 64
+          elif cloak < 768:
+            c = 96
+          elif cloak < 1000:
+            c = 97
+          else:
+            c = 98
+    return c / 100
+
 
   NameList = ["Aarhus", "Abderhalden", "Aberdonia", "Abilunon", "Abkhazia",
                "Achaemenides", "Adachi", "Adelheid", "Admetos", "Adonis",
@@ -107,7 +142,7 @@ class Ruleset(random.Random):
     super(self.__class__, self).__init__(seed)
     self.Seed = seed
     self.Location = []
-    self.PlanetNames = list(self.NameList)
+    self.PlanetNames = list(Ruleset.NameList)
 
 
   def _FindClosest(self, x0, y0):
@@ -133,6 +168,7 @@ class Ruleset(random.Random):
 
 
   def FindPosition(self):
+    rmin = GuiProps.planet_distance / GuiProps.Xscale
     xlim = self.Xmax()
     ylim = self.Ymax()
     Retries = 0
@@ -140,7 +176,7 @@ class Ruleset(random.Random):
       x = self.uniform(-xlim, xlim)
       y = self.uniform(-ylim, ylim)
       r = self._FindClosest(x, y)
-      if r > self.Rmin():
+      if r > self.Rmin() and r > rmin:
         self.Location.append([x, y])
         return [x, y]
     return None
@@ -171,10 +207,10 @@ class Ruleset(random.Random):
     return 15
 
   def Xmax(self):
-    return 800.0
+    return 1000.0
 
   def Ymax(self):
-    return 800.0
+    return 1000.0
 
   def Rmin(self):
-    return 100.0
+    return 20.0

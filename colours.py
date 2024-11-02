@@ -13,8 +13,8 @@ _white = QColor(255, 255, 255)
 _brown = QColor(181, 101, 29)
 _neutral = QColor(40, 220, 40)
 
-_scanner_yellow = QColor(255, 255, 0, 120)
-_scanner_red = QColor(255, 120, 0, 220)
+_scanner_yellow = QColor(236, 175, 0)     # QColor(255, 255, 0, 120)
+_scanner_red = QColor(220, 104, 0)        # QColor(255, 120, 0, 220)
 _label_white = QColor(255, 255, 255, 120)
 
 _light_blue = QColor(0, 100, 255)

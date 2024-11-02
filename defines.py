@@ -61,7 +61,7 @@ class GuiProps:
     fontsize = 14
     mapFont = QFont('Courier', pointSize=fontsize, weight=50)
 
-    Xscale = 1.0
+    Xscale = 0.75       # Change to resize the star map ...
 
     dy_label = 10
     dy_pointer = 20
@@ -70,6 +70,9 @@ class GuiProps:
     flag_height = 25
     flag_width = 10
     flag_stem = 2
-    center_size = 4
+    center_size = 3
     scale_length = 30
     pointer_size = 20
+
+    map_frame = 200          # screen coordinates ...
+    planet_distance = 100    # screen coordinates ...

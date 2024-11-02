@@ -1,6 +1,7 @@
 
 class Diagram:
 
+
   def __init__(self):
 
     self.BlueBox = None
@@ -9,8 +10,8 @@ class Diagram:
     self.VAxis = None
     self.HAxis = None
     self.ScaleLength = 0
-    
-    
+
+
   def Show(self, switch):
 
     self.BlueBox.setVisible(switch)
@@ -64,4 +65,3 @@ class Diagram:
       self.Show(True)
     else:
       self.Show(False)
-      

@@ -5,12 +5,16 @@ import stars_rc
 from PyQt6.QtWidgets import QApplication
 
 from gui import Gui
+from faction import Faction
 from defines import Stance
 from planet import Planet
 from ruleset import Ruleset
 from race import Race
 from fleet import Fleet
 from ship import Ship
+from system import System
+from system import SystemType as ST
+from scanner import Model
 from minefield import Minefield
 from minefield import Model as M
 
@@ -44,19 +48,27 @@ def main():
 
     Terra.Name = 'Tau Ceti'
 
+    s = System()
+    s.itemCount = 1
+    s.itemType = Model.Rhino
+    s.domain = ST.SCANNER
+
     ship = Ship()
-    ship.TotalWeight = 25
+    ship.EmptyWeight = 25
+    ship.TotalWeight = 120
     ship.CargoSpace = 200
+    ship.System.append(s)
     ship.Settlers = 60
     ship.Boranium = 10
     ship.Germanium = 30
     ship.Ironium = 20
+    ship.Cloaking = 700
     ship.Fuel = 130
     ship.TotalFuel = 150
     ship.Name = "Explorer"
     ship.Type = "Scout"
 
-    fleet_0 = Fleet(ship, 4, Stance.friendly)
+    fleet_0 = Fleet(ship, 4, Stance.allied)
     fleet_1 = Fleet(ship, 2, Stance.neutral)
     fleet_2 = Fleet(ship, 8, Stance.hostile)
 
@@ -69,20 +81,14 @@ def main():
 
     form.InspectPlanet(Terra)
 
-    form.Map.Universe.planets[2].UpdateFriends(2020)
-    form.Map.Universe.planets[2].UpdateFriends(-2000)
-    form.Map.Universe.planets[2].UpdateOthers(2)
-    form.Map.Universe.planets[2].UpdateOthers(23)
-    form.Map.Universe.planets[2].UpdateFoes(-2000)
-    form.Map.Universe.planets[2].UpdateFoes(8)
-    form.Map.Universe.planets[2].UpdateFoes(18)
+    p = form.Map.Universe.planets[2]
 
-    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_0)
-    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_1)
-    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_2)
-    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_3)
-    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_4)
-    form.Map.Universe.planets[2].fleets_in_orbit.append(fleet_5)
+    form.Map.Universe.RegisterFleet(fleet_0, p)
+    form.Map.Universe.RegisterFleet(fleet_1, p)
+    form.Map.Universe.RegisterFleet(fleet_2, p)
+    form.Map.Universe.RegisterFleet(fleet_3, p)
+    form.Map.Universe.RegisterFleet(fleet_4, p)
+    form.Map.Universe.RegisterFleet(fleet_5, p)
 
     form.Map.Universe.planets[0].BuildStarbase()
     form.Map.Universe.planets[0].Relation = Stance.neutral
@@ -98,12 +104,14 @@ def main():
     form.Map.Universe.planets[5].Colonists = 400000
     form.Map.Universe.planets[5].Relation = Stance.allied
 
-    x = -300
-    y = -300
+    x = -30
+    y = -30
 
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 1, M.Normal, Stance.allied))
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 100, y + 500, 1, M.Normal, Stance.friendly))
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 500, y - 100, 1, M.Normal, Stance.hostile))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, p.x, p.y, 2500, M.Normal, 0))
+
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 400, M.Normal, 4))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 10, y + 50, 2500, M.Normal, 0))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 16000, M.Normal, -1))
 
     form.Map.Universe.ComputeTurn()
 

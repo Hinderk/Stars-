@@ -3,8 +3,11 @@ from PyQt6.QtCore import QRectF, QPointF
 from PyQt6.QtGui import QPolygonF
 
 from enum import Enum
+from math import sqrt
+from ruleset import Ruleset
+from faction import Faction
 from colours import Pen, Brush
-from defines import Stance, GuiProps as GP
+from defines import Stance, GuiProps
 
 
 
@@ -18,29 +21,32 @@ class Model(Enum):
 class Minefield:
 
   caret = QPolygonF()
-  caret << QPointF(0, - GP.center_size) << QPointF(GP.center_size, 0)
-  caret << QPointF(0, GP.center_size) << QPointF(-GP.center_size, 0)
+  caret << QPointF(0, - GuiProps.center_size)
+  caret << QPointF(GuiProps.center_size, 0)
+  caret << QPointF(0, GuiProps.center_size)
+  caret << QPointF(-GuiProps.center_size, 0)
 
-  def __init__(self, scene, x, y, m, model, fof):
+  def __init__(self, scene, x, y, m, model, fID):
 
-    r = 600 #  TODO: determine size of minefield as function of mine count
+    r = sqrt(m) * GuiProps.Xscale
 
+    self.fof = Faction.Stance(Ruleset.fID0, fID)
+    self.faction = fID
     self.xo = x
     self.yo = y
-    self.radius = r
     self.mines = m
     self.model = model
-    self.fof = fof
-    self.rate_of_decay = 0.01
+    self.rate_of_decay = Ruleset.MinefieldDecay(fID)
     self.countdown = 0
-
+    x *= GuiProps.Xscale
+    y *= GuiProps.Xscale
     box = QRectF(x - r, y - r, r + r, r + r)
-    if fof == Stance.allied:
+    if self.fof == Stance.allied:
       brush = Brush.blue
       pen = Pen.blue_l
       self.area = scene.addEllipse(box, Pen.blue_m, Brush.blue_m)
       self.area.setZValue(-6)
-    elif fof == Stance.friendly:
+    elif self.fof == Stance.friendly:
       brush = Brush.yellow
       pen = Pen.noshow
       self.area = scene.addEllipse(box, Pen.yellow_m, Brush.yellow_m)
