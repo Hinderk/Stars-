@@ -1,15 +1,12 @@
 
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtGui import QIcon, QPixmap
-from PyQt6.QtCore import QSize
+from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtWidgets import QWidget, QStackedLayout, QSizePolicy
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel
 from PyQt6.QtWidgets import QMainWindow, QPushButton, QToolButton
 from PyQt6.QtWidgets import QStatusBar, QGroupBox, QCheckBox
 from PyQt6.QtWidgets import QPlainTextEdit
-
-from PyQt6.QtCore import Qt
-# from PyQt6.QtCore import pyqtSignal as QSignal
 
 from design import Design
 from defines import Stance
@@ -17,7 +14,9 @@ from menubar import Menu
 from toolbar import ToolBar
 from inspector import Inspector
 from fleetdata import Fleetdata
+from minedata import Minedata
 from starmap import Starmap
+from minefield import Model as MineModel
 
 
 
@@ -28,7 +27,6 @@ def _CreateButton(name):
     Button.setIcon(Icon)
     Button.setIconSize(QSize(30, 30))
     Button.setStyleSheet(Style)
-    Button.setVisible(True)
     return Button
 
 
@@ -39,14 +37,17 @@ class Gui(QMainWindow):
         super(self.__class__, self).__init__()
         self.CurrentYear = rules.FirstYear()
         self.SelectedPlanet = None
+        self.SelectedFields = None
         self.EnemyFleetIndex = 0
         self.NeutralFleetIndex = 0
         self.FleetIndex = 0
+        self.MineIndex = 0
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
+        self.MineOffset = 0
         design = Design()
-        self.setStyleSheet(design.getStyle())
+        self.setStyleSheet(Design.getStyle())
         self.Action = dict()
         self.SetupUI(design, people, rules)
         self.Buttons.actionRadarView.toggled.connect(self.Map.Universe.ShowScannerRanges)
@@ -62,11 +63,13 @@ class Gui(QMainWindow):
         self.Buttons.ChangeZoom.connect(self.Map.ResizeStarmap)
         self.Buttons.Mines.toggled.connect(self.Map.Universe.ShowFields)
         self.Buttons.ShowMines.connect(self.Map.Universe.ShowMines)
+        self.Map.Universe.SelectField.connect(self.InspectMineField)
         self.Map.Universe.ChangeFocus.connect(self.InspectPlanet)
         self.ShowPlanet.clicked.connect(self.InspectPlanets)
         self.SelectNextEnemy.clicked.connect(self.InspectEnemyFleets)
         self.SelectNextNeutral.clicked.connect(self.InspectNeutralFleets)
         self.SelectNextFleet.clicked.connect(self.InspectFleets)
+        self.ShowFields.clicked.connect(self.InspectMines)
 
 
     def SetupUI(self, design, people, rules):
@@ -122,6 +125,8 @@ class Gui(QMainWindow):
 
         self.FleetInfo = Fleetdata()
         self.ItemInfo.addWidget(self.FleetInfo)
+        self.MineInfo = Minedata()
+        self.ItemInfo.addWidget(self.MineInfo)
 
         Enigma = QWidget()
         Enigma_HL = QHBoxLayout(Enigma)
@@ -227,6 +232,10 @@ class Gui(QMainWindow):
         ButtonLayout_HL = QHBoxLayout(ButtonBox)
         ButtonLayout_HL.setSpacing(0)
         ButtonLayout_HL.addStretch()
+        self.PreviousField = _CreateButton(":/Toolbar/Mine")  # TODO: Fix icon ...
+        ButtonLayout_HL.addWidget(self.PreviousField)
+        self.NextField = _CreateButton(":/Toolbar/Mine")  # TODO: Fix icon ...
+        ButtonLayout_HL.addWidget(self.NextField)
         self.ShowAlienBase = _CreateButton(":/Icons/Fortress")
         ButtonLayout_HL.addWidget(self.ShowAlienBase)
         self.ShowNeutralBase = _CreateButton(":/Icons/Tradehub")
@@ -247,6 +256,8 @@ class Gui(QMainWindow):
         SwitchLayout_HL.addStretch(0)
         self.ShowPlanet = _CreateButton(":/Icons/Planet")
         SwitchLayout_HL.addWidget(self.ShowPlanet)
+        self.ShowFields = _CreateButton(":/Toolbar/Mine")  # TODO: Fix icon ...
+        SwitchLayout_HL.addWidget(self.ShowFields)
         SelectedObject_HL.addWidget(SwitchBox)
         Title.setMinimumHeight(65)
         return Title
@@ -254,17 +265,23 @@ class Gui(QMainWindow):
 
     def InspectPlanet(self, p):
         self.SelectedPlanet = p
+        self.PreviousField.setVisible(False)
+        self.NextField.setVisible(False)
         self.ShowPlanet.setVisible(False)
+        self.ShowFields.setVisible(len(p.mine_fields) > 0)
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
+        self.MineOffset = 0
+        self.MineIndex = 0
+        self.SelectedFields = p.mine_fields
         if p.Discovered:
             self.ItemInfo.setCurrentIndex(0)
             self.PlanetInfo.UpdateMinerals(p)
             self.PlanetInfo.UpdateBiome(p)
             self.PlanetInfo.UpdateText(self.CurrentYear, p)
         else:
-            self.ItemInfo.setCurrentIndex(2)
+            self.ItemInfo.setCurrentIndex(3)
         if p.ShipTracking:
             self.SelectNextEnemy.setVisible(p.TotalFoes > 0)
             self.SelectNextNeutral.setVisible(p.TotalOthers > 0)
@@ -287,14 +304,20 @@ class Gui(QMainWindow):
         self.SelectedObject.setText(p.Name + ' - Summary')
 
 
+    def InspectMineField(self, m_list):
+        self.SelectedFields = m_list
+        self.InspectMines(True)
+
+
     def InspectNextFleet(self, index, offset, fof):
         self.ShowPlanet.setVisible(True)
+        self.ShowFields.setVisible(False)
         self.ItemInfo.setCurrentIndex(1)
         nmax = len(self.SelectedPlanet.fleets_in_orbit)
         n = (index + offset) % nmax
         while n < nmax:
             f = self.SelectedPlanet.fleets_in_orbit[n]
-            if f.FriendOrFoe == fof:
+            if f.FriendOrFoe in fof:
                 self.SelectedObject.setText(f.Name + ' - Summary')
                 self.FleetInfo.UpdateCargo(f)
                 return n
@@ -302,29 +325,43 @@ class Gui(QMainWindow):
         n = 0
         while n <= index:
             f = self.SelectedPlanet.fleets_in_orbit[n]
-            if f.FriendOrFoe == fof:
+            if f.FriendOrFoe in fof:
                 self.SelectedObject.setText(f.Name + ' - Summary')
                 self.FleetInfo.UpdateCargo(f)
                 return n
             n += 1
 
 
+    def InspectNextMinefield(self, index, offset):
+        n = (index + self.NumberOfFields + offset) % self.NumberOfFields
+        field = self.SelectedFields[n]
+        self.MineInfo.UpdateData(field)
+        if field.model == MineModel.Normal:
+            self.SelectedObject.setText('Normal Mine Field - Summary')
+        elif field.model == MineModel.Heavy:
+            self.SelectedObject.setText('Heavy Mine Field - Summary')
+        else:
+            self.SelectedObject.setText('Speed Trap Mine Field - Summary')
+        return n
+
+
     def InspectEnemyFleets(self, event):
-        self.EnemyFleetIndex = self.InspectNextFleet(self.EnemyFleetIndex, self.EnemyFleetOffset, Stance.hostile)
+        self.EnemyFleetIndex = self.InspectNextFleet(self.EnemyFleetIndex, self.EnemyFleetOffset, [Stance.hostile])
         self.EnemyFleetOffset = 1
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
 
 
     def InspectNeutralFleets(self, event):
-        self.NeutralFleetIndex = self.InspectNextFleet(self.NeutralFleetIndex, self.NeutralFleetOffset, Stance.neutral)
+        fof = [Stance.friendly, Stance.neutral]
+        self.NeutralFleetIndex = self.InspectNextFleet(self.NeutralFleetIndex, self.NeutralFleetOffset, fof)
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 1
         self.FleetOffset = 0
 
 
     def InspectFleets(self, event):
-        self.FleetIndex = self.InspectNextFleet(self.FleetIndex, self.FleetOffset, Stance.friendly)
+        self.FleetIndex = self.InspectNextFleet(self.FleetIndex, self.FleetOffset, [Stance.allied])
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
         self.FleetOffset = 1
@@ -332,6 +369,25 @@ class Gui(QMainWindow):
 
     def InspectPlanets(self, event):
         self.InspectPlanet(self.SelectedPlanet)
+
+
+    def InspectMines(self, event):
+        self.EnemyFleetOffset = 0
+        self.NeutralFleetOffset = 0
+        self.FleetOffset = 0
+        self.ItemInfo.setCurrentIndex(2)
+        self.SelectNextEnemy.setVisible(False)
+        self.SelectNextNeutral.setVisible(False)
+        self.SelectNextFleet.setVisible(False)
+        self.ShowNeutralBase.setVisible(False)
+        self.ShowAlienBase.setVisible(False)
+        self.ShowStarBase.setVisible(False)
+        self.ShowPlanet.setVisible(not event)
+        self.ShowFields.setVisible(False)
+        self.NumberOfFields = len(self.SelectedFields)
+        self.NextField.setVisible(self.NumberOfFields > 1)
+        self.PreviousField.setVisible(self.NumberOfFields > 1)
+        self.InspectNextMinefield(self.MineIndex, 0)
 
 
     def ShowCrustDiagrams(self, event):

@@ -106,9 +106,7 @@ class Design:
 
          """
 
-    def __init__(self):
-        self.MenuFontSize = 16
-        self.GuiDesign = (self.Style_0, self.Style_0)
+    MenuFontSize = 16
 
-    def getStyle(self, select=1):
-        return self.GuiDesign[select]
+    def getStyle(select=0):
+        return Design.Style_0

@@ -53,6 +53,7 @@ class Planet(PlanetData):
     self.flagVisible = False
 
     self.fleets_in_orbit = []
+    self.mine_fields = []
 
     self.TotalFriends = 0
     self.IdleFriends = 0

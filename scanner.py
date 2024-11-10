@@ -2,7 +2,7 @@
 from PyQt6.QtCore import QRectF
 
 from enum import Enum
-from defines import GuiProps
+from guiprop import GuiProps
 from defines import Perks as P
 from defines import Traits as T
 

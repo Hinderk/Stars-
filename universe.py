@@ -8,16 +8,20 @@ from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtCore import pyqtSignal as QSignal
 
 from scanner import Scanner
+from ruleset import Ruleset
 from planet import Planet
 from colours import Pen
 from colours import Brush
-from defines import Stance, GuiProps
+from defines import Stance
+from guiprop import GuiProps
+#  from minefield import Minefield
 
 
 
 class Universe(QGraphicsScene, GuiProps):
 
   ChangeFocus = QSignal(Planet)
+  SelectField = QSignal(list)
 
 
   def __init__(self, rules):
@@ -28,24 +32,20 @@ class Universe(QGraphicsScene, GuiProps):
     self.minefields = []
     self.debris = []
 
-    self.FieldsVisible = False
-    self.ShowField = dict()
-    self.ShowField[Stance.allied] = True
-    self.ShowField[Stance.friendly] = True
-    self.ShowField[Stance.neutral] = True
-    self.ShowField[Stance.hostile] = True
+    self.SelectedPlanet = None
 
-    self.PopulationCeiling = rules.GetPopulationCeiling()
+    self.PopulationCeiling = Ruleset.GetPopulationCeiling()
 
     self.CreateIndicator()
+    self.SetupMinefields()
     self.NamesVisible = False
     self.CreatePlanets(rules)
-    self.ColonizePlanets(rules)
+    self.ColonizePlanets()
 
     self.setBackgroundBrush(Brush.black)
 
 
-  def ColonizePlanets(self, rules):
+  def ColonizePlanets(self):
 #    for p in self.planets:
     pass
 
@@ -54,14 +54,30 @@ class Universe(QGraphicsScene, GuiProps):
     pos = mouseClick.scenePos()
     xo = pos.x() / self.Xscale
     yo = pos.y() / self.Xscale
-    po = None
+    m_list = None
     dist = 1e20
     for p in self.planets:
       d = (p.x - xo) * (p.x - xo) + (p.y - yo) * (p.y - yo)
       if d < dist:
         po = p
         dist = d
-    self.HighlightPlanet(po)
+    po.mine_fields = []
+    for m in self.minefields:
+      if m.Detected:
+        if self.FieldsVisible:
+          d = (m.x - xo) * (m.x - xo) + (m.y - yo) * (m.y - yo)
+          if d < dist:
+            m_list = [m]
+            dist = d
+          elif m_list and d < dist + 1e-8:
+            m_list.append(m)
+        d = (m.x - po.x) * (m.x - po.x) + (m.y - po.y) * (m.y - po.y)
+        if d < m.mines:
+          po.mine_fields.append(m)
+    if m_list:
+      self.HighlightMinefield(m_list)
+    else:
+      self.HighlightPlanet(po)
 
 
   def CreateIndicator(self):
@@ -70,20 +86,44 @@ class Universe(QGraphicsScene, GuiProps):
     triangle << QPointF(0, 0) << QPointF(self.pointer_size / 2, w)
     triangle << QPointF(- self.pointer_size / 2, w)
     self.pointer = self.addPolygon(triangle, Pen.white_08, Brush.yellow)
+    self.pointer.setZValue(8)
 
 
   def HighlightPlanet(self, p):
-    self.LastPlanet.label.setPen(Pen.white_l)
-    self.LastPlanet.label.setBrush(Brush.white_l)
+    if self.SelectedPlanet:
+      self.SelectedPlanet.label.setPen(Pen.white_l)
+      self.SelectedPlanet.label.setBrush(Brush.white_l)
     if self.NamesVisible:
       p.label.setPen(Pen.white)
       p.label.setBrush(Brush.white)
+      self.pointer.setVisible(False)
     else:
       xp = self.Xscale * p.x
       yp = self.Xscale * p.y + self.p_radius + self.dy_pointer
       self.pointer.setPos(xp, yp)
-    self.LastPlanet = p
+    self.SelectedPlanet = p
     self.ChangeFocus.emit(p)
+
+
+  def HighlightMinefield(self, m_list):
+    if self.SelectedPlanet:
+      self.SelectedPlanet.label.setPen(Pen.white_l)
+      self.SelectedPlanet.label.setBrush(Brush.white_l)
+    xp = self.Xscale * m_list[0].x
+    yp = self.Xscale * m_list[0].y + self.dy_pointer
+    self.pointer.setPos(xp, yp)
+    self.pointer.setVisible(True)
+    self.SelectedPlanet = None
+    self.SelectField.emit(m_list)
+
+
+  def SetupMinefields(self):
+    self.FieldsVisible = False
+    self.ShowField = dict()
+    self.ShowField[Stance.allied] = True
+    self.ShowField[Stance.friendly] = True
+    self.ShowField[Stance.neutral] = True
+    self.ShowField[Stance.hostile] = True
 
 
   def ShowMines(self, switch, fof):
@@ -96,7 +136,7 @@ class Universe(QGraphicsScene, GuiProps):
   def ShowFields(self, show):
     if show:
       for field in self.minefields:
-        switch = self.ShowField[field.fof]
+        switch = self.ShowField[field.fof] and field.Detected
         field.area.setVisible(switch)
         field.center.setVisible(switch)
     else:
@@ -117,8 +157,9 @@ class Universe(QGraphicsScene, GuiProps):
 
   def ShowPlanetNames(self, switch):
     self.NamesVisible = switch
-    self.HighlightPlanet(self.LastPlanet)
-    self.pointer.setVisible(not switch)
+    if self.SelectedPlanet:
+      self.HighlightPlanet(self.SelectedPlanet)
+      self.pointer.setVisible(not switch)
     for p in self.planets:
       p.label.setVisible(switch)
 
@@ -225,7 +266,7 @@ class Universe(QGraphicsScene, GuiProps):
   def CreatePlanets(self, rules):
     x = []
     y = []
-    n = rules.PlanetCount()
+    n = Ruleset.PlanetCount()
     while n > 0:
       n -= 1
       p = self.CreatePlanet(rules, n < 1)
@@ -240,7 +281,7 @@ class Universe(QGraphicsScene, GuiProps):
     model = rules.FirstScanner()
     if model:
       p.scanner = self.CreateScanner(p.x, p.y, model.value)
-    self.LastPlanet = p
+    self.SelectedPlanet = p
     self.HighlightPlanet(p)
 
 

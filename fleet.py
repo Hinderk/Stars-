@@ -1,16 +1,16 @@
 
-from ruleset import Ruleset
+from faction import Faction
 from math import sqrt
 from system import SystemType
 from defines import Perks
-from defines import Stance
+from ruleset import Ruleset
 
 
 
 class Fleet:
 
 
-  def __init__(self, ship, faction, fof=Stance.friendly):
+  def __init__(self, ship, fID):
     self.ShipList = [ship]
     self.TotalWeight = ship.TotalWeight
     self.TotalFuel = ship.TotalFuel
@@ -22,9 +22,9 @@ class Fleet:
     self.CargoSpace = ship.CargoSpace
     self.MineLaying = ship.MineLaying
     self.MineSweeping = ship.MineSweeping
-    self.FriendOrFoe = fof
+    self.FriendOrFoe = Faction.Stance(Ruleset.fID0, fID)
     self.Name = ship.Name
-    self.Faction = faction
+    self.Faction = fID
     self.scanner = None
     self.StealCargo = False
     self.CloakingFactor = self.ComputeCloaking()

@@ -10,9 +10,9 @@ class Faction:
     def Stance(fIDA, fIDB):  # TODO: For testing purposes only ...
         if fIDA == fIDB:
             return Stance.allied
-        elif fIDA < fIDB:
+        elif fIDB < 4:
             return Stance.friendly
-        elif fIDB == 1:
+        elif fIDB < 8:
             return Stance.neutral
         else:
             return Stance.hostile

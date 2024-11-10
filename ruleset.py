@@ -1,9 +1,8 @@
 
 import random
 import math
-from defines import GuiProps
+from guiprop import GuiProps
 from scanner import Model
-from faction import Faction
 
 
 # This class facilities the generation of a random "Stars!" universe ...
@@ -186,7 +185,7 @@ class Ruleset(random.Random):
     return 2400
 
 
-  def GetPopulationCeiling(self):
+  def GetPopulationCeiling():
     return 400000                    # TODO: Species dependent model
 
 
@@ -203,7 +202,7 @@ class Ruleset(random.Random):
   def GetResources(self):
     return 70.0
 
-  def PlanetCount(self):
+  def PlanetCount():
     return 15
 
   def Xmax(self):

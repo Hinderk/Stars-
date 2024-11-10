@@ -68,16 +68,16 @@ def main():
     ship.Name = "Explorer"
     ship.Type = "Scout"
 
-    fleet_0 = Fleet(ship, 4, Stance.allied)
-    fleet_1 = Fleet(ship, 2, Stance.neutral)
-    fleet_2 = Fleet(ship, 8, Stance.hostile)
+    fleet_0 = Fleet(ship, 4)
+    fleet_1 = Fleet(ship, 2)
+    fleet_2 = Fleet(ship, 0)
 
     ship.Name = "Hauler"
     ship.Type = "Freighter"
 
-    fleet_3 = Fleet(ship, 6, Stance.friendly)
-    fleet_4 = Fleet(ship, 3, Stance.neutral)
-    fleet_5 = Fleet(ship, 9, Stance.hostile)
+    fleet_3 = Fleet(ship, 1)
+    fleet_4 = Fleet(ship, 3)
+    fleet_5 = Fleet(ship, 9)
 
     form.InspectPlanet(Terra)
 
@@ -107,9 +107,15 @@ def main():
     x = -30
     y = -30
 
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, p.x, p.y, 2500, M.Normal, 0))
+    M0 = Minefield(form.Map.Universe, p.x, p.y, 2500, M.Normal, 0)
+    M0.Detected = True
+    form.Map.Universe.minefields.append(M0)
+    M0 = Minefield(form.Map.Universe, p.x, p.y, 25000, M.SpeedTrap, 11)
+    M0.Detected = True
+    form.Map.Universe.minefields.append(M0)
 
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 400, M.Normal, 4))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 1400, M.SpeedTrap, 4))
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 10, y + 50, 2500, M.Normal, 0))
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 16000, M.Normal, -1))
 

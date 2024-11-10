@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene
 # from PyQt6.QtWidgets import QGraphicsPixmapItem
 from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
-
+from guiprop import GuiProps as GP
 from colours import Brush
 
 
@@ -19,7 +19,7 @@ class Fleetdata(QGraphicsView):
   xWidth = 550
   xText = 100
   IconWidth = 120
-  DataOffset = 150
+  DataOffset = 180
   FlagOffset = 20
   TopOffset = 10
 
@@ -35,66 +35,63 @@ class Fleetdata(QGraphicsView):
     self.AddLogos()
     self.setScene(self.Scene)
     self.setMaximumHeight(325)
-    self.CurrentFaction = None
+    self.CurrentFaction = 0
 
 
   def AddStaticText(self):
-    font = QFont('Segoe', pointSize=16, weight=400)
-    ShipCount = self.Scene.addSimpleText("Ship count:", font)
+    ShipCount = self.Scene.addSimpleText("Ship count:", GP.infoFont)
     xpos = self.xOffset
     ypos = 0
     ShipCount.moveBy(xpos, ypos)
-    FuelLoad = self.Scene.addSimpleText("Fuel:", font)
+    FuelLoad = self.Scene.addSimpleText("Fuel:", GP.infoFont)
     ypos += self.yDelta + 5
     FuelLoad.moveBy(xpos, ypos)
-    Cargo = self.Scene.addSimpleText("Cargo:", font)
+    Cargo = self.Scene.addSimpleText("Cargo:", GP.infoFont)
     ypos += self.yDelta
     Cargo.moveBy(xpos, ypos)
-    FleetMass = self.Scene.addSimpleText("Fleet Mass:", font)
+    FleetMass = self.Scene.addSimpleText("Fleet Mass:", GP.infoFont)
     ypos += self.yDelta + 5
     FleetMass.moveBy(xpos, ypos)
-    Waypoint = self.Scene.addSimpleText("Next Waypoint:", font)
+    Waypoint = self.Scene.addSimpleText("Next Waypoint:", GP.infoFont)
     ypos += self.yDelta
     Waypoint.moveBy(xpos, ypos)
-    Task = self.Scene.addSimpleText("Waypoint Task:", font)
+    Task = self.Scene.addSimpleText("Waypoint Task:", GP.infoFont)
     ypos += self.yDelta
     Task.moveBy(xpos, ypos)
-    Speed = self.Scene.addSimpleText("Warp Speed:", font)
+    Speed = self.Scene.addSimpleText("Warp Speed:", GP.infoFont)
     ypos += self.yDelta
     Speed.moveBy(xpos, ypos)
-    text = "This fleet can lay up to 100 mines per year."
-    self.Mines = self.Scene.addSimpleText(text, font)
+#    text = "This fleet can lay up to 100 mines per year."
+    self.Mines = self.Scene.addSimpleText(" ", GP.infoFont)
     ypos += self.yDelta
     self.Mines.moveBy(xpos, ypos)
-    text = "This fleet can destroy up to 100 mines per year."
-    self.Sweeps = self.Scene.addSimpleText(text, font)
+#    text = "This fleet can destroy up to 100 mines per year."
+    self.Sweeps = self.Scene.addSimpleText(" ", GP.infoFont)
     ypos += self.yDelta
     self.Sweeps.moveBy(xpos, ypos)
 
 
   def AddInfoText(self):
-    font = QFont('Segoe', pointSize=16, weight=400)
-    self.ShipCount = self.Scene.addSimpleText("1", font)
+    self.ShipCount = self.Scene.addSimpleText("", GP.infoFont)
     xpos = self.xOffset + self.DataOffset
     ypos = 0
     self.ShipCount.moveBy(xpos, ypos)
     ypos += 2 * self.yDelta + 10
-    self.Mass = self.Scene.addSimpleText("999kT", font)
+    self.Mass = self.Scene.addSimpleText("", GP.infoFont)
     ypos += self.yDelta
     self.Mass.moveBy(xpos, ypos)
-    self.Waypoint = self.Scene.addSimpleText("none", font)
+    self.Waypoint = self.Scene.addSimpleText("", GP.infoFont)
     ypos += self.yDelta
     self.Waypoint.moveBy(xpos, ypos)
-    self.Task = self.Scene.addSimpleText("none", font)
+    self.Task = self.Scene.addSimpleText("", GP.infoFont)
     ypos += self.yDelta
     self.Task.moveBy(xpos, ypos)
-    self.Speed = self.Scene.addSimpleText("12", font)
+    self.Speed = self.Scene.addSimpleText("", GP.infoFont)
     ypos += self.yDelta
     self.Speed.moveBy(xpos, ypos)
 
 
   def InitCargo(self):
-    font = QFont('Segoe', pointSize=14, weight=800)
     pen = QPen(QColor(0, 0, 0))
     brush = QBrush(QColor(200, 200, 200))
     pen.setWidthF(2.0)
@@ -104,24 +101,19 @@ class Fleetdata(QGraphicsView):
     self.Scene.addRect(box, pen, brush)
     box = QRectF(xp, yp, self.xWidth / 2, self.ySize)
     self.Fuel = self.Scene.addRect(box, pen, self.brush[4])
-    self.FuelWeight = self.Scene.addSimpleText("50 of 100mg", font)
-    x = self.xWidth - self.FuelWeight.boundingRect().width()
-    self.FuelWeight.setPos(xp + x / 2, yp + 2)
+    self.FuelWeight = self.Scene.addSimpleText("", GP.cargoFont)
     yp += self.yDelta + 2
     box = QRectF(xp, yp, self.xWidth, self.ySize)
     self.Scene.addRect(box, pen, brush)
     for n in (0, 1, 2, 3):
       box = QRectF(xp, yp, self.xWidth, self.ySize)
       self.Freight.append(self.Scene.addRect(box, pen, self.brush[n]))
-    self.Cargo = self.Scene.addSimpleText("75 of 100kT", font)
-    x = self.xWidth - self.Cargo.boundingRect().width()
-    self.Cargo.setPos(xp + x / 2, yp + 2)
+    self.Cargo = self.Scene.addSimpleText("", GP.cargoFont)
 
 
   def UpdateCargo(self, fleet):
-    if self.CurrentFaction:
-      self.FactionBanner[self.CurrentFaction].setVisible(False)
-    self.CurrentFaction = fleet.Faction - 1
+    self.FactionBanner[self.CurrentFaction].setVisible(False)
+    self.CurrentFaction = fleet.Faction
     self.FactionBanner[self.CurrentFaction].setVisible(True)
     fraction = []
     fuel = self.xWidth * fleet.Fuel / fleet.TotalFuel

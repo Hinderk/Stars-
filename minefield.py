@@ -7,7 +7,8 @@ from math import sqrt
 from ruleset import Ruleset
 from faction import Faction
 from colours import Pen, Brush
-from defines import Stance, GuiProps
+from defines import Stance
+from guiprop import GuiProps
 
 
 
@@ -30,14 +31,21 @@ class Minefield:
 
     r = sqrt(m) * GuiProps.Xscale
 
+    self.fleets_en_route = []
+    self.TotalFriends = 0
+    self.TotalFoes = 0
+    self.TotalOthers = 0
+    self.Detected = True # False    -- FIXME
+    self.ShipTracking = False
     self.fof = Faction.Stance(Ruleset.fID0, fID)
     self.faction = fID
-    self.xo = x
-    self.yo = y
+    self.x = x
+    self.y = y
     self.mines = m
     self.model = model
     self.rate_of_decay = Ruleset.MinefieldDecay(fID)
     self.countdown = 0
+
     x *= GuiProps.Xscale
     y *= GuiProps.Xscale
     box = QRectF(x - r, y - r, r + r, r + r)
