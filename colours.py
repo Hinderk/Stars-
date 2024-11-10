@@ -27,6 +27,10 @@ _minefield_red = QColor(255, 0, 0)
 _minefield_yellow = QColor(255, 255, 0, 128)
 _minefield_blue = QColor(0, 0, 255)
 
+_background_blue = QColor(200, 200, 255)
+_background_red = QColor(255, 200, 200)
+_background_yellow = QColor(255, 255, 200)
+
 
 
 class Pen:
@@ -77,3 +81,6 @@ class Brush:
   red_s = QBrush(_scanner_red)
   yellow_s = QBrush(_scanner_yellow)
   yellow_m = QBrush(_minefield_yellow, Qt.BrushStyle.Dense6Pattern)
+  blue_p = QBrush(_background_blue)
+  red_p = QBrush(_background_red)
+  yellow_p = QBrush(_background_yellow)

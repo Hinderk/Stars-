@@ -1,0 +1,1639 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+
+<!-- CreationDate: 2024-11-10 18:32:26 -->
+
+<!-- Magnification: 1.05 -->
+
+<svg
+   width="569pt"
+   height="569pt"
+   viewBox="-12 -12 9024 9024"
+   version="1.1"
+   id="svg168"
+   sodipodi:docname="test-a.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs168" />
+  <sodipodi:namedview
+     id="namedview168"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="pt"
+     inkscape:zoom="2.4477153"
+     inkscape:cx="379.12906"
+     inkscape:cy="412.01687"
+     inkscape:window-width="3840"
+     inkscape:window-height="2071"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Background"
+     style="display:inline">
+    <path
+       id="rect1"
+       style="opacity:1"
+       d="M 0.010709256 0.010709256 L 0.010709256 9000.0045 L 9000.0045 9000.0045 L 9000.0045 0.010709256 L 0.010709256 0.010709256 z M 2121.0044 680.99702 A 356 356 0 0 1 2477.0046 1036.9972 A 356 356 0 0 1 2121.0044 1392.9974 A 356 356 0 0 1 1765.0042 1036.9972 A 356 356 0 0 1 2121.0044 680.99702 z M 1581.0103 2341.0071 A 356 356 0 0 1 1937.0105 2697.0073 A 356 356 0 0 1 1581.0103 3053.0076 A 356 356 0 0 1 1225.0101 2697.0073 A 356 356 0 0 1 1581.0103 2341.0071 z M 3474.0096 2402.9889 A 569 569 0 0 1 4042.9967 2971.9992 A 569 569 0 0 1 3474.0096 3541.0094 A 569 569 0 0 1 2904.9994 2971.9992 A 569 569 0 0 1 3474.0096 2402.9889 z M 7673.9944 4002.9919 A 569 569 0 0 1 8243.0046 4572.0022 A 569 569 0 0 1 7673.9944 5140.9892 A 569 569 0 0 1 7105.0073 4572.0022 A 569 569 0 0 1 7673.9944 4002.9919 z M 5405.9915 4186.01 A 356 356 0 0 1 5761.9917 4542.0103 A 356 356 0 0 1 5405.9915 4898.0105 A 356 356 0 0 1 5049.9912 4542.0103 A 356 356 0 0 1 5405.9915 4186.01 z M 2835.0027 4905.0032 A 1620 1620 0 0 1 4455.0081 6525.0086 A 1620 1620 0 0 1 2835.0027 8144.9907 A 1620 1620 0 0 1 1214.9973 6525.0086 A 1620 1620 0 0 1 2835.0027 4905.0032 z M 7020.0031 6329.004 A 880 880 0 0 1 7899.9908 7208.9917 A 880 880 0 0 1 7020.0031 8089.0027 A 880 880 0 0 1 6139.9921 7208.9917 A 880 880 0 0 1 7020.0031 6329.004 z " />
+  </g>
+  <g
+     fill="none"
+     id="Layer_0"
+     style="display:inline;opacity:1"
+     inkscape:label="Layer 0">
+    <!-- Line -->
+    <!-- Circle -->
+    <circle
+       cx="4608"
+       cy="6524"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle1" />
+    <!-- Circle -->
+    <circle
+       cx="1053"
+       cy="6524"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle2" />
+    <!-- Circle -->
+    <circle
+       cx="1198"
+       cy="7217"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle3" />
+    <!-- Circle -->
+    <circle
+       cx="1583"
+       cy="7776"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle4" />
+    <!-- Circle -->
+    <circle
+       cx="2140"
+       cy="8148"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle5" />
+    <!-- Circle -->
+    <circle
+       cx="2842"
+       cy="8289"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle6" />
+    <!-- Circle -->
+    <circle
+       cx="3535"
+       cy="8149"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle7" />
+    <!-- Circle -->
+    <circle
+       cx="4090"
+       cy="7770"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle8" />
+    <!-- Circle -->
+    <circle
+       cx="4453"
+       cy="7218"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle9" />
+    <!-- Circle -->
+    <circle
+       cx="4453"
+       cy="5836"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle10" />
+    <!-- Circle -->
+    <circle
+       cx="4086"
+       cy="5277"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle11" />
+    <!-- Circle -->
+    <circle
+       cx="3529"
+       cy="4905"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle12" />
+    <!-- Circle -->
+    <circle
+       cx="2835"
+       cy="4762"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle13" />
+    <!-- Circle -->
+    <circle
+       cx="2140"
+       cy="4906"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle14" />
+    <!-- Circle -->
+    <circle
+       cx="1217"
+       cy="5832"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle15" />
+    <!-- Circle -->
+    <circle
+       cx="1591"
+       cy="5276"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle16" />
+    <!-- Circle -->
+    <circle
+       cx="7984"
+       cy="7209"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle17" />
+    <!-- Circle -->
+    <circle
+       cx="6052"
+       cy="7209"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle18" />
+    <!-- Circle -->
+    <circle
+       cx="6131"
+       cy="7585"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle19" />
+    <!-- Circle -->
+    <circle
+       cx="6340"
+       cy="7889"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle20" />
+    <!-- Circle -->
+    <circle
+       cx="6643"
+       cy="8091"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle21" />
+    <!-- Circle -->
+    <circle
+       cx="7024"
+       cy="8168"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle22" />
+    <!-- Circle -->
+    <circle
+       cx="7401"
+       cy="8091"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle23" />
+    <!-- Circle -->
+    <circle
+       cx="7702"
+       cy="7886"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle24" />
+    <!-- Circle -->
+    <circle
+       cx="7899"
+       cy="7586"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle25" />
+    <!-- Circle -->
+    <circle
+       cx="7899"
+       cy="6835"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle26" />
+    <!-- Circle -->
+    <circle
+       cx="7700"
+       cy="6531"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle27" />
+    <!-- Circle -->
+    <circle
+       cx="7397"
+       cy="6329"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle28" />
+    <!-- Circle -->
+    <circle
+       cx="7020"
+       cy="6251"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle29" />
+    <!-- Circle -->
+    <circle
+       cx="6643"
+       cy="6330"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle30" />
+    <!-- Circle -->
+    <circle
+       cx="6142"
+       cy="6833"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle31" />
+    <!-- Circle -->
+    <circle
+       cx="6345"
+       cy="6531"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle32" />
+    <!-- Circle -->
+    <circle
+       cx="8298"
+       cy="4572"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle33" />
+    <!-- Circle -->
+    <circle
+       cx="7047"
+       cy="4572"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle34" />
+    <!-- Circle -->
+    <circle
+       cx="7099"
+       cy="4815"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle35" />
+    <!-- Circle -->
+    <circle
+       cx="7234"
+       cy="5012"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle36" />
+    <!-- Circle -->
+    <circle
+       cx="7430"
+       cy="5143"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle37" />
+    <!-- Circle -->
+    <circle
+       cx="7676"
+       cy="5193"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle38" />
+    <!-- Circle -->
+    <circle
+       cx="7920"
+       cy="5143"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle39" />
+    <!-- Circle -->
+    <circle
+       cx="8115"
+       cy="5010"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle40" />
+    <!-- Circle -->
+    <circle
+       cx="8243"
+       cy="4816"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle41" />
+    <!-- Circle -->
+    <circle
+       cx="8243"
+       cy="4330"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle42" />
+    <!-- Circle -->
+    <circle
+       cx="8114"
+       cy="4134"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle43" />
+    <!-- Circle -->
+    <circle
+       cx="7918"
+       cy="4003"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle44" />
+    <!-- Circle -->
+    <circle
+       cx="7674"
+       cy="3952"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle45" />
+    <!-- Circle -->
+    <circle
+       cx="7430"
+       cy="4004"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle46" />
+    <!-- Circle -->
+    <circle
+       cx="7106"
+       cy="4329"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle47" />
+    <!-- Circle -->
+    <circle
+       cx="7237"
+       cy="4134"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle48" />
+    <!-- Circle -->
+    <circle
+       cx="4098"
+       cy="2972"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle49" />
+    <!-- Circle -->
+    <circle
+       cx="2847"
+       cy="2972"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle50" />
+    <!-- Circle -->
+    <circle
+       cx="2899"
+       cy="3215"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle51" />
+    <!-- Circle -->
+    <circle
+       cx="3034"
+       cy="3412"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle52" />
+    <!-- Circle -->
+    <circle
+       cx="3230"
+       cy="3543"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle53" />
+    <!-- Circle -->
+    <circle
+       cx="3476"
+       cy="3593"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle54" />
+    <!-- Circle -->
+    <circle
+       cx="3720"
+       cy="3543"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle55" />
+    <!-- Circle -->
+    <circle
+       cx="3915"
+       cy="3410"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle56" />
+    <!-- Circle -->
+    <circle
+       cx="4043"
+       cy="3216"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle57" />
+    <!-- Circle -->
+    <circle
+       cx="4043"
+       cy="2730"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle58" />
+    <!-- Circle -->
+    <circle
+       cx="3914"
+       cy="2534"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle59" />
+    <!-- Circle -->
+    <circle
+       cx="3718"
+       cy="2403"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle60" />
+    <!-- Circle -->
+    <circle
+       cx="3474"
+       cy="2352"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle61" />
+    <!-- Circle -->
+    <circle
+       cx="3230"
+       cy="2404"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle62" />
+    <!-- Circle -->
+    <circle
+       cx="2906"
+       cy="2729"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle63" />
+    <!-- Circle -->
+    <circle
+       cx="3037"
+       cy="2534"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle64" />
+    <!-- Circle -->
+    <circle
+       cx="1972"
+       cy="2697"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle65" />
+    <!-- Circle -->
+    <circle
+       cx="1189"
+       cy="2697"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle66" />
+    <!-- Circle -->
+    <circle
+       cx="1221"
+       cy="2849"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle67" />
+    <!-- Circle -->
+    <circle
+       cx="1306"
+       cy="2973"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle68" />
+    <!-- Circle -->
+    <circle
+       cx="1429"
+       cy="3055"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle69" />
+    <!-- Circle -->
+    <circle
+       cx="1583"
+       cy="3086"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle70" />
+    <!-- Circle -->
+    <circle
+       cx="1735"
+       cy="3055"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle71" />
+    <!-- Circle -->
+    <circle
+       cx="1858"
+       cy="2972"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle72" />
+    <!-- Circle -->
+    <circle
+       cx="1938"
+       cy="2850"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle73" />
+    <!-- Circle -->
+    <circle
+       cx="1938"
+       cy="2546"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle74" />
+    <!-- Circle -->
+    <circle
+       cx="1857"
+       cy="2423"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle75" />
+    <!-- Circle -->
+    <circle
+       cx="1734"
+       cy="2341"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle76" />
+    <!-- Circle -->
+    <circle
+       cx="1581"
+       cy="2309"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle77" />
+    <!-- Circle -->
+    <circle
+       cx="1429"
+       cy="2341"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle78" />
+    <!-- Circle -->
+    <circle
+       cx="1226"
+       cy="2545"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle79" />
+    <!-- Circle -->
+    <circle
+       cx="1308"
+       cy="2423"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle80" />
+    <!-- Circle -->
+    <circle
+       cx="2512"
+       cy="1037"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle81" />
+    <!-- Circle -->
+    <circle
+       cx="1729"
+       cy="1037"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle82" />
+    <!-- Circle -->
+    <circle
+       cx="1761"
+       cy="1189"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle83" />
+    <!-- Circle -->
+    <circle
+       cx="1846"
+       cy="1313"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle84" />
+    <!-- Circle -->
+    <circle
+       cx="1969"
+       cy="1395"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle85" />
+    <!-- Circle -->
+    <circle
+       cx="2123"
+       cy="1426"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle86" />
+    <!-- Circle -->
+    <circle
+       cx="2275"
+       cy="1395"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle87" />
+    <!-- Circle -->
+    <circle
+       cx="2398"
+       cy="1312"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle88" />
+    <!-- Circle -->
+    <circle
+       cx="2478"
+       cy="1190"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle89" />
+    <!-- Circle -->
+    <circle
+       cx="2478"
+       cy="886"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle90" />
+    <!-- Circle -->
+    <circle
+       cx="2397"
+       cy="763"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle91" />
+    <!-- Circle -->
+    <circle
+       cx="2274"
+       cy="681"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle92" />
+    <!-- Circle -->
+    <circle
+       cx="2121"
+       cy="649"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle93" />
+    <!-- Circle -->
+    <circle
+       cx="1969"
+       cy="681"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle94" />
+    <!-- Circle -->
+    <circle
+       cx="1766"
+       cy="885"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle95" />
+    <!-- Circle -->
+    <circle
+       cx="1848"
+       cy="763"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle96" />
+    <!-- Circle -->
+    <circle
+       cx="5797"
+       cy="4542"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle97" />
+    <!-- Circle -->
+    <circle
+       cx="5014"
+       cy="4542"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle98" />
+    <!-- Circle -->
+    <circle
+       cx="5046"
+       cy="4694"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle99" />
+    <!-- Circle -->
+    <circle
+       cx="5131"
+       cy="4818"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle100" />
+    <!-- Circle -->
+    <circle
+       cx="5254"
+       cy="4900"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle101" />
+    <!-- Circle -->
+    <circle
+       cx="5408"
+       cy="4931"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle102" />
+    <!-- Circle -->
+    <circle
+       cx="5560"
+       cy="4900"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle103" />
+    <!-- Circle -->
+    <circle
+       cx="5683"
+       cy="4817"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle104" />
+    <!-- Circle -->
+    <circle
+       cx="5763"
+       cy="4695"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle105" />
+    <!-- Circle -->
+    <circle
+       cx="5763"
+       cy="4391"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle106" />
+    <!-- Circle -->
+    <circle
+       cx="5682"
+       cy="4268"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle107" />
+    <!-- Circle -->
+    <circle
+       cx="5559"
+       cy="4186"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle108" />
+    <!-- Circle -->
+    <circle
+       cx="5406"
+       cy="4154"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle109" />
+    <!-- Circle -->
+    <circle
+       cx="5254"
+       cy="4186"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle110" />
+    <!-- Circle -->
+    <circle
+       cx="5051"
+       cy="4390"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle111" />
+    <!-- Circle -->
+    <circle
+       cx="5133"
+       cy="4268"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle112" />
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Circle -->
+    <!-- Text -->
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="Layer 1"
+     style="display:inline">
+    <circle
+       cx="2121"
+       cy="1037"
+       r="356"
+       fill="#ffffff"
+       stroke="#008f8f"
+       stroke-width="60px"
+       id="circle118"
+       style="opacity:1;fill:none" />
+    <circle
+       cx="5406"
+       cy="4542"
+       r="356"
+       fill="#ffffff"
+       stroke="#008f8f"
+       stroke-width="60px"
+       id="circle119"
+       style="opacity:1;fill:none" />
+    <circle
+       cx="3474"
+       cy="2972"
+       r="569"
+       fill="#ffffff"
+       stroke="#008f8f"
+       stroke-width="60px"
+       id="circle116"
+       style="opacity:1;fill:none" />
+    <circle
+       cx="1581"
+       cy="2697"
+       r="356"
+       fill="#ffffff"
+       stroke="#008f8f"
+       stroke-width="60px"
+       id="circle117"
+       style="opacity:1;fill:none" />
+    <circle
+       cx="7674"
+       cy="4572"
+       r="569"
+       fill="#ffffff"
+       stroke="#008f8f"
+       stroke-width="60px"
+       id="circle115"
+       style="opacity:1;fill:none" />
+    <circle
+       cx="7020"
+       cy="7209"
+       r="880"
+       fill="#ffffff"
+       stroke="#008f8f"
+       stroke-width="135px"
+       id="circle114"
+       style="opacity:1;fill:none" />
+    <circle
+       cx="2835"
+       cy="6525"
+       r="1620"
+       fill="#ffffff"
+       stroke="#008f8f"
+       stroke-width="285px"
+       id="circle113"
+       style="opacity:1;fill:none;fill-opacity:1" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2"
+     style="display:inline">
+    <circle
+       cx="1928"
+       cy="926"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle161" />
+    <circle
+       cx="2121"
+       cy="1261"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle159" />
+    <circle
+       cx="2314"
+       cy="1149"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle158" />
+    <circle
+       cx="2314"
+       cy="926"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle157" />
+    <circle
+       cx="2121"
+       cy="814"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle156" />
+    <circle
+       cx="1929"
+       cy="1149"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle160" />
+    <circle
+       cx="2121"
+       cy="1037"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle155" />
+    <circle
+       cx="6543"
+       cy="6934"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle133"
+       style="opacity:1" />
+    <circle
+       cx="1581"
+       cy="2697"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle148"
+       style="opacity:1" />
+    <circle
+       cx="1581"
+       cy="2921"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle152"
+       style="opacity:1" />
+    <circle
+       cx="1388"
+       cy="2586"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle154"
+       style="opacity:1" />
+    <circle
+       cx="1581"
+       cy="2474"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle149"
+       style="opacity:1" />
+    <circle
+       cx="1774"
+       cy="2586"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle150"
+       style="opacity:1" />
+    <circle
+       cx="1774"
+       cy="2809"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle151"
+       style="opacity:1" />
+    <circle
+       cx="1389"
+       cy="2809"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle153"
+       style="opacity:1" />
+    <circle
+       cx="3474"
+       cy="2616"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle142"
+       style="opacity:1" />
+    <circle
+       cx="3782"
+       cy="2794"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle143"
+       style="opacity:1" />
+    <circle
+       cx="3782"
+       cy="3151"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle144"
+       style="opacity:1" />
+    <circle
+       cx="3474"
+       cy="3329"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle145"
+       style="opacity:1" />
+    <circle
+       cx="3166"
+       cy="3151"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle146"
+       style="opacity:1" />
+    <circle
+       cx="3165"
+       cy="2794"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle147"
+       style="opacity:1" />
+    <circle
+       cx="7982"
+       cy="4394"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle136"
+       style="opacity:1" />
+    <circle
+       cx="7982"
+       cy="4751"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle137"
+       style="opacity:1" />
+    <circle
+       cx="7674"
+       cy="4929"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle138"
+       style="opacity:1" />
+    <circle
+       cx="7366"
+       cy="4751"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle139"
+       style="opacity:1" />
+    <circle
+       cx="7365"
+       cy="4394"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle140"
+       style="opacity:1" />
+    <circle
+       cx="3474"
+       cy="2972"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle141"
+       style="opacity:1" />
+    <circle
+       cx="1956"
+       cy="6018"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle126"
+       style="opacity:1" />
+    <circle
+       cx="7020"
+       cy="7209"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle127"
+       style="opacity:1" />
+    <circle
+       cx="7020"
+       cy="6658"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle128"
+       style="opacity:1" />
+    <circle
+       cx="7497"
+       cy="6933"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle129"
+       style="opacity:1" />
+    <circle
+       cx="7497"
+       cy="7486"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle130"
+       style="opacity:1" />
+    <circle
+       cx="7021"
+       cy="7760"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle131"
+       style="opacity:1" />
+    <circle
+       cx="6544"
+       cy="7485"
+       r="88"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle132"
+       style="opacity:1" />
+    <circle
+       cx="7674"
+       cy="4572"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle134"
+       style="opacity:1" />
+    <circle
+       cx="7674"
+       cy="4216"
+       r="57"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle135"
+       style="opacity:1" />
+    <circle
+       cx="2835"
+       cy="5511"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle121"
+       style="opacity:1" />
+    <circle
+       cx="3713"
+       cy="6016"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle122"
+       style="opacity:1" />
+    <circle
+       cx="3713"
+       cy="7034"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle123"
+       style="opacity:1" />
+    <circle
+       cx="2836"
+       cy="7539"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle124"
+       style="opacity:1" />
+    <circle
+       cx="1958"
+       cy="7033"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle125"
+       style="opacity:1" />
+    <circle
+       cx="5406"
+       cy="4542"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle162" />
+    <circle
+       cx="5214"
+       cy="4654"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle167" />
+    <circle
+       cx="5406"
+       cy="4319"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle163" />
+    <circle
+       cx="5599"
+       cy="4431"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle164" />
+    <circle
+       cx="5599"
+       cy="4654"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle165" />
+    <circle
+       cx="5213"
+       cy="4431"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle168" />
+    <circle
+       cx="5406"
+       cy="4766"
+       r="36"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle166" />
+    <circle
+       cx="2835"
+       cy="6525"
+       r="162"
+       fill="#008f8f"
+       stroke="#008f8f"
+       stroke-width="75px"
+       id="circle120"
+       style="opacity:1" />
+    <text
+       xml:space="preserve"
+       x="5119.6172"
+       y="2218.113"
+       fill="#ffffff"
+       font-family="Courier"
+       font-style="normal"
+       font-weight="bold"
+       font-size="1584"
+       text-anchor="start"
+       id="text168"
+       style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2283.75px;font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI, Bold Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-anchor:start;opacity:1;fill:#ffffff"
+       inkscape:transform-center-x="-150.64297"
+       inkscape:transform-center-y="-204.09693">MF</text>
+  </g>
+</svg>

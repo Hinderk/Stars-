@@ -172,8 +172,8 @@ class Ruleset(random.Random):
     ylim = self.Ymax()
     Retries = 0
     while Retries < 128:
-      x = self.uniform(-xlim, xlim)
-      y = self.uniform(-ylim, ylim)
+      x = self.randrange(-xlim, xlim)
+      y = self.randrange(-ylim, ylim)
       r = self._FindClosest(x, y)
       if r > self.Rmin() and r > rmin:
         self.Location.append([x, y])

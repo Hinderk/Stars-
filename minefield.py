@@ -13,9 +13,9 @@ from guiprop import GuiProps
 
 
 class Model(Enum):
-  Normal = 0
-  Heavy = 1
-  SpeedTrap = 2
+  Normal = 'Standard'
+  Heavy = 'Heavy'
+  SpeedTrap = 'Speed Trap'
 
 
 

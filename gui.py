@@ -16,7 +16,6 @@ from inspector import Inspector
 from fleetdata import Fleetdata
 from minedata import Minedata
 from starmap import Starmap
-from minefield import Model as MineModel
 
 
 
@@ -58,6 +57,8 @@ class Gui(QMainWindow):
         self.Buttons.actionPopulationView.toggled.connect(self.ShowPopulationView)
         self.Buttons.actionNoInfoView.toggled.connect(self.ShowMinimalView)
         self.Buttons.actionPercentView.toggled.connect(self.ShowPercentageView)
+        self.NextField.clicked.connect(self.ShowNextMineField)
+        self.PreviousField.clicked.connect(self.ShowPreviousMineField)
         self.Buttons.actionNoInfoView.setChecked(True)
         self.Buttons.RadarRange.valueChanged.connect(self.Map.Universe.ScaleRadarRanges)
         self.Buttons.ChangeZoom.connect(self.Map.ResizeStarmap)
@@ -232,9 +233,9 @@ class Gui(QMainWindow):
         ButtonLayout_HL = QHBoxLayout(ButtonBox)
         ButtonLayout_HL.setSpacing(0)
         ButtonLayout_HL.addStretch()
-        self.PreviousField = _CreateButton(":/Toolbar/Mine")  # TODO: Fix icon ...
+        self.PreviousField = _CreateButton(":/Icons/Previous")
         ButtonLayout_HL.addWidget(self.PreviousField)
-        self.NextField = _CreateButton(":/Toolbar/Mine")  # TODO: Fix icon ...
+        self.NextField = _CreateButton(":/Icons/Next")
         ButtonLayout_HL.addWidget(self.NextField)
         self.ShowAlienBase = _CreateButton(":/Icons/Fortress")
         ButtonLayout_HL.addWidget(self.ShowAlienBase)
@@ -256,10 +257,10 @@ class Gui(QMainWindow):
         SwitchLayout_HL.addStretch(0)
         self.ShowPlanet = _CreateButton(":/Icons/Planet")
         SwitchLayout_HL.addWidget(self.ShowPlanet)
-        self.ShowFields = _CreateButton(":/Toolbar/Mine")  # TODO: Fix icon ...
+        self.ShowFields = _CreateButton(":/Icons/Mines")
         SwitchLayout_HL.addWidget(self.ShowFields)
         SelectedObject_HL.addWidget(SwitchBox)
-        Title.setMinimumHeight(65)
+        Title.setMinimumHeight(68)
         return Title
 
 
@@ -335,13 +336,8 @@ class Gui(QMainWindow):
     def InspectNextMinefield(self, index, offset):
         n = (index + self.NumberOfFields + offset) % self.NumberOfFields
         field = self.SelectedFields[n]
-        self.MineInfo.UpdateData(field)
-        if field.model == MineModel.Normal:
-            self.SelectedObject.setText('Normal Mine Field - Summary')
-        elif field.model == MineModel.Heavy:
-            self.SelectedObject.setText('Heavy Mine Field - Summary')
-        else:
-            self.SelectedObject.setText('Speed Trap Mine Field - Summary')
+        self.MineInfo.UpdateData(field, n + 1, self.NumberOfFields)
+        self.SelectedObject.setText(field.model.value + ' Mine Field - Summary')
         return n
 
 
@@ -388,6 +384,14 @@ class Gui(QMainWindow):
         self.NextField.setVisible(self.NumberOfFields > 1)
         self.PreviousField.setVisible(self.NumberOfFields > 1)
         self.InspectNextMinefield(self.MineIndex, 0)
+
+
+    def ShowNextMineField(self, event):
+        self.MineIndex = self.InspectNextMinefield(self.MineIndex, 1)
+
+
+    def ShowPreviousMineField(self, event):
+        self.MineIndex = self.InspectNextMinefield(self.MineIndex, -1)
 
 
     def ShowCrustDiagrams(self, event):

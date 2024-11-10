@@ -42,6 +42,7 @@
     <file alias="Faction-T">Images/Factions/faction-t.svg</file>
   </qresource>
   <qresource prefix="Graphics">
+    <file alias="Mines">Images/Graphics/minefield.svg</file>
     <file alias="Enigma">Images/Graphics/enigma.svg</file>
     <file alias="Frigate">Images/Graphics/ship-a.svg</file>
   </qresource>
