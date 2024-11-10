@@ -55,6 +55,9 @@
     <file alias="Starbase">Images/Icons/starbase.svg</file>
     <file alias="ShowNews">Images/Icons/showme.svg</file>
     <file alias="NoNews">Images/Icons/ignore.svg</file>
+    <file alias="Mines">Images/Icons/mines.svg</file>
     <file alias="Planet">Images/Icons/planet.svg</file>
+    <file alias="Previous">Images/Icons/previous.svg</file>
+    <file alias="Next">Images/Icons/next.svg</file>
   </qresource>
 </RCC>
