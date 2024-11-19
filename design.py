@@ -106,7 +106,33 @@ class Design:
 
          """
 
-    MenuFontSize = 16
+    Style_1 = """
+
+             QMenu {
+                 border: 1.5px solid rgb(200,200,200) ;
+                 border-radius: 0px
+             }
+
+             QMenu::item {
+                 background-color: rgb(0,0,0);
+                 color: rgb(240,240,240);
+                 font-size: 18px;
+                 padding: 6px 12px 6px 12px;
+             }
+
+             QMenu::separator {
+                 width: 1.0px;
+                 height: 1.0px;
+                 background-color: rgb(200,200,200);
+             }
+
+             QMenu::item::selected {
+                 background-color: rgb(200,200,200);
+                 color: rgb(0,0,0);
+                 font-size: 18px;
+             }
+
+         """
 
     def getStyle(select=0):
         return Design.Style_0

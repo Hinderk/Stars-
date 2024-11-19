@@ -12,6 +12,7 @@ _red = QColor(255, 0, 0)
 _white = QColor(255, 255, 255)
 _brown = QColor(181, 101, 29)
 _neutral = QColor(40, 220, 40)
+_grey = QColor(200, 200, 200)
 
 _scanner_yellow = QColor(236, 175, 0)     # QColor(255, 255, 0, 120)
 _scanner_red = QColor(220, 104, 0)        # QColor(255, 120, 0, 220)
@@ -62,6 +63,9 @@ class Pen:
   red_m.setWidthF(0.4)
   blue_m.setWidthF(0.4)
   yellow_m.setWidthF(0.4)
+  black_2 = QPen(_black)
+  black_2.setWidthF(2.0)
+
 
 
 class Brush:
@@ -70,6 +74,7 @@ class Brush:
   white = QBrush(_white)
   black = QBrush(_black)
   blue = QBrush(_blue)
+  grey = QBrush(_grey)
   blue_m = QBrush(_minefield_blue, Qt.BrushStyle.BDiagPattern)
   blue_l = QBrush(_light_blue)
   green = QBrush(_green)

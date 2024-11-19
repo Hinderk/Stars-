@@ -14,6 +14,7 @@ class Starmap(QGraphicsView):
 
     self.Universe = Universe(rules)
     self.setScene(self.Universe)
+    self.CurrentScaling = 100
     pol = QSizePolicy()
     pol.setHorizontalPolicy(pol.Policy.MinimumExpanding)
     pol.setVerticalPolicy(pol.Policy.MinimumExpanding)
@@ -26,7 +27,6 @@ class Starmap(QGraphicsView):
       if level == 100:
         self.resetTransform()
       else:
-        ratio = level / self.CurrentScaling / 100.0
+        ratio = (1.0 * level) / self.CurrentScaling
         self.scale(ratio, ratio)
-    else:
-      self.CurrentScaling = level / 100.0
+      self.CurrentScaling = level

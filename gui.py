@@ -49,6 +49,7 @@ class Gui(QMainWindow):
         self.setStyleSheet(Design.getStyle())
         self.Action = dict()
         self.SetupUI(design, people, rules)
+        self.Buttons.Zoom.setMenu(self.Menu.MenuZoom)
         self.Buttons.actionRadarView.toggled.connect(self.Map.Universe.ShowScannerRanges)
         self.Buttons.actionPlanetNames.toggled.connect(self.Map.Universe.ShowPlanetNames)
         self.Buttons.actionConcentrationView.toggled.connect(self.ShowCrustDiagrams)
@@ -61,7 +62,7 @@ class Gui(QMainWindow):
         self.PreviousField.clicked.connect(self.ShowPreviousMineField)
         self.Buttons.actionNoInfoView.setChecked(True)
         self.Buttons.RadarRange.valueChanged.connect(self.Map.Universe.ScaleRadarRanges)
-        self.Buttons.ChangeZoom.connect(self.Map.ResizeStarmap)
+        self.Menu.ChangeZoom.connect(self.Map.ResizeStarmap)
         self.Buttons.Mines.toggled.connect(self.Map.Universe.ShowFields)
         self.Buttons.ShowMines.connect(self.Map.Universe.ShowMines)
         self.Map.Universe.SelectField.connect(self.InspectMineField)
@@ -274,7 +275,7 @@ class Gui(QMainWindow):
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
         self.MineOffset = 0
-        self.MineIndex = 0
+#        self.MineIndex = 0
         self.SelectedFields = p.mine_fields
         if p.Discovered:
             self.ItemInfo.setCurrentIndex(0)
@@ -305,9 +306,13 @@ class Gui(QMainWindow):
         self.SelectedObject.setText(p.Name + ' - Summary')
 
 
-    def InspectMineField(self, m_list):
+    def InspectMineField(self, planet, index, m_list):
         self.SelectedFields = m_list
-        self.InspectMines(True)
+        self.MineIndex = index
+        if planet:
+            self.InspectMines(False)
+        else:
+            self.InspectMines(True)
 
 
     def InspectNextFleet(self, index, offset, fof):

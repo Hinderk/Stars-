@@ -7,7 +7,7 @@ from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 from math import sqrt
 
 from guiprop import GuiProps as GP
-from colours import Brush
+from colours import Brush, Pen
 from minefield import Minefield
 from defines import Stance
 
@@ -58,9 +58,6 @@ class Minedata(QGraphicsView):
     self.IndexLabel = self.Scene.addSimpleText("Field:", GP.infoFont)
     ypos += 2 * self.yDelta
     self.IndexLabel.moveBy(xpos, ypos)
-    Spacer = self.Scene.addSimpleText(" ", GP.infoFont)
-    ypos += 2 * self.yDelta
-    Spacer.moveBy(xpos + 640, ypos)
 
 
   def AddInfoText(self):
@@ -132,3 +129,4 @@ class Minedata(QGraphicsView):
       banner.setVisible(False)
       self.Scene.addItem(banner)
       self.FactionBanner.append(banner)
+    self.Scene.addRect(QRectF(800, 315, 5, 5), Pen.noshow)

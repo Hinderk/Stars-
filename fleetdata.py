@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene
 from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
 from guiprop import GuiProps as GP
-from colours import Brush
+from colours import Brush, Pen
 
 
 
@@ -92,22 +92,19 @@ class Fleetdata(QGraphicsView):
 
 
   def InitCargo(self):
-    pen = QPen(QColor(0, 0, 0))
-    brush = QBrush(QColor(200, 200, 200))
-    pen.setWidthF(2.0)
     xp = self.xOffset + self.xText
     yp = self.yDelta + 5
     box = QRectF(xp, yp, self.xWidth, self.ySize)
-    self.Scene.addRect(box, pen, brush)
+    self.Scene.addRect(box, Pen.black_2, Brush.grey)
     box = QRectF(xp, yp, self.xWidth / 2, self.ySize)
-    self.Fuel = self.Scene.addRect(box, pen, self.brush[4])
+    self.Fuel = self.Scene.addRect(box, Pen.black_2, self.brush[4])
     self.FuelWeight = self.Scene.addSimpleText("", GP.cargoFont)
     yp += self.yDelta + 2
     box = QRectF(xp, yp, self.xWidth, self.ySize)
-    self.Scene.addRect(box, pen, brush)
+    self.Scene.addRect(box, Pen.black_2, Brush.grey)
     for n in (0, 1, 2, 3):
       box = QRectF(xp, yp, self.xWidth, self.ySize)
-      self.Freight.append(self.Scene.addRect(box, pen, self.brush[n]))
+      self.Freight.append(self.Scene.addRect(box, Pen.black_2, self.brush[n]))
     self.Cargo = self.Scene.addSimpleText("", GP.cargoFont)
 
 
@@ -150,7 +147,6 @@ class Fleetdata(QGraphicsView):
     yp = self.TopOffset
     rectangle = QRectF(1, yp + 1, self.IconWidth - 2, self.IconWidth - 2)
     self.backdrop = self.Scene.addRect(rectangle)
-    self.backdrop.setBrush(QBrush(QColor(200, 200, 255)))
     for ext in "abcdefg":
       resource = "Design/Images/Graphics/ship-" + ext + ".svg"
       image = QGraphicsSvgItem(resource)
@@ -172,3 +168,4 @@ class Fleetdata(QGraphicsView):
       banner.setVisible(False)
       self.Scene.addItem(banner)
       self.FactionBanner.append(banner)
+    self.Scene.addRect(QRectF(800, 315, 5, 5), Pen.noshow)

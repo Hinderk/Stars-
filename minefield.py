@@ -31,6 +31,7 @@ class Minefield:
 
     r = sqrt(m) * GuiProps.Xscale
 
+    self.name = 'Mine Field - X' #  TODO: Fix Me!
     self.fleets_en_route = []
     self.TotalFriends = 0
     self.TotalFoes = 0

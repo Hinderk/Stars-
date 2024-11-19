@@ -1,27 +1,43 @@
 
 import math
 
-from PyQt6.QtGui import QPolygonF, QFont
-from PyQt6.QtCore import QPointF, QLineF, QRectF
+from PyQt6.QtGui import QPolygonF
+from PyQt6.QtCore import QPointF, QLineF, QRectF, Qt
+from PyQt6.QtWidgets import QMenu
 from PyQt6.QtWidgets import QGraphicsScene
 
 from PyQt6.QtCore import pyqtSignal as QSignal
 
+from design import Design
 from scanner import Scanner
 from ruleset import Ruleset
 from planet import Planet
 from colours import Pen
 from colours import Brush
 from defines import Stance
-from guiprop import GuiProps
-#  from minefield import Minefield
+from guiprop import GuiProps as GP
 
 
 
-class Universe(QGraphicsScene, GuiProps):
+class ItemSelector(QMenu):
+
+  def __init__(self, pos):
+    super(self.__class__, self).__init__()
+    self.xo = pos.x()
+    self.yo = pos.y()
+
+
+  def mousePressEvent(self, mouseClick):
+    pos = mouseClick.localPos()
+    print(pos)
+
+
+
+
+class Universe(QGraphicsScene):
 
   ChangeFocus = QSignal(Planet)
-  SelectField = QSignal(list)
+  SelectField = QSignal(bool, int, list)
 
 
   def __init__(self, rules):
@@ -50,10 +66,44 @@ class Universe(QGraphicsScene, GuiProps):
     pass
 
 
+  def contextMenuEvent(self, mouseClick):
+    print(self.Context)
+    Select = QMenu()
+    Select.setStyleSheet(Design.Style_1)
+    n = 0
+    if self.Context[1]:
+      for f in self.Context[1]:
+        a = Select.addAction(f.name)
+        a.setData((1, n))
+        n += 1
+    elif self.Context[0]:
+      a = Select.addAction(self.Context[0].Name)
+      a.setData((0, 0))
+      if self.Context[0].mine_fields:
+        Select.addSeparator()
+        for f in self.Context[0].mine_fields:
+          a = Select.addAction(f.name)
+          a.setData((1, n))
+          n += 1
+      if self.Context[2]:
+        Select.addSeparator()
+    selected = Select.exec(mouseClick.screenPos())
+    if selected:
+      itemtype, item = selected.data()
+      if itemtype == 1 and self.Context[1]:
+        self.HighlightMinefield(self.Context[1], item, False)
+      elif itemtype == 1:
+        po = self.Context[0]
+        self.HighlightPlanet(po)
+        self.SelectField.emit(True, item, po.mine_fields)
+      else:
+        self.HighlightPlanet(self.Context[0])
+
+
   def mousePressEvent(self, mouseClick):
     pos = mouseClick.scenePos()
-    xo = pos.x() / self.Xscale
-    yo = pos.y() / self.Xscale
+    xo = round(0.5 + pos.x() / GP.Xscale)
+    yo = round(0.5 + pos.y() / GP.Xscale)
     m_list = None
     dist = 1e20
     for p in self.planets:
@@ -69,22 +119,24 @@ class Universe(QGraphicsScene, GuiProps):
           if d < dist:
             m_list = [m]
             dist = d
-          elif m_list and d < dist + 1e-8:
+          elif m_list and d == dist:
             m_list.append(m)
         d = (m.x - po.x) * (m.x - po.x) + (m.y - po.y) * (m.y - po.y)
         if d < m.mines:
           po.mine_fields.append(m)
-    if m_list:
-      self.HighlightMinefield(m_list)
-    else:
-      self.HighlightPlanet(po)
+    self.Context = (po, m_list, None)
+    if mouseClick.buttons() == Qt.MouseButton.LeftButton:
+      if m_list:
+        self.HighlightMinefield(m_list, 0, False)
+      else:
+        self.HighlightPlanet(po)
 
 
   def CreateIndicator(self):
-    w = self.pointer_size * math.sqrt(3.0) / 2
+    w = GP.pointer_size * math.sqrt(3.0) / 2
     triangle = QPolygonF()
-    triangle << QPointF(0, 0) << QPointF(self.pointer_size / 2, w)
-    triangle << QPointF(- self.pointer_size / 2, w)
+    triangle << QPointF(0, 0) << QPointF(GP.pointer_size / 2, w)
+    triangle << QPointF(- GP.pointer_size / 2, w)
     self.pointer = self.addPolygon(triangle, Pen.white_08, Brush.yellow)
     self.pointer.setZValue(8)
 
@@ -98,23 +150,23 @@ class Universe(QGraphicsScene, GuiProps):
       p.label.setBrush(Brush.white)
       self.pointer.setVisible(False)
     else:
-      xp = self.Xscale * p.x
-      yp = self.Xscale * p.y + self.p_radius + self.dy_pointer
+      xp = GP.Xscale * p.x
+      yp = GP.Xscale * p.y + GP.p_radius + GP.dy_pointer
       self.pointer.setPos(xp, yp)
     self.SelectedPlanet = p
     self.ChangeFocus.emit(p)
 
 
-  def HighlightMinefield(self, m_list):
+  def HighlightMinefield(self, m_list, index, planet):
     if self.SelectedPlanet:
       self.SelectedPlanet.label.setPen(Pen.white_l)
       self.SelectedPlanet.label.setBrush(Brush.white_l)
-    xp = self.Xscale * m_list[0].x
-    yp = self.Xscale * m_list[0].y + self.dy_pointer
+    xp = GP.Xscale * m_list[0].x
+    yp = GP.Xscale * m_list[0].y + GP.dy_pointer
     self.pointer.setPos(xp, yp)
     self.pointer.setVisible(True)
     self.SelectedPlanet = None
-    self.SelectField.emit(m_list)
+    self.SelectField.emit(planet, index, m_list)
 
 
   def SetupMinefields(self):
@@ -203,9 +255,9 @@ class Universe(QGraphicsScene, GuiProps):
         q = math.sqrt(p.Colonists / self.PopulationCeiling)
         if q > 1.0:
           q = 1.0
-        rnew = self.p_radius * (1 + q) / 2 + q * self.d_radius
-        x = self.Xscale * p.x - rnew
-        y = self.Xscale * p.y - rnew
+        rnew = GP.p_radius * (1 + q) / 2 + q * GP.d_radius
+        x = GP.Xscale * p.x - rnew
+        y = GP.Xscale * p.y - rnew
         w = 2 * rnew
         p.body.setRect(QRectF(x, y, w, w))
         p.body.setPen(Pen.brown)
@@ -242,9 +294,9 @@ class Universe(QGraphicsScene, GuiProps):
           p.body.setPen(Pen.green)
           p.body.setBrush(Brush.green)
           q = 3 * (q - 0.66)
-        rnew = self.p_radius * (1 + q) / 2 + q * self.d_radius
-        x = self.Xscale * p.x - rnew
-        y = self.Xscale * p.y - rnew
+        rnew = GP.p_radius * (1 + q) / 2 + q * GP.d_radius
+        x = GP.Xscale * p.x - rnew
+        y = GP.Xscale * p.y - rnew
         w = 2 * rnew
         p.body.setRect(QRectF(x, y, w, w))
       if p.flagVisible:
@@ -273,10 +325,10 @@ class Universe(QGraphicsScene, GuiProps):
       x.append(p.x)
       y.append(p.y)
       self.planets.append(p)
-    xmin = self.Xscale * min(x) - self.map_frame
-    xmax = self.Xscale * max(x) + self.map_frame
-    ymin = self.Xscale * min(y) - self.map_frame
-    ymax = self.Xscale * max(y) + self.map_frame
+    xmin = GP.Xscale * min(x) - GP.map_frame
+    xmax = GP.Xscale * max(x) + GP.map_frame
+    ymin = GP.Xscale * min(y) - GP.map_frame
+    ymax = GP.Xscale * max(y) + GP.map_frame
     self.setSceneRect(xmin, ymin, xmax - xmin, ymax - ymin)
     model = rules.FirstScanner()
     if model:
@@ -287,15 +339,15 @@ class Universe(QGraphicsScene, GuiProps):
 
   def CreateScanner(self, xo, yo, ranges):
     s = Scanner(xo, yo, ranges)
-    r = ranges[0] * self.Xscale
-    x = self.Xscale * xo
-    y = self.Xscale * yo
+    r = ranges[0] * GP.Xscale
+    x = GP.Xscale * xo
+    y = GP.Xscale * yo
     if r > 0:
       box = QRectF(x - r, y - r, r + r, r + r)
       s.detection = self.addEllipse(box, Pen.red_s, Brush.red_s)
       s.detection.setZValue(-10)
       s.detection.setVisible(False)
-    r = ranges[1] * self.Xscale
+    r = ranges[1] * GP.Xscale
     if r > 0:
       box = QRectF(x - r, y - r, r + r, r + r)
       s.penetration = self.addEllipse(box, Pen.yellow_s, Brush.yellow_s)
@@ -318,7 +370,7 @@ class Universe(QGraphicsScene, GuiProps):
 
 
   def CreateOrbitLabel(self, x, y):
-    label = self.addSimpleText("", self.mapFont)
+    label = self.addSimpleText("", GP.mapFont)
     label.setPen(Pen.white_l)
     label.setBrush(Brush.white_l)
     label.setPos(x, y)
@@ -327,41 +379,41 @@ class Universe(QGraphicsScene, GuiProps):
 
 
   def CreateDiagram(self, diagram, x, y, w):
-    line = QLineF(0, -self.scale_length, 0, 0)
-    line.translate(x + w / 2 - self.scale_length / 2, y - self.dy_label)
+    line = QLineF(0, -GP.scale_length, 0, 0)
+    line.translate(x + w / 2 - GP.scale_length / 2, y - GP.dy_label)
     diagram.VAxis = self.addLine(line, Pen.white_08)
-    d = self.scale_length / 13
-    box = QRectF(d, 0, 3 * d, -self.scale_length)
+    d = GP.scale_length / 13
+    box = QRectF(d, 0, 3 * d, -GP.scale_length)
     diagram.BlueBox = self.addRect(box, Pen.blue, Brush.blue)
-    diagram.BlueBox.setPos(x + w / 2 - self.scale_length / 2, y - self.dy_label)
-    box = QRectF(5 * d, 0, 3 * d, -self.scale_length)
+    diagram.BlueBox.setPos(x + w / 2 - GP.scale_length / 2, y - GP.dy_label)
+    box = QRectF(5 * d, 0, 3 * d, -GP.scale_length)
     diagram.GreenBox = self.addRect(box, Pen.green, Brush.green)
-    diagram.GreenBox.setPos(x + w / 2 - self.scale_length / 2, y - self.dy_label)
-    box = QRectF(9 * d, 0, 3 * d, -self.scale_length)
+    diagram.GreenBox.setPos(x + w / 2 - GP.scale_length / 2, y - GP.dy_label)
+    box = QRectF(9 * d, 0, 3 * d, -GP.scale_length)
     diagram.YellowBox = self.addRect(box, Pen.yellow, Brush.yellow)
-    diagram.YellowBox.setPos(x + w / 2 - self.scale_length / 2, y - self.dy_label)
-    line = QLineF(self.scale_length, 0, 0, 0)
-    line.translate(x + w / 2 - self.scale_length / 2, y - self.dy_label)
+    diagram.YellowBox.setPos(x + w / 2 - GP.scale_length / 2, y - GP.dy_label)
+    line = QLineF(GP.scale_length, 0, 0, 0)
+    line.translate(x + w / 2 - GP.scale_length / 2, y - GP.dy_label)
     diagram.HAxis = self.addLine(line, Pen.white_08)
-    diagram.ScaleLength = self.scale_length
+    diagram.ScaleLength = GP.scale_length
     diagram.Show(False)
 
 
   def CreatePlanet(self, rules, homeworld):
     p = Planet(rules, homeworld)
     [p.x, p.y] = rules.FindPosition()
-    w = self.p_radius
-    xo = p.x * self.Xscale - w
-    yo = p.y * self.Xscale - w
+    w = GP.p_radius
+    xo = p.x * GP.Xscale - w
+    yo = p.y * GP.Xscale - w
     x = xo + w / 2
     y = yo + w / 2
     p.center = self.addEllipse(x, y, w, w, Pen.white, Brush.white)
-    w += self.p_radius
+    w += GP.p_radius
     p.core = self.addEllipse(xo, yo, w, w, Pen.brown, Brush.brown)
     p.core.setVisible(False)
-    x = xo - self.d_radius
-    y = yo - self.d_radius
-    w += 2 * self.d_radius
+    x = xo - GP.d_radius
+    y = yo - GP.d_radius
+    w += 2 * GP.d_radius
     c = 0.3 * w
     dc = w - 7 * c / 8
     p.body = self.addEllipse(x, y, w, w)
@@ -375,24 +427,24 @@ class Universe(QGraphicsScene, GuiProps):
     p.neutral.setVisible(False)
     p.foes.setVisible(False)
     p.friends.setVisible(False)
-    p.label = self.addSimpleText(p.Name, self.mapFont)
+    p.label = self.addSimpleText(p.Name, GP.mapFont)
     p.label.setPen(Pen.white_l)
     p.label.setBrush(Brush.white_l)
     p.label.setVisible(False)
     w0 = p.label.boundingRect().width()
-    p.label.setPos(x - w0 / 2 + w / 2, y + w + self.dy_label)
-    p.ships = self.CreateOrbitLabel(x - c / 2, y + w - self.fontsize)
-    p.attackers = self.CreateOrbitLabel(x - c / 2, y - self.fontsize / 2)
-    p.others = self.CreateOrbitLabel(x + w + c / 2, y + w - self.fontsize)
-    p.population = self.CreateOrbitLabel(x + w + c / 2, y - self.fontsize / 2)
+    p.label.setPos(x - w0 / 2 + w / 2, y + w + GP.dy_label)
+    p.ships = self.CreateOrbitLabel(x - c / 2, y + w - GP.fontsize)
+    p.attackers = self.CreateOrbitLabel(x - c / 2, y - GP.fontsize / 2)
+    p.others = self.CreateOrbitLabel(x + w + c / 2, y + w - GP.fontsize)
+    p.population = self.CreateOrbitLabel(x + w + c / 2, y - GP.fontsize / 2)
     flag = QPolygonF()
-    flag << QPointF(0, 0) << QPointF(0, - self.flag_height - self.flag_width)
-    flag << QPointF(self.flag_width + self.flag_stem, -self.flag_height - self.flag_width)
-    flag << QPointF(self.flag_width + self.flag_stem, -self.flag_height)
-    flag << QPointF(self.flag_stem, -self.flag_height)
-    flag << QPointF(self.flag_stem, 0)
+    flag << QPointF(0, 0) << QPointF(0, - GP.flag_height - GP.flag_width)
+    flag << QPointF(GP.flag_width + GP.flag_stem, -GP.flag_height - GP.flag_width)
+    flag << QPointF(GP.flag_width + GP.flag_stem, -GP.flag_height)
+    flag << QPointF(GP.flag_stem, -GP.flag_height)
+    flag << QPointF(GP.flag_stem, 0)
     p.flag = self.addPolygon(flag)
-    p.flag.setPos(x + w / 2 - self.flag_stem / 2, y + w / 2)
+    p.flag.setPos(x + w / 2 - GP.flag_stem / 2, y + w / 2)
     p.flag.setVisible(False)
     self.CreateDiagram(p.diagram, x, y, w)
     return p
