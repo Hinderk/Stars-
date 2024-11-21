@@ -7,6 +7,7 @@ from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
 from guiprop import GuiProps as GP
 from colours import Brush, Pen
+from defines import Stance
 
 
 
@@ -27,6 +28,7 @@ class Fleetdata(QGraphicsView):
   def __init__(self):
     super(self.__class__, self).__init__()
     self.Freight = []
+    self.HullLogo = dict()
     self.Scene = QGraphicsScene(self)
     self.AddStaticText()
     self.AddInfoText()
@@ -35,6 +37,7 @@ class Fleetdata(QGraphicsView):
     self.AddLogos()
     self.setScene(self.Scene)
     self.setMaximumHeight(325)
+    self.CurrentFleet = 0
     self.CurrentFaction = 0
 
 
@@ -110,8 +113,11 @@ class Fleetdata(QGraphicsView):
 
   def UpdateCargo(self, fleet):
     self.FactionBanner[self.CurrentFaction].setVisible(False)
+    self.HullLogo[self.CurrentFleet].setVisible(False)
     self.CurrentFaction = fleet.Faction
+    self.CurrentFleet = fleet.Design                            # TODO: Identify the proper design index to pick the hull picture 
     self.FactionBanner[self.CurrentFaction].setVisible(True)
+    self.HullLogo[self.CurrentFleet].setVisible(True)
     fraction = []
     fuel = self.xWidth * fleet.Fuel / fleet.TotalFuel
     xp = self.xOffset + self.xText
@@ -135,6 +141,14 @@ class Fleetdata(QGraphicsView):
     self.Cargo.setText(str(total) + text)
     x = self.xWidth - self.Cargo.boundingRect().width()
     self.Cargo.setPos(xp + x / 2, yp + 2)
+    if fleet.FriendOrFoe == Stance.allied:
+      self.backdrop.setBrush(Brush.blue_p)
+    elif fleet.FriendOrFoe == Stance.friendly:
+      self.backdrop.setBrush(Brush.green_p)
+    elif fleet.FriendOrFoe == Stance.neutral:
+      self.backdrop.setBrush(Brush.yellow_p)
+    else:
+      self.backdrop.setBrush(Brush.red_p)
 
 
   def SetupColors(self):
@@ -143,20 +157,20 @@ class Fleetdata(QGraphicsView):
 
 
   def AddLogos(self):
-    self.FleetImage = []
+    self.HullLogo = []
     yp = self.TopOffset
     rectangle = QRectF(1, yp + 1, self.IconWidth - 2, self.IconWidth - 2)
     self.backdrop = self.Scene.addRect(rectangle)
-    for ext in "abcdefg":
+    for ext in "abcd":
       resource = "Design/Images/Graphics/ship-" + ext + ".svg"
       image = QGraphicsSvgItem(resource)
       width = image.boundingRect().width()
       if width > 0:
         image.setScale(self.IconWidth / width)
         image.setPos(0, yp)
-#        image.setVisible(False)
+        image.setVisible(False)
         self.Scene.addItem(image)
-        self.FleetImage.append(image)
+        self.HullLogo.append(image)
     yp += self.FlagOffset + self.IconWidth
     self.FactionBanner = []
     for faction in "ABCDEFGHIJKLMNOPQRST":

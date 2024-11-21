@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QGraphicsScene
 
 from PyQt6.QtCore import pyqtSignal as QSignal
 
-from design import Design
+from guidesign import GuiDesign
 from scanner import Scanner
 from ruleset import Ruleset
 from planet import Planet
@@ -69,7 +69,7 @@ class Universe(QGraphicsScene):
   def contextMenuEvent(self, mouseClick):
     print(self.Context)
     Select = QMenu()
-    Select.setStyleSheet(Design.Style_1)
+    Select.setStyleSheet(GuiDesign.getMapStyle())
     n = 0
     if self.Context[1]:
       for f in self.Context[1]:

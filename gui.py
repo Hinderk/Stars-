@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QMainWindow, QPushButton, QToolButton
 from PyQt6.QtWidgets import QStatusBar, QGroupBox, QCheckBox
 from PyQt6.QtWidgets import QPlainTextEdit
 
-from design import Design
+from guidesign import GuiDesign
 from defines import Stance
 from menubar import Menu
 from toolbar import ToolBar
@@ -45,10 +45,9 @@ class Gui(QMainWindow):
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
         self.MineOffset = 0
-        design = Design()
-        self.setStyleSheet(Design.getStyle())
+        self.setStyleSheet(GuiDesign.getGuiStyle())
         self.Action = dict()
-        self.SetupUI(design, people, rules)
+        self.SetupUI(people, rules)
         self.Buttons.Zoom.setMenu(self.Menu.MenuZoom)
         self.Buttons.actionRadarView.toggled.connect(self.Map.Universe.ShowScannerRanges)
         self.Buttons.actionPlanetNames.toggled.connect(self.Map.Universe.ShowPlanetNames)
@@ -74,16 +73,17 @@ class Gui(QMainWindow):
         self.ShowFields.clicked.connect(self.InspectMines)
 
 
-    def SetupUI(self, design, people, rules):
+    def SetupUI(self, people, rules):
 
-        self.resize(2400, 1350)                        # TODO: Query design!
+        sx, sy = GuiDesign.getSize()
+        self.resize(sx, sy)
         self.setWindowTitle("My Stars!")
         Icon = QIcon()
         Icon.addPixmap(QPixmap(":/Icons/Stars"))
         self.setWindowIcon(Icon)
         self.CentralWidget = QWidget(self)
         self.setCentralWidget(self.CentralWidget)
-        self.CentralWidget.setMinimumSize(2400, 1350)  # TODO: Query design!
+        self.CentralWidget.setMinimumSize(sx, sy)
 
         LeftSide = QWidget()
         LeftSide.setMinimumWidth(875)        # Minimal feasible value ...

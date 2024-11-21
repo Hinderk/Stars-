@@ -30,6 +30,7 @@ _minefield_blue = QColor(0, 0, 255)
 
 _background_blue = QColor(200, 200, 255)
 _background_red = QColor(255, 200, 200)
+_background_green = QColor(200, 255, 200)
 _background_yellow = QColor(255, 255, 200)
 
 
@@ -89,3 +90,4 @@ class Brush:
   blue_p = QBrush(_background_blue)
   red_p = QBrush(_background_red)
   yellow_p = QBrush(_background_yellow)
+  green_p = QBrush(_background_green)

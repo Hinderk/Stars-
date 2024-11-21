@@ -24,6 +24,7 @@ class Fleet:
     self.MineSweeping = ship.MineSweeping
     self.FriendOrFoe = Faction.Stance(Ruleset.fID0, fID)
     self.Name = ship.Name
+    self.Design = ship.Design
     self.Faction = fID
     self.scanner = None
     self.StealCargo = False
@@ -45,6 +46,7 @@ class Fleet:
     self.CargoSpace += ship.CargoSpace
     self.MineLaying += ship.MineLaying
     self.MineSweeping += ship.MineSweeping
+#    self.UpdateShipDesign(ship)  # TODO: Rank battle rating & modify flagship if necessary
     self.UpdateScannerData(ship)
 
 

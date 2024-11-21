@@ -53,7 +53,7 @@ def main():
     s.itemType = Model.Rhino
     s.domain = ST.SCANNER
 
-    ship = Ship()
+    ship = Ship(0)
     ship.EmptyWeight = 25
     ship.TotalWeight = 120
     ship.CargoSpace = 200

@@ -1,6 +1,6 @@
 
 
-class Design:
+class GuiDesign:
 
     Style_0 = """
 
@@ -134,5 +134,14 @@ class Design:
 
          """
 
-    def getStyle(select=0):
-        return Design.Style_0
+
+    def getGuiStyle(select=0):
+        return GuiDesign.Style_0
+
+
+    def getMapStyle(select=0):
+        return GuiDesign.Style_1
+
+
+    def getSize():
+        return [2400, 1350]
