@@ -53,3 +53,21 @@ class Perks(Enum):
     RSH = 14         # Regenerating shields
     ROB = 15         # Steal freight
     HIDE = 16        # Improve ship cloaking
+
+
+class ShipClass(Enum):
+    COL = "Colony Ship"
+    FRT = "Freighter"
+    SCT = "Scout"
+    WAR = "Warship"
+    UTL = "Utility Vessel"
+    MLY = "Mine Layer"
+    BMB = "Bomber"
+    MIN = "Mining Rig"
+    FLT = "Fuel Transport"
+
+
+class Task(Enum):
+    IDLE = 0
+    MOVE = 1
+        

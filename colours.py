@@ -17,6 +17,7 @@ _grey = QColor(200, 200, 200)
 _scanner_yellow = QColor(236, 175, 0)     # QColor(255, 255, 0, 120)
 _scanner_red = QColor(220, 104, 0)        # QColor(255, 120, 0, 220)
 _label_white = QColor(255, 255, 255, 120)
+_fleet_blue = QColor(40, 40, 255)
 
 _light_blue = QColor(0, 100, 255)
 _light_red = QColor(255, 100, 100)
@@ -38,6 +39,10 @@ _background_yellow = QColor(255, 255, 200)
 class Pen:
 
   noshow = QPen(Qt.PenStyle.NoPen)
+  blue_p = QPen(_background_blue)
+  red_p = QPen(_background_red)
+  yellow_p = QPen(_background_yellow)
+  green_p = QPen(_background_green)
   white_l = QPen(_label_white)
   red_m = QPen(_minefield_red)
   red_s = QPen(_scanner_red)
@@ -91,3 +96,4 @@ class Brush:
   red_p = QBrush(_background_red)
   yellow_p = QBrush(_background_yellow)
   green_p = QBrush(_background_green)
+  blue_f = QBrush(_fleet_blue)

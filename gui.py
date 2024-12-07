@@ -57,6 +57,8 @@ class Gui(QMainWindow):
         self.Buttons.actionPopulationView.toggled.connect(self.ShowPopulationView)
         self.Buttons.actionNoInfoView.toggled.connect(self.ShowMinimalView)
         self.Buttons.actionPercentView.toggled.connect(self.ShowPercentageView)
+        self.Buttons.actionFoes.toggled.connect(self.Map.Universe.EnableFoeFilter)
+        self.Buttons.actionShipCount.toggled.connect(self.Map.Universe.ShowShipCount)
         self.NextField.clicked.connect(self.ShowNextMineField)
         self.PreviousField.clicked.connect(self.ShowPreviousMineField)
         self.Buttons.actionNoInfoView.setChecked(True)
@@ -71,6 +73,7 @@ class Gui(QMainWindow):
         self.SelectNextNeutral.clicked.connect(self.InspectNeutralFleets)
         self.SelectNextFleet.clicked.connect(self.InspectFleets)
         self.ShowFields.clicked.connect(self.InspectMines)
+        self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
 
 
     def SetupUI(self, people, rules):
@@ -152,10 +155,6 @@ class Gui(QMainWindow):
         self.setStatusBar(self.Status)
 #
         self.Buttons.UpdateFriendlyDesigns([])
-        self.Buttons.UpdateEnemyDesigns(
-            ['Colony Ships', 'Freighters', 'Scouts', 'Warships', 'Utility Ships',
-             'Bombers', 'Mining Ships', 'Fuel Transports']
-        )
 
 
     def SetupNewsReader(self):

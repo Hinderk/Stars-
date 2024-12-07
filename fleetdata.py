@@ -1,8 +1,7 @@
 
 from PyQt6.QtCore import QRectF
-from PyQt6.QtGui import QPen, QBrush, QColor, QFont # , QPixmap
-from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene
-# from PyQt6.QtWidgets import QGraphicsPixmapItem
+from PyQt6.QtWidgets import QGraphicsView
+from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
 from guiprop import GuiProps as GP
@@ -32,12 +31,11 @@ class Fleetdata(QGraphicsView):
     self.Scene = QGraphicsScene(self)
     self.AddStaticText()
     self.AddInfoText()
-    self.SetupColors()
     self.InitCargo()
     self.AddLogos()
     self.setScene(self.Scene)
     self.setMaximumHeight(325)
-    self.CurrentFleet = 0
+    self.FleetPicture = 0
     self.CurrentFaction = 0
 
 
@@ -65,11 +63,11 @@ class Fleetdata(QGraphicsView):
     ypos += self.yDelta
     Speed.moveBy(xpos, ypos)
 #    text = "This fleet can lay up to 100 mines per year."
-    self.Mines = self.Scene.addSimpleText(" ", GP.infoFont)
+    self.Mines = self.Scene.addSimpleText("", GP.infoFont)
     ypos += self.yDelta
     self.Mines.moveBy(xpos, ypos)
 #    text = "This fleet can destroy up to 100 mines per year."
-    self.Sweeps = self.Scene.addSimpleText(" ", GP.infoFont)
+    self.Sweeps = self.Scene.addSimpleText("", GP.infoFont)
     ypos += self.yDelta
     self.Sweeps.moveBy(xpos, ypos)
 
@@ -95,29 +93,30 @@ class Fleetdata(QGraphicsView):
 
 
   def InitCargo(self):
+    brush = [Brush.white, Brush.yellow, Brush.green, Brush.blue_f, Brush.red]
     xp = self.xOffset + self.xText
     yp = self.yDelta + 5
     box = QRectF(xp, yp, self.xWidth, self.ySize)
     self.Scene.addRect(box, Pen.black_2, Brush.grey)
     box = QRectF(xp, yp, self.xWidth / 2, self.ySize)
-    self.Fuel = self.Scene.addRect(box, Pen.black_2, self.brush[4])
+    self.Fuel = self.Scene.addRect(box, Pen.black_2, brush[4])
     self.FuelWeight = self.Scene.addSimpleText("", GP.cargoFont)
     yp += self.yDelta + 2
     box = QRectF(xp, yp, self.xWidth, self.ySize)
     self.Scene.addRect(box, Pen.black_2, Brush.grey)
     for n in (0, 1, 2, 3):
       box = QRectF(xp, yp, self.xWidth, self.ySize)
-      self.Freight.append(self.Scene.addRect(box, Pen.black_2, self.brush[n]))
+      self.Freight.append(self.Scene.addRect(box, Pen.black_2, brush[n]))
     self.Cargo = self.Scene.addSimpleText("", GP.cargoFont)
 
 
   def UpdateCargo(self, fleet):
     self.FactionBanner[self.CurrentFaction].setVisible(False)
-    self.HullLogo[self.CurrentFleet].setVisible(False)
+    self.HullLogo[self.FleetPicture].setVisible(False)
     self.CurrentFaction = fleet.Faction
-    self.CurrentFleet = fleet.Design                            # TODO: Identify the proper design index to pick the hull picture 
+    self.FleetPicture = fleet.Picture
     self.FactionBanner[self.CurrentFaction].setVisible(True)
-    self.HullLogo[self.CurrentFleet].setVisible(True)
+    self.HullLogo[self.FleetPicture].setVisible(True)
     fraction = []
     fuel = self.xWidth * fleet.Fuel / fleet.TotalFuel
     xp = self.xOffset + self.xText
@@ -149,11 +148,9 @@ class Fleetdata(QGraphicsView):
       self.backdrop.setBrush(Brush.yellow_p)
     else:
       self.backdrop.setBrush(Brush.red_p)
-
-
-  def SetupColors(self):
-    blue = QColor(40, 40, 255)
-    self.brush = [Brush.white, Brush.yellow, Brush.green, QBrush(blue), Brush.red]
+    self.ShipCount.setText(str(len(fleet.ShipList)))
+#    text = "This fleet can lay up to 100 mines per year."
+#    text = "This fleet can destroy up to 100 mines per year."
 
 
   def AddLogos(self):
@@ -161,16 +158,17 @@ class Fleetdata(QGraphicsView):
     yp = self.TopOffset
     rectangle = QRectF(1, yp + 1, self.IconWidth - 2, self.IconWidth - 2)
     self.backdrop = self.Scene.addRect(rectangle)
-    for ext in "abcd":
-      resource = "Design/Images/Graphics/ship-" + ext + ".svg"
-      image = QGraphicsSvgItem(resource)
-      width = image.boundingRect().width()
-      if width > 0:
-        image.setScale(self.IconWidth / width)
-        image.setPos(0, yp)
-        image.setVisible(False)
-        self.Scene.addItem(image)
-        self.HullLogo.append(image)
+    for e1 in "abcdefghi":
+      for e2 in "123456":
+        resource = "Design/Images/Graphics/ship-" + e1 + e2 + ".svg"
+        image = QGraphicsSvgItem(resource)
+        width = image.boundingRect().width()
+        if width > 0:
+          image.setScale(self.IconWidth / width)
+          image.setPos(0, yp)
+          image.setVisible(False)
+          self.Scene.addItem(image)
+          self.HullLogo.append(image)
     yp += self.FlagOffset + self.IconWidth
     self.FactionBanner = []
     for faction in "ABCDEFGHIJKLMNOPQRST":

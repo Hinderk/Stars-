@@ -12,10 +12,19 @@ class GuiProps:
 
     Xscale = 0.75       # Change to resize the star map ...
 
+    # The following numbers denote screen coordinates.
+
+    h_vector = 10
+    dh_vector = 4
+    w_vector = 6
+    f_radius = 5
+    f_dist = 6
+
     dy_label = 10
     dy_pointer = 20
     d_radius = 8
     p_radius = 8
+    o_radius = 5
     flag_height = 25
     flag_width = 10
     flag_stem = 2
@@ -23,5 +32,5 @@ class GuiProps:
     scale_length = 30
     pointer_size = 20
 
-    map_frame = 200          # screen coordinates ...
-    planet_distance = 100    # screen coordinates ...
+    map_frame = 200
+    planet_distance = 100

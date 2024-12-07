@@ -8,9 +8,7 @@ class Ship:
         self.TotalWeight = 0
         self.EmptyWeight = 0
         self.TotalFuel = 0
-        self.System = []
-        self.Engine = None
-        self.WarpSpeed = 1
+        self.WarpSpeed = 0
         self.MineLaying = 0
         self.MineSweeping = 0
         self.Cloaking = 0
@@ -20,4 +18,3 @@ class Ship:
         self.Boranium = 0
         self.Germanium = 0
         self.CargoSpace = 0
-

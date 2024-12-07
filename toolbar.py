@@ -7,7 +7,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QSize
 from PyQt6.QtCore import pyqtSignal as QSignal
 
-from defines import Stance
+from defines import Stance, ShipClass
 
 
 Instant = QToolButton.ToolButtonPopupMode.InstantPopup
@@ -18,6 +18,7 @@ Delayed = QToolButton.ToolButtonPopupMode.DelayedPopup
 class ToolBar(QToolBar):
 
     ShowMines = QSignal(bool, Stance)
+    FilterEnemyFleets = QSignal(bool, dict)
 
 
     def __init__(self):
@@ -25,6 +26,8 @@ class ToolBar(QToolBar):
         super(self.__class__, self).__init__()
 
         self.EnemyDesigns = dict()
+        for sc in ShipClass:
+            self.EnemyDesigns[sc.name] = True
         self.FriendlyDesigns = dict()
         self.MineFilter = dict()
         self.MineFilter[Stance.allied] = True
@@ -125,15 +128,15 @@ class ToolBar(QToolBar):
         self.actionFriendlies.setMenu(self.FriendFilter)
 
         Icon = QIcon(":/Toolbar/Foes")
-        self.FoeFilter = QMenu(self)
-        self.FoeFilter.setStyleSheet("QMenu::item{padding: 5px 45px 5px 0px}")
         self.actionFoes = QToolButton(self)
-        self.actionFoes.setCheckable(True)
+#            self.actionFoes.setChecked(False)
+        self.actionFoes.setCheckable(False)
+        self.actionFoes.setPopupMode(Instant)
         self.actionFoes.setIcon(Icon)
         self.actionFoes.setToolTip("Show enemy fleets ...")
         self.actionFoes.setStatusTip("Show only enemy fleets on the star map ...")
         self.actionFoes.setAutoRepeat(False)
-        self.actionFoes.setMenu(self.FoeFilter)
+        self.DefineEnemyDesignMenu(self.actionFoes)
 
         Icon = QIcon(":/Toolbar/Zoomlevel")
         self.Zoom = QToolButton(self)
@@ -217,20 +220,40 @@ class ToolBar(QToolBar):
             self.FriendlyDesigns[NewDesign] = NewAction
 
 
-    def UpdateEnemyDesigns(self, DesignData):
+    def DefineEnemyDesignMenu(self, DesignMenu):
 
-        self.FoeFilter.clear()
-        self.AllFoes = self.FoeFilter.addAction('   All Designs')
-        self.InvertFoes = self.FoeFilter.addAction('   Invert Filter')
-        self.NoFoes = self.FoeFilter.addAction('   No Designs')
-        self.FoeFilter.addSeparator()
-        self.EnemyDesigns.clear()
-        for NewDesign in DesignData:
-            NewAction = self.FoeFilter.addAction(NewDesign)
-            NewAction.setCheckable(True)
-            NewAction.setChecked(True)
-            self.EnemyDesigns[NewDesign] = NewAction
+        class EnemyAction(QAction):
 
+            def __init__(self, design):
+                super(self.__class__, self).__init__()
+                self.ShipDesign = design.name
+
+        @staticmethod
+        def addAction(menu, action, label):
+            action.setText(label)
+            action.setCheckable(True)
+            action.setChecked(True)
+            action.toggled.connect(self.ShowEnemyFleets)
+            menu.addAction(action)
+
+        self.FoeFilter = dict()
+        Menu = QMenu(self)
+        Menu.setStyleSheet("QMenu::item{padding: 5px 40px 5px 0px}")
+        self.AllEnemyDesigns = Menu.addAction('   All Designs')
+        self.AllEnemyDesigns.setCheckable(False)
+        self.AllEnemyDesigns.triggered.connect(self.ShowAllEnemyDesigns)
+        self.InvertEnemyDesigns = Menu.addAction('   Invert Filter')
+        self.InvertEnemyDesigns.setCheckable(False)
+        self.InvertEnemyDesigns.triggered.connect(self.InvertEnemyDisplay)
+        self.HideEnemyDesigns = Menu.addAction('   No Designs')
+        self.HideEnemyDesigns.setCheckable(False)
+        self.HideEnemyDesigns.triggered.connect(self.HideAllEnemyDesigns)
+        Menu.addSeparator()
+        for design in ShipClass:
+            action = EnemyAction(design)
+            addAction(Menu, action, design.value)
+            self.FoeFilter[design] = action
+        DesignMenu.setMenu(Menu)
 
 
     def DefineMineMenu(self, Mines):
@@ -295,3 +318,36 @@ class ToolBar(QToolBar):
             self.Mines.setCheckable(False)
             self.Mines.setPopupMode(Instant)
         self.ShowMines.emit(event, fof)
+
+
+    def ShowEnemyFleets(self, event):
+        sc = self.sender().ShipDesign
+        self.EnemyDesigns[sc] = event
+        disabled = True
+        for b in self.EnemyDesigns.values():
+            disabled = disabled and b
+        if disabled:
+            self.actionFoes.setChecked(False)
+            self.actionFoes.setCheckable(False)
+            self.actionFoes.setPopupMode(Instant)
+        else:
+            self.actionFoes.setCheckable(True)
+            self.actionFoes.setChecked(True)
+            self.actionFoes.setPopupMode(Delayed)
+        self.FilterEnemyFleets.emit(disabled, self.EnemyDesigns)
+
+
+    def ShowAllEnemyDesigns(self):
+        for design in ShipClass:
+            self.FoeFilter[design].setChecked(True)
+
+
+    def InvertEnemyDisplay(self):
+        for design in ShipClass:
+            show = self.FoeFilter[design].isChecked()
+            self.FoeFilter[design].setChecked(not show)
+
+
+    def HideAllEnemyDesigns(self):
+        for design in ShipClass:
+            self.FoeFilter[design].setChecked(False)

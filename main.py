@@ -5,7 +5,8 @@ import stars_rc
 from PyQt6.QtWidgets import QApplication
 
 from gui import Gui
-from faction import Faction
+from hull import Hull
+from design import Design
 from defines import Stance
 from planet import Planet
 from ruleset import Ruleset
@@ -53,11 +54,11 @@ def main():
     s.itemType = Model.Rhino
     s.domain = ST.SCANNER
 
-    ship = Ship(0)
+    ship = Ship(Design(0, Hull.SCT))
     ship.EmptyWeight = 25
     ship.TotalWeight = 120
     ship.CargoSpace = 200
-    ship.System.append(s)
+    ship.Design.System.append(s)
     ship.Settlers = 60
     ship.Boranium = 10
     ship.Germanium = 30
@@ -68,16 +69,19 @@ def main():
     ship.Name = "Explorer"
     ship.Type = "Scout"
 
-    fleet_0 = Fleet(ship, 4)
-    fleet_1 = Fleet(ship, 2)
-    fleet_2 = Fleet(ship, 0)
+    fleet_0 = Fleet([ship], 4)
+    fleet_1 = Fleet([ship], 2)
+    fleet_2 = Fleet([ship], 0)
 
     ship.Name = "Hauler"
     ship.Type = "Freighter"
 
-    fleet_3 = Fleet(ship, 1)
-    fleet_4 = Fleet(ship, 3)
-    fleet_5 = Fleet(ship, 9)
+    fleet_3 = Fleet([ship, ship, ship], 1)
+    fleet_4 = Fleet([ship], 3)
+    fleet_5 = Fleet([ship], 9)
+
+    fleet_6 = Fleet([ship, ship], 9)
+    fleet_6.ShipCounter = 234
 
     form.InspectPlanet(Terra)
 
@@ -89,6 +93,8 @@ def main():
     form.Map.Universe.RegisterFleet(fleet_3, p)
     form.Map.Universe.RegisterFleet(fleet_4, p)
     form.Map.Universe.RegisterFleet(fleet_5, p)
+
+    form.Map.Universe.RegisterFleet(fleet_6, 100, 200)
 
     form.Map.Universe.planets[0].BuildStarbase()
     form.Map.Universe.planets[0].Relation = Stance.neutral

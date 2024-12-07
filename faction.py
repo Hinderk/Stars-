@@ -18,5 +18,9 @@ class Faction:
             return Stance.hostile
 
 
+    def CargoRobber(fID):    # TODO: For testing purposes only ...
+        return 5 < fID
+
+
     def __init__(self):
         self.FactionLogo = None

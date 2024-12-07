@@ -113,6 +113,7 @@ class Planet(PlanetData):
         self.UpdateFoes(ships)
       else:
         self.UpdateOthers(ships)
+    fleet.Orbiting = self
 
 
   def UpdateFriends(self, count=0):
@@ -198,7 +199,7 @@ class Planet(PlanetData):
       self.flagVisible = False
 
 
-  def ShowDefaultView(self):
+  def ShowDefaultView(self, showNumbers):
     self.center.setVisible(True)
     self.core.setVisible(self.coreVisible)
     self.body.setVisible(False)
@@ -207,9 +208,9 @@ class Planet(PlanetData):
     self.neutral.setVisible(self.othersVisible)
     self.foes.setVisible(self.foesVisible)
     self.friends.setVisible(self.friendsVisible)
-    self.ships.setVisible(self.friendsVisible)
-    self.attackers.setVisible(self.foesVisible)
-    self.others.setVisible(self.othersVisible)
+    self.ships.setVisible(self.friendsVisible and showNumbers)
+    self.attackers.setVisible(self.foesVisible and showNumbers)
+    self.others.setVisible(self.othersVisible and showNumbers)
     self.population.setVisible(False)
     self.flag.setVisible(False)
 

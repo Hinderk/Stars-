@@ -36,7 +36,7 @@ class Minefield:
     self.TotalFriends = 0
     self.TotalFoes = 0
     self.TotalOthers = 0
-    self.Detected = True # False    -- FIXME
+    self.Detected = True # False    -- FIXME: Test feature
     self.ShipTracking = False
     self.fof = Faction.Stance(Ruleset.fID0, fID)
     self.faction = fID
@@ -51,23 +51,17 @@ class Minefield:
     y *= GuiProps.Xscale
     box = QRectF(x - r, y - r, r + r, r + r)
     if self.fof == Stance.allied:
-      brush = Brush.blue
-      pen = Pen.blue_l
       self.area = scene.addEllipse(box, Pen.blue_m, Brush.blue_m)
       self.area.setZValue(-6)
+      self.center = scene.addPolygon(self.caret, Pen.blue_l, Brush.blue)
     elif self.fof == Stance.friendly:
-      brush = Brush.yellow
-      pen = Pen.noshow
       self.area = scene.addEllipse(box, Pen.yellow_m, Brush.yellow_m)
       self.area.setZValue(-5)
+      self.center = scene.addPolygon(self.caret, Pen.noshow, Brush.yellow)
     else:
-      brush = Brush.red
-      pen = Pen.noshow
       self.area = scene.addEllipse(box, Pen.red_m, Brush.red_m)
       self.area.setZValue(-4)
-    self.center = scene.addPolygon(self.caret)
-    self.center.setPen(pen)
-    self.center.setBrush(brush)
+      self.center = scene.addPolygon(self.caret, Pen.noshow, Brush.red)
     self.center.setZValue(2)
     self.center.setPos(x, y)
     self.area.setVisible(False)
