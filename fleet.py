@@ -22,12 +22,15 @@ class Fleet:
   arrow << QPointF(0, GuiProps.dh_vector - GuiProps.h_vector)
   arrow << QPointF(GuiProps.w_vector, -GuiProps.h_vector)
 
+#  RecycleBin = []
+
   def __init__(self, ships, fID):
     self.ShipList = []
     self.ShipCounter = 0
     self.Waypoints = []
     self.WaypointIndex = -1
     self.RepeatSchedule = False
+    self.Idle = True
     self.Discovered = True           # TODO: Depends on scanners!
     self.Orbiting = None
     self.TotalWeight = 0
@@ -47,6 +50,7 @@ class Fleet:
     self.Index = None
     self.Picture = None
     self.FriendOrFoe = Faction.Stance(Ruleset.fID0, fID)
+    self.ShipCounter = len(ships)
     for s in ships:
       self.AddShip(s)
     self.Faction = fID
@@ -117,11 +121,20 @@ class Fleet:
         val = n * r
 
 
-  def ApplyFilter(self, select):
+  def ApplyFoeFilter(self, idle, select):
     self.ShipCounter = 0
-    for s in self.ShipList:
-      if select[s.Design.Hull.value[2].name]:
-        self.ShipCounter += 1
+    if self.Idle or not idle:
+      for s in self.ShipList:
+        if select[s.Design.Hull.value[2].name]:
+          self.ShipCounter += 1
+
+
+  def ApplyMyFilter(self, idle, select):
+    self.ShipCounter = 0
+    if self.Idle or not idle:
+      for s in self.ShipList:
+        if select[s.Design.Name]:
+          self.ShipCounter += 1
 
 
   def getColours(self):

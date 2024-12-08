@@ -58,7 +58,9 @@ class Gui(QMainWindow):
         self.Buttons.actionNoInfoView.toggled.connect(self.ShowMinimalView)
         self.Buttons.actionPercentView.toggled.connect(self.ShowPercentageView)
         self.Buttons.actionFoes.toggled.connect(self.Map.Universe.EnableFoeFilter)
+        self.Buttons.actionFriendlies.toggled.connect(self.Map.Universe.EnableFriendFilter)
         self.Buttons.actionShipCount.toggled.connect(self.Map.Universe.ShowShipCount)
+        self.Buttons.actionWaitingFleets.toggled.connect(self.Map.Universe.FilterIdleFleets)
         self.NextField.clicked.connect(self.ShowNextMineField)
         self.PreviousField.clicked.connect(self.ShowPreviousMineField)
         self.Buttons.actionNoInfoView.setChecked(True)
@@ -67,13 +69,15 @@ class Gui(QMainWindow):
         self.Buttons.Mines.toggled.connect(self.Map.Universe.ShowFields)
         self.Buttons.ShowMines.connect(self.Map.Universe.ShowMines)
         self.Map.Universe.SelectField.connect(self.InspectMineField)
-        self.Map.Universe.ChangeFocus.connect(self.InspectPlanet)
+        self.Map.Universe.SelectPlanet.connect(self.InspectPlanet)
+        self.Map.Universe.UpdatePlanet.connect(self.UpdatePlanetView)
         self.ShowPlanet.clicked.connect(self.InspectPlanets)
         self.SelectNextEnemy.clicked.connect(self.InspectEnemyFleets)
         self.SelectNextNeutral.clicked.connect(self.InspectNeutralFleets)
         self.SelectNextFleet.clicked.connect(self.InspectFleets)
         self.ShowFields.clicked.connect(self.InspectMines)
         self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
+        self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFriendlies)
 
 
     def SetupUI(self, people, rules):
@@ -153,8 +157,6 @@ class Gui(QMainWindow):
         self.setMenuBar(self.Menu)
         self.Status = QStatusBar(self)
         self.setStatusBar(self.Status)
-#
-        self.Buttons.UpdateFriendlyDesigns([])
 
 
     def SetupNewsReader(self):
@@ -264,6 +266,38 @@ class Gui(QMainWindow):
         return Title
 
 
+    def UpdatePlanetView(self, p):
+        if self.ItemInfo.currentIndex() < 2:
+            if p.ShipTracking:
+                self.SelectNextEnemy.setVisible(p.TotalFoes > 0)
+                self.SelectNextNeutral.setVisible(p.TotalOthers > 0)
+            else:
+                self.SelectNextEnemy.setVisible(False)
+                self.SelectNextNeutral.setVisible(False)
+            self.SelectNextFleet.setVisible(p.TotalFriends > 0)
+        if self.ItemInfo.currentIndex() == 1:
+            if self.EnemyFleetOffset > 0 and p.TotalFoes > 0:
+                self.EnemyFleetOffset = 0
+                self.InspectEnemyFleets(True)
+            elif self.NeutralFleetOffset > 0 and p.TotalOthers > 0:
+                self.NeutralFleetOffset = 0
+                self.InspectNeutralFleets(True)
+            elif self.FleetOffset > 0 and p.TotalFriends > 0:
+                self.FleetOffset = 0
+                self.InspectFleets(True)
+            elif p.TotalFoes > 0:
+                self.EnemyFleetOffset = 0
+                self.InspectEnemyFleets(True)
+            elif p.TotalOthers > 0:
+                self.NeutralFleetOffset = 0
+                self.InspectNeutralFleets(True)
+            elif p.TotalFriends > 0:
+                self.FleetOffset = 0
+                self.InspectFleets(True)
+            else:
+                self.InspectPlanet(p)
+
+
     def InspectPlanet(self, p):
         self.SelectedPlanet = p
         self.PreviousField.setVisible(False)
@@ -302,7 +336,7 @@ class Gui(QMainWindow):
             self.ShowStarBase.setVisible(False)
             self.ShowNeutralBase.setVisible(p.SpaceStation and p.ShipTracking)
         self.SelectNextFleet.setVisible(p.TotalFriends > 0)
-        self.SelectedObject.setText(p.Name + ' - Summary')
+        self.SelectedObject.setText(p.Name)
 
 
     def InspectMineField(self, planet, index, m_list):
@@ -322,16 +356,16 @@ class Gui(QMainWindow):
         n = (index + offset) % nmax
         while n < nmax:
             f = self.SelectedPlanet.fleets_in_orbit[n]
-            if f.FriendOrFoe in fof:
-                self.SelectedObject.setText(f.Name + ' - Summary')
+            if f.ShipCounter > 0 and f.FriendOrFoe in fof:
+                self.SelectedObject.setText(f.Name)
                 self.FleetInfo.UpdateCargo(f)
                 return n
             n += 1
         n = 0
         while n <= index:
             f = self.SelectedPlanet.fleets_in_orbit[n]
-            if f.FriendOrFoe in fof:
-                self.SelectedObject.setText(f.Name + ' - Summary')
+            if f.ShipCounter > 0 and f.FriendOrFoe in fof:
+                self.SelectedObject.setText(f.Name)
                 self.FleetInfo.UpdateCargo(f)
                 return n
             n += 1
@@ -341,7 +375,7 @@ class Gui(QMainWindow):
         n = (index + self.NumberOfFields + offset) % self.NumberOfFields
         field = self.SelectedFields[n]
         self.MineInfo.UpdateData(field, n + 1, self.NumberOfFields)
-        self.SelectedObject.setText(field.model.value + ' Mine Field - Summary')
+        self.SelectedObject.setText(field.model.value + ' Mine Field')
         return n
 
 

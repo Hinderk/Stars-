@@ -18,6 +18,7 @@ Delayed = QToolButton.ToolButtonPopupMode.DelayedPopup
 class ToolBar(QToolBar):
 
     ShowMines = QSignal(bool, Stance)
+    FilterMyFleets = QSignal(bool, dict)
     FilterEnemyFleets = QSignal(bool, dict)
 
 
@@ -25,10 +26,11 @@ class ToolBar(QToolBar):
 
         super(self.__class__, self).__init__()
 
-        self.EnemyDesigns = dict()
+        self.DesignNames = []
+        self.MyDesigns = dict()
+        self.AlienDesigns = dict()
         for sc in ShipClass:
-            self.EnemyDesigns[sc.name] = True
-        self.FriendlyDesigns = dict()
+            self.AlienDesigns[sc.name] = True
         self.MineFilter = dict()
         self.MineFilter[Stance.allied] = True
         self.MineFilter[Stance.friendly] = True
@@ -118,18 +120,16 @@ class ToolBar(QToolBar):
 
         Icon = QIcon(":/Toolbar/Friendlies")
         self.actionFriendlies = QToolButton(self)
-        self.actionFriendlies.setCheckable(True)
+        self.actionFriendlies.setCheckable(False)
+        self.actionFriendlies.setPopupMode(Instant)
         self.actionFriendlies.setIcon(Icon)
-        self.actionFriendlies.setAutoRepeat(False)
         self.actionFriendlies.setToolTip("Show friendly fleets ...")
         self.actionFriendlies.setStatusTip("Show only friendly fleets on the star map ...")
-        self.FriendFilter = QMenu(self)
-        self.FriendFilter.setStyleSheet("QMenu::item{padding: 5px 45px 5px 0px}")
-        self.actionFriendlies.setMenu(self.FriendFilter)
+        self.actionFriendlies.setAutoRepeat(False)
+        self.DefineMyDesignMenu(self.actionFriendlies)
 
         Icon = QIcon(":/Toolbar/Foes")
         self.actionFoes = QToolButton(self)
-#            self.actionFoes.setChecked(False)
         self.actionFoes.setCheckable(False)
         self.actionFoes.setPopupMode(Instant)
         self.actionFoes.setIcon(Icon)
@@ -205,19 +205,57 @@ class ToolBar(QToolBar):
         self.addWidget(self.Zoom)
 
 
-    def UpdateFriendlyDesigns(self, DesignData):
+    def UpdateMyDesigns(self, DesignData):
 
-        self.FriendFilter.clear()
-        self.AllFriends = self.FriendFilter.addAction('   All Designs')
-        self.InvertFriends = self.FriendFilter.addAction('   Invert Filter')
-        self.NoFriends = self.FriendFilter.addAction('   No Designs')
-        self.FriendFilter.addSeparator()
-        self.FriendlyDesigns.clear()
-        for NewDesign in DesignData:
-            NewAction = self.FriendFilter.addAction(NewDesign)
-            NewAction.setCheckable(True)
-            NewAction.setChecked(True)
-            self.FriendlyDesigns[NewDesign] = NewAction
+        class MyAction(QAction):
+
+            def __init__(self, name):
+                super(self.__class__, self).__init__()
+                self.ShipDesign = name
+
+        @staticmethod
+        def addAction(menu, action, label):
+            action.setText(label)
+            action.setCheckable(True)
+            action.setChecked(True)
+            action.toggled.connect(self.ShowMyFleets)
+            menu.addAction(action)
+
+        Menu = self.actionFriendlies.menu()
+        for design in self.DesignNames:
+            Menu.removeAction(self.MyFilter[design])
+        self.MyFilter.clear()
+        DesignData.sort()
+        NewDesigns = dict()
+        for name in DesignData:
+            if name in self.DesignNames:
+                NewDesigns[name] = self.MyDesigns[name]
+            else:
+                NewDesigns[name] = True
+            NewAction = MyAction(name)
+            addAction(Menu, NewAction, name)
+            self.MyFilter[name] = NewAction
+        self.MyDesigns = NewDesigns
+        self.DesignNames = DesignData
+
+
+    def DefineMyDesignMenu(self, DesignMenu):
+        self.DesignNames = []
+        self.MyDesigns = dict()
+        self.MyFilter = dict()
+        Menu = QMenu(self)
+        Menu.setStyleSheet("QMenu::item{padding: 5px 40px 5px 0px}")
+        self.AllMyDesigns = Menu.addAction('   All Designs')
+        self.AllMyDesigns.setCheckable(False)
+        self.AllMyDesigns.triggered.connect(self.ShowAllMyDesigns)
+        self.InvertMyDesigns = Menu.addAction('   Invert Filter')
+        self.InvertMyDesigns.setCheckable(False)
+        self.InvertMyDesigns.triggered.connect(self.InvertMyDisplay)
+        self.HideMyDesigns = Menu.addAction('   No Designs')
+        self.HideMyDesigns.setCheckable(False)
+        self.HideMyDesigns.triggered.connect(self.HideAllMyDesigns)
+        Menu.addSeparator()
+        DesignMenu.setMenu(Menu)
 
 
     def DefineEnemyDesignMenu(self, DesignMenu):
@@ -322,9 +360,9 @@ class ToolBar(QToolBar):
 
     def ShowEnemyFleets(self, event):
         sc = self.sender().ShipDesign
-        self.EnemyDesigns[sc] = event
+        self.AlienDesigns[sc] = event
         disabled = True
-        for b in self.EnemyDesigns.values():
+        for b in self.AlienDesigns.values():
             disabled = disabled and b
         if disabled:
             self.actionFoes.setChecked(False)
@@ -334,7 +372,40 @@ class ToolBar(QToolBar):
             self.actionFoes.setCheckable(True)
             self.actionFoes.setChecked(True)
             self.actionFoes.setPopupMode(Delayed)
-        self.FilterEnemyFleets.emit(disabled, self.EnemyDesigns)
+        self.FilterEnemyFleets.emit(not disabled, self.AlienDesigns)
+
+
+    def ShowMyFleets(self, event):
+        sc = self.sender().ShipDesign
+        self.MyDesigns[sc] = event
+        disabled = True
+        for b in self.MyDesigns.values():
+            disabled = disabled and b
+        if disabled:
+            self.actionFriendlies.setChecked(False)
+            self.actionFriendlies.setCheckable(False)
+            self.actionFriendlies.setPopupMode(Instant)
+        else:
+            self.actionFriendlies.setCheckable(True)
+            self.actionFriendlies.setChecked(True)
+            self.actionFriendlies.setPopupMode(Delayed)
+        self.FilterMyFleets.emit(not disabled, self.MyDesigns)
+
+
+    def ShowAllMyDesigns(self):
+        for design in self.DesignNames:
+            self.MyFilter[design].setChecked(True)
+
+
+    def InvertMyDisplay(self):
+        for design in self.DesignNames:
+            show = self.MyFilter[design].isChecked()
+            self.MyFilter[design].setChecked(not show)
+
+
+    def HideAllMyDesigns(self):
+        for design in self.DesignNames:
+            self.MyFilter[design].setChecked(False)
 
 
     def ShowAllEnemyDesigns(self):

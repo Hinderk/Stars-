@@ -37,7 +37,8 @@ class ItemSelector(QMenu):
 
 class Universe(QGraphicsScene):
 
-  ChangeFocus = QSignal(Planet)
+  SelectPlanet = QSignal(Planet)
+  UpdatePlanet = QSignal(Planet)
   SelectField = QSignal(bool, int, list)
 
   flag = QPolygonF()
@@ -59,7 +60,11 @@ class Universe(QGraphicsScene):
     self.SelectedPlanet = None
     self.DefaultView = False
     self.ShowFleetStrength = False
+    self.ShowIdleFleetsOnly = False
+    self.FoeFilterEnabled = False
+    self.FriendFilterEnabled = False
     self.ActiveFoeFilter = None
+    self.ActiveFriendFilter = None
 
     self.PopulationCeiling = Ruleset.GetPopulationCeiling()
 
@@ -165,7 +170,7 @@ class Universe(QGraphicsScene):
       yp = GP.Xscale * p.y + GP.p_radius + GP.dy_pointer
       self.pointer.setPos(xp, yp)
     self.SelectedPlanet = p
-    self.ChangeFocus.emit(p)
+    self.SelectPlanet.emit(p)
 
 
   def HighlightMinefield(self, m_list, index, planet):
@@ -448,7 +453,7 @@ class Universe(QGraphicsScene):
     y = yo - GP.d_radius
     w += 2 * GP.d_radius
     c = 2 * GP.o_radius
-    w0 = w / math.sqrt(8.0)
+    w0 = w / math.sqrt(8.0) + 0.5
     xm = x + w / 2 - w0 - GP.o_radius
     xp = x + w / 2 + w0 - GP.o_radius
     ym = y + w / 2 - w0 - GP.o_radius
@@ -488,37 +493,100 @@ class Universe(QGraphicsScene):
     for f in self.fleets:
       if f.Discovered and not f.Orbiting:
         f.ShipCount.setVisible(event and f.ShipCounter > 0)
+    self.update()
     self.ShowFleetStrength = event
 
 
-  def FilterFoes(self, disabled, select):
+  def FilterFoes(self, enabled, select):
+    self.FoeFilterEnabled = enabled
     if select:
       self.ActiveFoeFilter = select
-    if disabled:
+    if enabled:
       for f in self.fleets:
-        if f.FriendOrFoe == Stance.hostile:
-          f.ShipCounter = len(f.ShipList)
+        if f.FriendOrFoe != Stance.allied:
+          f.ApplyFoeFilter(self.ShowIdleFleetsOnly, select)
           f.ShipCount.setText(str(f.ShipCounter))
+    elif self.ShowIdleFleetsOnly:
+      for f in self.fleets:
+        if f.FriendOrFoe != Stance.allied:
+          if f.Idle:
+            f.ShipCounter = len(f.ShipList)
+            f.ShipCount.setText(str(f.ShipCounter))
+          else:
+            f.ShipCounter = 0
     else:
       for f in self.fleets:
-        if f.FriendOrFoe == Stance.hostile:
-          f.ApplyFilter(select)
+        if f.FriendOrFoe != Stance.allied:
+          f.ShipCounter = len(f.ShipList)
           f.ShipCount.setText(str(f.ShipCounter))
     for p in self.planets:
-      p.TotalFoes = 0
+      TotalOthers = 0
+      TotalFoes = 0
       for f in p.fleets_in_orbit:
         if f.FriendOrFoe == Stance.hostile:
-          p.TotalFoes += f.ShipCounter
-        p.UpdateFoes()
+          TotalFoes += f.ShipCounter
+        elif f.FriendOrFoe != Stance.allied:
+          TotalOthers += f.ShipCounter
+      p.UpdateFoes(TotalFoes - p.TotalFoes)
+      p.UpdateOthers(TotalOthers - p.TotalOthers)
     self.ShowShipCount(self.ShowFleetStrength)
+    if self.SelectedPlanet:
+      self.UpdatePlanet.emit(self.SelectedPlanet)
+    self.update()
+
+
+  def FilterFriendlies(self, enabled, select):
+    self.FriendFilterEnabled = enabled
+    if select:
+      self.ActiveFriendFilter = select
+    if enabled:
+      for f in self.fleets:
+        if f.FriendOrFoe == Stance.allied:
+          f.ApplyMyFilter(self.ShowIdleFleetsOnly, select)
+          f.ShipCount.setText(str(f.ShipCounter))
+    elif self.ShowIdleFleetsOnly:
+      for f in self.fleets:
+        if f.FriendOrFoe == Stance.allied:
+          if f.Idle:
+            f.ShipCounter = len(f.ShipList)
+            f.ShipCount.setText(str(f.ShipCounter))
+          else:
+            f.ShipCounter = 0
+    else:
+      for f in self.fleets:
+        if f.FriendOrFoe == Stance.allied:
+          f.ShipCounter = len(f.ShipList)
+          f.ShipCount.setText(str(f.ShipCounter))
+    for p in self.planets:
+      TotalFriends = 0
+      for f in p.fleets_in_orbit:
+        if f.FriendOrFoe == Stance.allied:
+          TotalFriends += f.ShipCounter
+      p.UpdateFriends(TotalFriends - p.TotalFriends)
+    self.ShowShipCount(self.ShowFleetStrength)
+    if self.SelectedPlanet:
+      self.UpdatePlanet.emit(self.SelectedPlanet)
     self.update()
 
 
   def EnableFoeFilter(self, event):
     if event and self.ActiveFoeFilter:
-      self.FilterFoes(False, self.ActiveFoeFilter)
+      self.FilterFoes(True, self.ActiveFoeFilter)
     else:
-      self.FilterFoes(True, None)
+      self.FilterFoes(False, None)
+
+
+  def EnableFriendFilter(self, event):
+    if event and self.ActiveFriendFilter:
+      self.FilterFriendlies(True, self.ActiveFriendFilter)
+    else:
+      self.FilterFriendlies(False, None)
+
+
+  def FilterIdleFleets(self, event):
+    self.ShowIdleFleetsOnly = event
+    self.FilterFoes(self.FoeFilterEnabled, self.ActiveFoeFilter)
+    self.FilterFriendlies(self.FriendFilterEnabled, self.ActiveFriendFilter)
 
 
   def ComputeTurn(self):

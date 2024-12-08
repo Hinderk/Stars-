@@ -29,7 +29,7 @@ def main():
 
     form = Gui(People, Rules)            # Create the main user interface
 
-    form.Buttons.UpdateFriendlyDesigns(['A - This is a very long name ...', 'B', 'C'])
+    form.Buttons.UpdateMyDesigns(['Scout - #1', 'Freighter - #1', 'C'])
 
     Terra = Planet(Rules)
     Terra.Surface.Ironium = 45000
@@ -67,7 +67,6 @@ def main():
     ship.Fuel = 130
     ship.TotalFuel = 150
     ship.Name = "Explorer"
-    ship.Type = "Scout"
 
     fleet_0 = Fleet([ship], 4)
     fleet_1 = Fleet([ship], 2)
@@ -77,6 +76,7 @@ def main():
     ship.Type = "Freighter"
 
     fleet_3 = Fleet([ship, ship, ship], 1)
+    fleet_3.Idle = False
     fleet_4 = Fleet([ship], 3)
     fleet_5 = Fleet([ship], 9)
 

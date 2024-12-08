@@ -12,7 +12,7 @@ class Design:
         return Design.HullDesign.get(index)
 
 
-    def __init__(self, fID, hull: Hull):
+    def __init__(self, fID, hull):
         self.fID = fID
         self.Index = 32 * self.LatestIndex + fID
         self.Hull = hull
@@ -31,7 +31,7 @@ class Design:
 
 
     def getDesignName(self):
-        return self.Name
+        return self.Hull.value[1]
 
     def getPictureIndex(self):
         return self.PictureIndex
