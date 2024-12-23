@@ -1,16 +1,21 @@
 
 from PyQt6.QtCore import QPointF
+from PyQt6.QtCore import QLineF
 from PyQt6.QtGui import QPolygonF
+
+import math
 
 from design import Design
 from faction import Faction
 from guiprop import GuiProps
-from defines import Stance
+from defines import Stance, Task
 from colours import Pen, Brush
 from math import sqrt
 from system import SystemType
 from defines import Perks
 from ruleset import Ruleset
+from waypoint import Waypoint
+from guiprop import GuiProps as GP
 
 
 
@@ -22,13 +27,24 @@ class Fleet:
   arrow << QPointF(0, GuiProps.dh_vector - GuiProps.h_vector)
   arrow << QPointF(GuiProps.w_vector, -GuiProps.h_vector)
 
-#  RecycleBin = []
+  def getDelta(dx, dy):
+    length = math.sqrt(dx * dx + dy * dy)
+    if length > 0:
+      scale = GP.Xscale * 100.0 / length   # Warp 10
+      return scale * dx, scale * dy
+    return 0, 0
+
 
   def __init__(self, ships, fID):
+    self.xc = 0
+    self.yc = 0
     self.ShipList = []
     self.ShipCounter = 0
-    self.Waypoints = []
-    self.WaypointIndex = -1
+    self.WarpSpeed = 0
+    self.FirstWaypoint = None
+    self.ActiveWaypoint = None
+    self.LastWaypoint = None
+    self.MineFields = []
     self.RepeatSchedule = False
     self.Idle = True
     self.Discovered = True           # TODO: Depends on scanners!
@@ -58,6 +74,7 @@ class Fleet:
     self.MovingFleet = None
     self.RestingFleet = None
     self.ShipCount = None
+    self.Universe = None
     self.CloakingFactor = self.ComputeCloaking()
     self.setFleetNameAndIndex()
 
@@ -139,10 +156,54 @@ class Fleet:
 
   def getColours(self):
     if self.FriendOrFoe == Stance.allied:
-      return (Pen.blue_p, Brush.blue_p)
-    elif self.FriendOrFoe == Stance.friendly:
-      return (Pen.green_p, Brush.green_p)
-    elif self.FriendOrFoe == Stance.neutral:
-      return (Pen.yellow_p, Brush.yellow_p)
+      return (Pen.blue_l, Brush.blue)
+    elif self.FriendOrFoe == Stance.hostile:
+      return (Pen.red_l, Brush.red)
     else:
-      return (Pen.red_p, Brush.red_p)
+      return (Pen.green, Brush.green)
+
+
+  def addWaypoint(self, x, y):
+    wa = Waypoint(x, y)
+    if self.FirstWaypoint:
+      xa = GP.Xscale * wa.xo
+      ya = GP.Xscale * wa.yo
+      if self.FriendOrFoe == Stance.allied:
+        pen = Pen.blue_l
+        pen.setWidthF(self.Universe.CurrentPathWidth)
+      else:
+        pen = None
+      w0 = self.ActiveWaypoint
+      x0 = GP.Xscale * w0.xo
+      y0 = GP.Xscale * w0.yo
+      wa.warp = w0.warp
+      if w0.next:
+        wa.task = Task.MOVE
+        if w0.segment:
+          self.Universe.removeItem(w0.segment)
+          w0.segment = None
+        w1 = w0.next
+        x1 = GP.Xscale * w1.xo
+        y1 = GP.Xscale * w1.yo
+        w1.previous = wa
+        wa.next = w1
+        wa.previous = w0
+        w0.next = wa
+        if pen:
+          line = QLineF(xa, ya, x1, y1)
+          wa.segment = self.Universe.addLine(line)
+          wa.segment.setPen(pen)
+          wa.segment.setZValue(-1)
+      else:
+        self.LastWaypoint = wa
+        w0.next = wa
+        wa.previous = w0
+      if pen:
+        line = QLineF(x0, y0, xa, ya)
+        w0.segment = self.Universe.addLine(line)
+        w0.segment.setPen(pen)
+        w0.segment.setZValue(-1)
+    else:
+      self.FirstWaypoint = wa
+      self.LastWaypoint = wa
+    self.ActiveWaypoint = wa

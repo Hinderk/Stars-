@@ -105,7 +105,7 @@ class Planet(PlanetData):
 
 
   def EnterOrbit(self, fleet):
-    ships = len(fleet.ShipList)
+    ships = fleet.ShipCounter
     if ships > 0:
       if fleet.FriendOrFoe == Stance.allied:
         self.UpdateFriends(ships)
@@ -114,6 +114,15 @@ class Planet(PlanetData):
       else:
         self.UpdateOthers(ships)
     fleet.Orbiting = self
+
+
+  def ClearOrbit(self):
+    self.TotalFriends = 0
+    self.TotalFoes = 0
+    self.TotalOthers = 0
+    self.friendsVisible = False
+    self.foesVisible = False
+    self.othersVisible = False
 
 
   def UpdateFriends(self, count=0):

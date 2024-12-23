@@ -83,6 +83,7 @@ class Brush:
   grey = QBrush(_grey)
   blue_m = QBrush(_minefield_blue, Qt.BrushStyle.BDiagPattern)
   blue_l = QBrush(_light_blue)
+  red_l = QBrush(_light_red)
   green = QBrush(_green)
   yellow = QBrush(_yellow)
   red = QBrush(_red)

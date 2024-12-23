@@ -16,6 +16,7 @@ from ship import Ship
 from system import System
 from system import SystemType as ST
 from scanner import Model
+from waypoint import Waypoint
 from minefield import Minefield
 from minefield import Model as M
 
@@ -80,7 +81,7 @@ def main():
     fleet_4 = Fleet([ship], 3)
     fleet_5 = Fleet([ship], 9)
 
-    fleet_6 = Fleet([ship, ship], 9)
+    fleet_6 = Fleet([ship, ship], 0)
     fleet_6.ShipCounter = 234
 
     form.InspectPlanet(Terra)
@@ -94,7 +95,11 @@ def main():
     form.Map.Universe.RegisterFleet(fleet_4, p)
     form.Map.Universe.RegisterFleet(fleet_5, p)
 
-    form.Map.Universe.RegisterFleet(fleet_6, 100, 200)
+    form.Map.Universe.RegisterFleet(fleet_6, 40, -50)
+    fleet_6.addWaypoint(240, 420)
+    fleet_6.addWaypoint(120, 550)
+    fleet_6.addWaypoint(480, 500)
+    fleet_6.addWaypoint(550, 300)
 
     form.Map.Universe.planets[0].BuildStarbase()
     form.Map.Universe.planets[0].Relation = Stance.neutral
@@ -122,9 +127,10 @@ def main():
 
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 400, M.Normal, 4))
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 1400, M.SpeedTrap, 4))
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 10, y + 50, 2500, M.Normal, 0))
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 16000, M.Normal, -1))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 10, y + 50, 25000, M.Normal, 0))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 64000, M.Normal, -1))
 
+    form.Map.Universe.ComputeTurn()
     form.Map.Universe.ComputeTurn()
 
     for p in form.Map.Universe.planets:

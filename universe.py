@@ -39,7 +39,8 @@ class Universe(QGraphicsScene):
 
   SelectPlanet = QSignal(Planet)
   UpdatePlanet = QSignal(Planet)
-  SelectField = QSignal(bool, int, list)
+  SelectFleet = QSignal(object, int, list, list)
+  SelectField = QSignal(object, int, list)
 
   flag = QPolygonF()
   flag << QPointF(0, 0)
@@ -67,6 +68,7 @@ class Universe(QGraphicsScene):
     self.ActiveFriendFilter = None
 
     self.PopulationCeiling = Ruleset.GetPopulationCeiling()
+    self.CurrentPathWidth = GP.fp_width
 
     self.CreateIndicator()
     self.SetupMinefields()
@@ -87,7 +89,10 @@ class Universe(QGraphicsScene):
     Select = QMenu()
     Select.setStyleSheet(GuiDesign.getMapStyle())
     n = 0
-    if self.Context[1]:
+    if self.Context[2]:
+      pass
+    # deal with fleets
+    elif self.Context[1]:
       for f in self.Context[1]:
         a = Select.addAction(f.name)
         a.setData((1, n))
@@ -107,11 +112,11 @@ class Universe(QGraphicsScene):
     if selected:
       itemtype, item = selected.data()
       if itemtype == 1 and self.Context[1]:
-        self.HighlightMinefield(self.Context[1], item, False)
+        self.HighlightMinefield(self.Context[1], item)
       elif itemtype == 1:
         po = self.Context[0]
         self.HighlightPlanet(po)
-        self.SelectField.emit(True, item, po.mine_fields)
+        self.SelectField.emit(po, item, po.mine_fields)
       else:
         self.HighlightPlanet(self.Context[0])
 
@@ -120,14 +125,22 @@ class Universe(QGraphicsScene):
     pos = mouseClick.scenePos()
     xo = round(0.5 + pos.x() / GP.Xscale)
     yo = round(0.5 + pos.y() / GP.Xscale)
-    m_list = None
     dist = 1e20
     for p in self.planets:
       d = (p.x - xo) * (p.x - xo) + (p.y - yo) * (p.y - yo)
       if d < dist:
         po = p
         dist = d
-    po.mine_fields = []
+    f_list = []
+    for f in self.fleets:
+      if f.Discovered and not f.Orbiting:
+          d = (f.xc - xo) * (f.xc - xo) + (f.yc - yo) * (f.yc - yo)
+          if d < dist:
+            dist = d
+            f_list = [f]
+          elif f_list and d == dist:
+            f_list.append(f)
+    m_list = []
     for m in self.minefields:
       if m.Detected:
         if self.FieldsVisible:
@@ -137,13 +150,12 @@ class Universe(QGraphicsScene):
             dist = d
           elif m_list and d == dist:
             m_list.append(m)
-        d = (m.x - po.x) * (m.x - po.x) + (m.y - po.y) * (m.y - po.y)
-        if d < m.mines:
-          po.mine_fields.append(m)
-    self.Context = (po, m_list, None)
+    self.Context = (po, m_list, f_list)
     if mouseClick.buttons() == Qt.MouseButton.LeftButton:
       if m_list:
-        self.HighlightMinefield(m_list, 0, False)
+        self.HighlightMinefield(m_list, 0)
+      elif f_list:
+        self.HighlightFleet(f_list, 0)
       else:
         self.HighlightPlanet(po)
 
@@ -155,9 +167,13 @@ class Universe(QGraphicsScene):
     triangle << QPointF(- GP.pointer_size / 2, w)
     self.pointer = self.addPolygon(triangle, Pen.white_08, Brush.yellow)
     self.pointer.setZValue(8)
+    w = GP.fp_radius
+    self.select = self.addEllipse(-w, -w, w + w, w + w, Pen.white_08, Brush.yellow)
+    self.select.setZValue(-2)
 
 
   def HighlightPlanet(self, p):
+    self.select.setVisible(False)
     if self.SelectedPlanet:
       self.SelectedPlanet.label.setPen(Pen.white_l)
       self.SelectedPlanet.label.setBrush(Brush.white_l)
@@ -169,20 +185,34 @@ class Universe(QGraphicsScene):
       xp = GP.Xscale * p.x
       yp = GP.Xscale * p.y + GP.p_radius + GP.dy_pointer
       self.pointer.setPos(xp, yp)
+      self.pointer.setVisible(True)
     self.SelectedPlanet = p
     self.SelectPlanet.emit(p)
 
 
-  def HighlightMinefield(self, m_list, index, planet):
+  def HighlightFleet(self, f_list, index):
+    self.pointer.setVisible(False)
     if self.SelectedPlanet:
       self.SelectedPlanet.label.setPen(Pen.white_l)
       self.SelectedPlanet.label.setBrush(Brush.white_l)
+    self.SelectedPlanet = None
+    f0 = f_list[index]
+    self.select.setPos(GP.Xscale * f0.xc, GP.Xscale * f0.yc)
+    self.select.setVisible(True)
+    self.SelectFleet.emit(None, index, f_list, f0.MineFields)
+
+
+  def HighlightMinefield(self, m_list, index):
+    self.select.setVisible(False)
+    if self.SelectedPlanet:
+      self.SelectedPlanet.label.setPen(Pen.white_l)
+      self.SelectedPlanet.label.setBrush(Brush.white_l)
+    self.SelectedPlanet = None
     xp = GP.Xscale * m_list[0].x
     yp = GP.Xscale * m_list[0].y + GP.dy_pointer
     self.pointer.setPos(xp, yp)
     self.pointer.setVisible(True)
-    self.SelectedPlanet = None
-    self.SelectField.emit(planet, index, m_list)
+    self.SelectField.emit(None, index, m_list)
 
 
   def SetupMinefields(self):
@@ -226,8 +256,15 @@ class Universe(QGraphicsScene):
   def ShowPlanetNames(self, switch):
     self.NamesVisible = switch
     if self.SelectedPlanet:
-      self.HighlightPlanet(self.SelectedPlanet)
-      self.pointer.setVisible(not switch)
+      if switch:
+        self.SelectedPlanet.label.setPen(Pen.white)
+        self.SelectedPlanet.label.setBrush(Brush.white)
+        self.pointer.setVisible(False)
+      else:
+        xp = GP.Xscale * self.SelectedPlanet.x
+        yp = GP.Xscale * self.SelectedPlanet.y + GP.p_radius + GP.dy_pointer
+        self.pointer.setPos(xp, yp)
+        self.pointer.setVisible(True)
     for p in self.planets:
       p.label.setVisible(switch)
 
@@ -379,31 +416,34 @@ class Universe(QGraphicsScene):
 
 
   def RegisterFleet(self, fleet, p, y=None):
+    fleet.Universe = self
     r = fleet.MaxRange
     pen, brush = fleet.getColours()
     fleet.MovingFleet = self.addPolygon(Fleet.arrow, pen, brush)
     fleet.MovingFleet.setVisible(False)
+    w = GP.f_radius
+    fleet.RestingFleet = self.addEllipse(-w, -w, w + w, w + w, pen, brush)
+    fleet.RestingFleet.setVisible(True) # TODO: Change to FALSE after testing ...
     if y:
       xo = p
       yo = y
     else:
       xo = p.x
       yo = p.y
-      p.fleets_in_orbit.append(fleet)
-      p.EnterOrbit(fleet)
+    fleet.addWaypoint(xo, yo)
     if fleet.FriendOrFoe == Stance.allied and r > 0:
       fleet.scanner = self.CreateScanner(xo, yo, [r, fleet.PenRange])
-    w = 2 * GP.f_radius
-    xs = xo * GP.Xscale - GP.f_radius
-    ys = yo * GP.Xscale - GP.f_radius
-    fleet.RestingFleet = self.addEllipse(xs, ys, w, w, pen, brush)
-    fleet.RestingFleet.setVisible(False)
-    fleet.MovingFleet.setPos(xo * GP.Xscale, yo * GP.Xscale)
+    xs = xo * GP.Xscale
+    ys = yo * GP.Xscale
+    fleet.RestingFleet.setPos(xs, ys)
+    fleet.MovingFleet.setPos(xs, ys)
     fleet.ShipCount = self.CreateOrbitLabel(0, 0)
     fleet.ShipCount.setText(str(fleet.ShipCounter))
     h = fleet.ShipCount.boundingRect().height() - 2
-    fleet.ShipCount.setPos(xs + w + GP.f_dist, yo * GP.Xscale - h / 2)
+    fleet.ShipCount.setPos(xs + w + GP.f_dist, ys - h / 2)
     fleet.ShipCount.setVisible(False)
+    fleet.xc = xo
+    fleet.yc = yo
     self.fleets.append(fleet)
 
 
@@ -589,6 +629,44 @@ class Universe(QGraphicsScene):
     self.FilterFriendlies(self.FriendFilterEnabled, self.ActiveFriendFilter)
 
 
+  def ResizeFlightPaths(self, width):
+    for f in self.fleets:
+      if f.FriendOrFoe == Stance.allied:
+        pen = Pen.blue_l
+      elif f.FriendOrFoe == Stance.hostile:
+        pen = Pen.red_l
+      else:
+        pen = Pen.green
+      wp = f.FirstWaypoint
+      while wp:
+        pen.setWidthF(width)
+        if wp.segment:
+          wp.segment.setPen(pen)
+        wp = wp.next
+    self.CurrentPathWidth = width
+
+
   def ComputeTurn(self):
     for p in self.planets:
+      p.ClearOrbit()
+      p.fleets_in_orbit = []
+    for f in self.fleets:
+      f.Orbiting = None
+      for p in self.planets:
+        if p.x == f.xc and p.y == f.yc:
+          p.EnterOrbit(f)
+          p.fleets_in_orbit.append(f)
+          break
+    for p in self.planets:
       p.UpdateShipTracking()
+      p.mine_fields = []
+      for m in self.minefields:
+        d = (m.x - p.x) * (m.x - p.x) + (m.y - p.y) * (m.y - p.y)
+        if d < m.mines:
+          p.mine_fields.append(m)
+    for f in self.fleets:
+      f.MineFields = []
+      for m in self.minefields:
+        d = (f.xc - m.x) * (f.xc - m.x) + (f.yc - m.y) * (f.yc - m.y)
+        if d < m.mines:
+          f.MineFields.append(m)
