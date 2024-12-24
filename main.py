@@ -77,12 +77,11 @@ def main():
     ship.Type = "Freighter"
 
     fleet_3 = Fleet([ship, ship, ship], 1)
-    fleet_3.Idle = False
     fleet_4 = Fleet([ship], 3)
     fleet_5 = Fleet([ship], 9)
-
     fleet_6 = Fleet([ship, ship], 0)
-    fleet_6.ShipCounter = 234
+
+    fleet_3.Idle = False
 
     form.InspectPlanet(Terra)
 
@@ -130,6 +129,8 @@ def main():
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 10, y + 50, 25000, M.Normal, 0))
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 64000, M.Normal, -1))
 
+    fleet_6.ShipCounter = 200
+    fleet_6.WarpSpeed = 0
     form.Map.Universe.ComputeTurn()
     form.Map.Universe.ComputeTurn()
 

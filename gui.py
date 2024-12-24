@@ -78,6 +78,7 @@ class Gui(QMainWindow):
         self.SelectNextNeutral.clicked.connect(self.InspectNeutralFleet)
         self.SelectNextFleet.clicked.connect(self.InspectAlliedFleet)
         self.ShowFields.clicked.connect(self.InspectMines)
+        self.ShowFleets.clicked.connect(self.InspectFleets)
         self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
         self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFriendlies)
 
@@ -263,6 +264,8 @@ class Gui(QMainWindow):
         SwitchLayout_HL.addWidget(self.ShowPlanet)
         self.ShowFields = _CreateButton(":/Icons/Mines")
         SwitchLayout_HL.addWidget(self.ShowFields)
+        self.ShowFleets = _CreateButton(":/Icons/Ships")
+        SwitchLayout_HL.addWidget(self.ShowFleets)
         SelectedObject_HL.addWidget(SwitchBox)
         Title.setMinimumHeight(68)
         return Title
@@ -307,6 +310,7 @@ class Gui(QMainWindow):
         self.PreviousField.setVisible(False)
         self.NextField.setVisible(False)
         self.ShowPlanet.setVisible(False)
+        self.ShowFleets.setVisible(False)
         self.ShowFields.setVisible(len(p.mine_fields) > 0)
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
@@ -445,8 +449,13 @@ class Gui(QMainWindow):
         self.FleetOffset = 1
 
 
-    def InspectPlanets(self, event):
+    def InspectPlanets(self):
         self.InspectPlanet(self.SelectedPlanet)
+
+
+    def InspectFleets(self):
+        self.ShowFleets.setVisible(False)
+        self.InspectFleet(self.SelectedPlanet, self.FleetIndex, self.SelectedFleets, self.SelectedFields)
 
 
     def InspectMines(self):
@@ -462,8 +471,13 @@ class Gui(QMainWindow):
         self.ShowStarBase.setVisible(False)
         if self.SelectedPlanet:
             self.ShowPlanet.setVisible(True)
+            self.ShowFleets.setVisible(False)
+        elif self.SelectedFleets:
+            self.ShowPlanet.setVisible(False)
+            self.ShowFleets.setVisible(True)
         else:
             self.ShowPlanet.setVisible(False)
+            self.ShowFleets.setVisible(False)
         self.ShowFields.setVisible(False)
         self.NumberOfFields = len(self.SelectedFields)
         self.NextField.setVisible(self.NumberOfFields > 1)

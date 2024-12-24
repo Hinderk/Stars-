@@ -22,10 +22,11 @@ from guiprop import GuiProps as GP
 class Fleet:
 
   arrow = QPolygonF()
+  arrow << QPointF(GuiProps.h_vector - GuiProps.dh_vector, 0)
+  arrow << QPointF(-GuiProps.dh_vector, -GuiProps.w_vector)
   arrow << QPointF(0, 0)
-  arrow << QPointF(-GuiProps.w_vector, -GuiProps.h_vector)
-  arrow << QPointF(0, GuiProps.dh_vector - GuiProps.h_vector)
-  arrow << QPointF(GuiProps.w_vector, -GuiProps.h_vector)
+  arrow << QPointF(-GuiProps.dh_vector, GuiProps.w_vector)
+
 
   def getDelta(dx, dy):
     length = math.sqrt(dx * dx + dy * dy)
@@ -41,9 +42,11 @@ class Fleet:
     self.ShipList = []
     self.ShipCounter = 0
     self.WarpSpeed = 0
+    self.Heading = 0.0
     self.FirstWaypoint = None
     self.ActiveWaypoint = None
     self.LastWaypoint = None
+    self.CurrentWaypoint = None
     self.MineFields = []
     self.RepeatSchedule = False
     self.Idle = True
@@ -206,4 +209,18 @@ class Fleet:
     else:
       self.FirstWaypoint = wa
       self.LastWaypoint = wa
+      self.CurrentWaypoint = wa
     self.ActiveWaypoint = wa
+
+
+  def UpdateShipCount(self):
+    self.ShipCount.setText(str(self.ShipCounter))
+    h = self.ShipCount.boundingRect().height() - 2
+    xs = GP.Xscale * self.xc
+    ys = GP.Xscale * self.yc
+    if abs(self.Heading) > 0.5 * math.pi:
+      xs += GP.f_radius + GP.f_dist
+    else:
+      w = self.ShipCount.boundingRect().width()
+      xs -= GP.f_radius + GP.f_dist + w
+    self.ShipCount.setPos(xs, ys - h / 2)

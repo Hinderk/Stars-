@@ -2,6 +2,7 @@
 import math
 
 from PyQt6.QtGui import QPolygonF
+from PyQt6.QtGui import QTransform
 from PyQt6.QtCore import QPointF, QLineF, QRectF, Qt
 from PyQt6.QtWidgets import QMenu
 from PyQt6.QtWidgets import QGraphicsScene
@@ -418,12 +419,11 @@ class Universe(QGraphicsScene):
   def RegisterFleet(self, fleet, p, y=None):
     fleet.Universe = self
     r = fleet.MaxRange
-    pen, brush = fleet.getColours()
-    fleet.MovingFleet = self.addPolygon(Fleet.arrow, pen, brush)
-    fleet.MovingFleet.setVisible(False)
     w = GP.f_radius
+    pen, brush = fleet.getColours()
     fleet.RestingFleet = self.addEllipse(-w, -w, w + w, w + w, pen, brush)
-    fleet.RestingFleet.setVisible(True) # TODO: Change to FALSE after testing ...
+    fleet.RestingFleet.setVisible(False)
+    fleet.MovingFleet = None
     if y:
       xo = p
       yo = y
@@ -433,15 +433,7 @@ class Universe(QGraphicsScene):
     fleet.addWaypoint(xo, yo)
     if fleet.FriendOrFoe == Stance.allied and r > 0:
       fleet.scanner = self.CreateScanner(xo, yo, [r, fleet.PenRange])
-    xs = xo * GP.Xscale
-    ys = yo * GP.Xscale
-    fleet.RestingFleet.setPos(xs, ys)
-    fleet.MovingFleet.setPos(xs, ys)
     fleet.ShipCount = self.CreateOrbitLabel(0, 0)
-    fleet.ShipCount.setText(str(fleet.ShipCounter))
-    h = fleet.ShipCount.boundingRect().height() - 2
-    fleet.ShipCount.setPos(xs + w + GP.f_dist, ys - h / 2)
-    fleet.ShipCount.setVisible(False)
     fleet.xc = xo
     fleet.yc = yo
     self.fleets.append(fleet)
@@ -453,6 +445,7 @@ class Universe(QGraphicsScene):
     label.setBrush(Brush.white_l)
     label.setPos(x, y)
     label.setVisible(False)
+    label.setZValue(4)
     return label
 
 
@@ -545,20 +538,20 @@ class Universe(QGraphicsScene):
       for f in self.fleets:
         if f.FriendOrFoe != Stance.allied:
           f.ApplyFoeFilter(self.ShowIdleFleetsOnly, select)
-          f.ShipCount.setText(str(f.ShipCounter))
+          f.UpdateShipCount()
     elif self.ShowIdleFleetsOnly:
       for f in self.fleets:
         if f.FriendOrFoe != Stance.allied:
           if f.Idle:
             f.ShipCounter = len(f.ShipList)
-            f.ShipCount.setText(str(f.ShipCounter))
+            f.UpdateShipCount()
           else:
             f.ShipCounter = 0
     else:
       for f in self.fleets:
         if f.FriendOrFoe != Stance.allied:
           f.ShipCounter = len(f.ShipList)
-          f.ShipCount.setText(str(f.ShipCounter))
+          f.UpdateShipCount()
     for p in self.planets:
       TotalOthers = 0
       TotalFoes = 0
@@ -583,20 +576,20 @@ class Universe(QGraphicsScene):
       for f in self.fleets:
         if f.FriendOrFoe == Stance.allied:
           f.ApplyMyFilter(self.ShowIdleFleetsOnly, select)
-          f.ShipCount.setText(str(f.ShipCounter))
+          f.UpdateShipCount()
     elif self.ShowIdleFleetsOnly:
       for f in self.fleets:
         if f.FriendOrFoe == Stance.allied:
           if f.Idle:
             f.ShipCounter = len(f.ShipList)
-            f.ShipCount.setText(str(f.ShipCounter))
+            f.UpdateShipCount()
           else:
             f.ShipCounter = 0
     else:
       for f in self.fleets:
         if f.FriendOrFoe == Stance.allied:
           f.ShipCounter = len(f.ShipList)
-          f.ShipCount.setText(str(f.ShipCounter))
+          f.UpdateShipCount()
     for p in self.planets:
       TotalFriends = 0
       for f in p.fleets_in_orbit:
@@ -651,12 +644,41 @@ class Universe(QGraphicsScene):
       p.ClearOrbit()
       p.fleets_in_orbit = []
     for f in self.fleets:
+      if f.MovingFleet:
+        self.removeItem(f.MovingFleet)
+      f.MovingFleet = None
       f.Orbiting = None
       for p in self.planets:
         if p.x == f.xc and p.y == f.yc:
           p.EnterOrbit(f)
           p.fleets_in_orbit.append(f)
           break
+    for f in self.fleets:
+      f.RestingFleet.setVisible(False)
+      f.ShipCount.setVisible(False)
+      if f.ShipCounter > 0 and f.Discovered and not f.Orbiting:
+        pen, brush = f.getColours()
+        xs = GP.Xscale * f.xc
+        ys = GP.Xscale * f.yc
+        f.Heading = math.pi
+        if f.CurrentWaypoint.next:
+          x0 = f.CurrentWaypoint.xo
+          y0 = f.CurrentWaypoint.yo
+          x1 = f.CurrentWaypoint.next.xo
+          y1 = f.CurrentWaypoint.next.yo
+          f.Heading = math.atan2(y1 - y0, x1 - x0)
+        if f.WarpSpeed > 0:
+          Q0 = QTransform()
+          Q0.translate(xs, ys)
+          Q0.rotateRadians(f.Heading)
+          f.MovingFleet = self.addPolygon(Q0.map(Fleet.arrow), pen, brush)
+        else:
+          f.RestingFleet.setPos(xs, ys)
+          f.RestingFleet.setPen(pen)
+          f.RestingFleet.setBrush(brush)
+          f.RestingFleet.setVisible(True)
+        f.UpdateShipCount()
+        f.ShipCount.setVisible(self.ShowFleetStrength)
     for p in self.planets:
       p.UpdateShipTracking()
       p.mine_fields = []
@@ -670,3 +692,4 @@ class Universe(QGraphicsScene):
         d = (f.xc - m.x) * (f.xc - m.x) + (f.yc - m.y) * (f.yc - m.y)
         if d < m.mines:
           f.MineFields.append(m)
+    self.update()
