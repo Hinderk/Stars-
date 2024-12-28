@@ -32,24 +32,6 @@ def main():
 
     form.Buttons.UpdateMyDesigns(['Scout - #1', 'Freighter - #1', 'C'])
 
-    Terra = Planet(Rules)
-    Terra.Surface.Ironium = 45000
-    Terra.Surface.Boranium = 2500
-    Terra.Surface.Germanium = 15000
-    Terra.Crust.Boranium = 55.0
-
-    Terra.Gravity = 1 / 8
-    Terra.Temperature = -120.6
-    Terra.Radioactivity = 80.75
-
-    Terra.TemperatureRate = 15.0
-    Terra.GravityRate = 1 / 40
-    Terra.RadioactivityRate = -7.0
-
-    Terra.Explore(2390)
-
-    Terra.Name = 'Tau Ceti'
-
     s = System()
     s.itemCount = 1
     s.itemType = Model.Rhino
@@ -80,10 +62,10 @@ def main():
     fleet_4 = Fleet([ship], 3)
     fleet_5 = Fleet([ship], 9)
     fleet_6 = Fleet([ship, ship], 0)
+    fleet_7 = Fleet([ship, ship, ship], 0)
 
     fleet_3.Idle = False
-
-    form.InspectPlanet(Terra)
+    fleet_7.Idle = False
 
     p = form.Map.Universe.planets[2]
 
@@ -95,10 +77,16 @@ def main():
     form.Map.Universe.RegisterFleet(fleet_5, p)
 
     form.Map.Universe.RegisterFleet(fleet_6, 40, -50)
-    fleet_6.addWaypoint(240, 420)
-    fleet_6.addWaypoint(120, 550)
-    fleet_6.addWaypoint(480, 500)
-    fleet_6.addWaypoint(550, 300)
+    form.Map.Universe.addWaypoint(fleet_6, 240, 420)
+    form.Map.Universe.addWaypoint(fleet_6, 120, 550)
+    form.Map.Universe.addWaypoint(fleet_6, 480, 500)
+    form.Map.Universe.addWaypoint(fleet_6, 550, 300)
+
+    form.Map.Universe.RegisterFleet(fleet_7, 40, -50)
+    form.Map.Universe.addWaypoint(fleet_7, -20, 500)
+    form.Map.Universe.addWaypoint(fleet_7, 180, 350)
+    form.Map.Universe.addWaypoint(fleet_7, 280, 600)
+    form.Map.Universe.addWaypoint(fleet_7, 500, 400)
 
     form.Map.Universe.planets[0].BuildStarbase()
     form.Map.Universe.planets[0].Relation = Stance.neutral
@@ -129,9 +117,7 @@ def main():
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 10, y + 50, 25000, M.Normal, 0))
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 64000, M.Normal, -1))
 
-    fleet_6.ShipCounter = 200
-    fleet_6.WarpSpeed = 0
-    form.Map.Universe.ComputeTurn()
+    fleet_7.WarpSpeed = 4
     form.Map.Universe.ComputeTurn()
 
     for p in form.Map.Universe.planets:

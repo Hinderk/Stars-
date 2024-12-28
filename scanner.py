@@ -38,21 +38,25 @@ class Model(Enum):
 
 
 
+
 class Scanner:
 
-  def __init__(self, x, y, ranges):
-    self.maxrange = ranges[0]
-    self.penrange = ranges[1]
+
+  def __init__(self, x, y, rmax, rp=0):
+    self.maxrange = rmax
+    self.penrange = rp
     self.xo = x
     self.yo = y
     self.detection = None
     self.penetration = None
+
 
   def ShowRanges(self, toggle):
     if self.penetration:
       self.penetration.setVisible(toggle)
     if self.detection:
       self.detection.setVisible(toggle)
+
 
   def ScaleRanges(self, factor):
     x = GuiProps.Xscale * self.xo

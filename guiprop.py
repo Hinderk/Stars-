@@ -17,9 +17,10 @@ class GuiProps:
     h_vector = 10
     dh_vector = 4
     w_vector = 6
+    c_dist = 0.05
     f_radius = 4
-    f_dist = 10
-    fp_radius = 10
+    f_dist = 6
+    fp_radius = 8
 
     dy_label = 10
     dy_pointer = 20
@@ -36,4 +37,4 @@ class GuiProps:
     map_frame = 200
     planet_distance = 100
 
-    fp_width = 1.2
+    fp_width = 1.4

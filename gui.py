@@ -26,6 +26,7 @@ def _CreateButton(name):
     Button.setIcon(Icon)
     Button.setIconSize(QSize(30, 30))
     Button.setStyleSheet(Style)
+    Button.setVisible(False)
     return Button
 
 
@@ -46,6 +47,10 @@ class Gui(QMainWindow):
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
         self.MineOffset = 0
+        self.AlliedFleets = 0
+        self.NeutralFleets = 0
+        self.HostileFleets = 0
+        self.ShowFleetMovements = False
         self.setStyleSheet(GuiDesign.getGuiStyle())
         self.Action = dict()
         self.SetupUI(people, rules)
@@ -62,6 +67,7 @@ class Gui(QMainWindow):
         self.Buttons.actionFriendlies.toggled.connect(self.Map.Universe.EnableFriendFilter)
         self.Buttons.actionShipCount.toggled.connect(self.Map.Universe.ShowShipCount)
         self.Buttons.actionWaitingFleets.toggled.connect(self.Map.Universe.FilterIdleFleets)
+        self.Buttons.actionPathOverlay.toggled.connect(self.ShowMovements)
         self.NextField.clicked.connect(self.ShowNextMineField)
         self.PreviousField.clicked.connect(self.ShowPreviousMineField)
         self.Buttons.actionNoInfoView.setChecked(True)
@@ -81,6 +87,8 @@ class Gui(QMainWindow):
         self.ShowFleets.clicked.connect(self.InspectFleets)
         self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
         self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFriendlies)
+        home = self.Map.Universe.planets[-1]
+        self.Map.Universe.HighlightPlanet(home)
 
 
     def SetupUI(self, people, rules):
@@ -124,7 +132,7 @@ class Gui(QMainWindow):
 
         Layout_VL.addWidget(InfoBox)
         Layout_VL.addWidget(self.SetupNewsReader())
-#
+
         InfoBox = QGroupBox()
         InfoBox.setMinimumHeight(420)
         InfoBox.setMaximumHeight(420)
@@ -271,34 +279,61 @@ class Gui(QMainWindow):
         return Title
 
 
+    def DisplayStarbaseIcons(self, p=None):
+        if p:
+            if p.Relation == Stance.allied:
+                self.ShowNeutralBase.setVisible(False)
+                self.ShowAlienBase.setVisible(False)
+                self.ShowStarBase.setVisible(p.SpaceStation)
+            elif p.Relation == Stance.hostile:
+                self.ShowNeutralBase.setVisible(False)
+                self.ShowStarBase.setVisible(False)
+                self.ShowAlienBase.setVisible(p.SpaceStation and p.ShipTracking)
+            else:
+                self.ShowAlienBase.setVisible(False)
+                self.ShowStarBase.setVisible(False)
+                self.ShowNeutralBase.setVisible(p.SpaceStation and p.ShipTracking)
+        else:
+            self.ShowNeutralBase.setVisible(False)
+            self.ShowAlienBase.setVisible(False)
+            self.ShowStarBase.setVisible(False)
+
+
+    def DisplayFleetIcons(self):
+        self.SelectNextEnemy.setVisible(self.HostileFleets > 0)
+        self.SelectNextNeutral.setVisible(self.NeutralFleets > 0)
+        self.SelectNextFleet.setVisible(self.AlliedFleets > 0)
+
+
     def UpdatePlanetView(self, p):
         if self.ItemInfo.currentIndex() < 2:
+            self.AlliedFleets = p.TotalFriends
             if p.ShipTracking:
-                self.SelectNextEnemy.setVisible(p.TotalFoes > 0)
-                self.SelectNextNeutral.setVisible(p.TotalOthers > 0)
+                self.HostileFleets = p.TotalFoes
+                self.NeutralFleets = p.TotalOthers
             else:
-                self.SelectNextEnemy.setVisible(False)
-                self.SelectNextNeutral.setVisible(False)
-            self.SelectNextFleet.setVisible(p.TotalFriends > 0)
+                self.HostileFleets = 0
+                self.NeutralFleets = 0
+            self.DisplayFleetIcons()
         if self.ItemInfo.currentIndex() == 1:
             if self.EnemyFleetOffset > 0 and p.TotalFoes > 0:
                 self.EnemyFleetOffset = 0
-                self.InspectEnemyFleets(True)
+                self.InspectEnemyFleet()
             elif self.NeutralFleetOffset > 0 and p.TotalOthers > 0:
                 self.NeutralFleetOffset = 0
-                self.InspectNeutralFleets(True)
+                self.InspectNeutralFleet()
             elif self.FleetOffset > 0 and p.TotalFriends > 0:
                 self.FleetOffset = 0
-                self.InspectFleets(True)
+                self.InspectFleets()
             elif p.TotalFoes > 0:
                 self.EnemyFleetOffset = 0
-                self.InspectEnemyFleets(True)
+                self.InspectEnemyFleet()
             elif p.TotalOthers > 0:
                 self.NeutralFleetOffset = 0
-                self.InspectNeutralFleets(True)
+                self.InspectNeutralFleet()
             elif p.TotalFriends > 0:
                 self.FleetOffset = 0
-                self.InspectFleets(True)
+                self.InspectFleets()
             else:
                 self.InspectPlanet(p)
 
@@ -324,25 +359,15 @@ class Gui(QMainWindow):
             self.PlanetInfo.UpdateText(self.CurrentYear, p)
         else:
             self.ItemInfo.setCurrentIndex(3)
+        self.AlliedFleets = p.TotalFriends
         if p.ShipTracking:
-            self.SelectNextEnemy.setVisible(p.TotalFoes > 0)
-            self.SelectNextNeutral.setVisible(p.TotalOthers > 0)
+            self.HostileFleets = p.TotalFoes
+            self.NeutralFleets = p.TotalOthers
         else:
-            self.SelectNextEnemy.setVisible(False)
-            self.SelectNextNeutral.setVisible(False)
-        if p.Relation == Stance.allied:
-            self.ShowNeutralBase.setVisible(False)
-            self.ShowAlienBase.setVisible(False)
-            self.ShowStarBase.setVisible(p.SpaceStation)
-        elif p.Relation == Stance.hostile:
-            self.ShowNeutralBase.setVisible(False)
-            self.ShowStarBase.setVisible(False)
-            self.ShowAlienBase.setVisible(p.SpaceStation and p.ShipTracking)
-        else:
-            self.ShowAlienBase.setVisible(False)
-            self.ShowStarBase.setVisible(False)
-            self.ShowNeutralBase.setVisible(p.SpaceStation and p.ShipTracking)
-        self.SelectNextFleet.setVisible(p.TotalFriends > 0)
+            self.HostileFleets = 0
+            self.NeutralFleets = 0
+        self.DisplayStarbaseIcons(p)
+        self.DisplayFleetIcons()
         self.SelectedObject.setText(p.Name)
 
 
@@ -354,41 +379,46 @@ class Gui(QMainWindow):
         self.SelectedFleets = f_list
         self.SelectedPlanet = planet
         self.SelectedFields = m_list
-        self.ItemInfo.setCurrentIndex(1)
-        allied = 0
-        hostile = 0
-        neutral = 0
+        self.AlliedFleets = 0
+        self.HostileFleets = 0
+        self.NeutralFleets = 0
+        fleets = 0
         for f in f_list:
             if f.ShipCounter > 0:
                 if f.FriendOrFoe == Stance.allied:
-                    allied += 1
+                    self.AlliedFleets += 1
                 elif f.FriendOrFoe == Stance.hostile:
-                    hostile += 1
+                    self.HostileFleets += 1
                 else:
-                    neutral += 1
-        total = allied + neutral + hostile
-        self.SelectNextEnemy.setVisible(hostile > 0 and total > 1)
-        self.SelectNextNeutral.setVisible(neutral > 0 and total > 1)
-        self.SelectNextFleet.setVisible(allied > 0 and total > 1)
-        self.ShowNeutralBase.setVisible(False)
-        self.ShowAlienBase.setVisible(False)
-        self.ShowStarBase.setVisible(False)
-        self.ShowFields.setVisible(len(m_list) > 0)
+                    self.NeutralFleets += 1
+                fleets += 1
         self.NextField.setVisible(False)
         self.PreviousField.setVisible(False)
-        fof = f_list[index].FriendOrFoe
-        if fof == Stance.allied:
-            self.InspectAlliedFleet()
-        elif fof == Stance.hostile:
-            self.InspectHostileFleet()
+        if fleets > 0:
+            self.DisplayStarbaseIcons(planet)
+#            self.ItemInfo.setCurrentIndex(1)
+            self.ShowFields.setVisible(len(m_list) > 0)
+            fof = f_list[index].FriendOrFoe
+            if fof == Stance.allied:
+                self.InspectAlliedFleet()
+            elif fof == Stance.hostile:
+                self.InspectHostileFleet()
+            else:
+                self.InspectNeutralFleet()
+        elif planet:
+            self.InspectPlanet(planet)
         else:
-            self.InspectNeutralFleet()
+            self.ItemInfo.setCurrentIndex(3)
+            self.ShowFields.setVisible(False)
+            self.DisplayFleetIcons()
+            self.SelectedObject.setText('')
 
 
     def InspectMineField(self, planet, index, m_list):
         self.SelectedFields = m_list
         self.MineIndex = index
         self.SelectedPlanet = planet
+        self.SelectedFleets = []
         self.InspectMines()
 
 
@@ -398,8 +428,9 @@ class Gui(QMainWindow):
             self.ShowFields.setVisible(False)
         else:
             self.ShowPlanet.setVisible(False)
-#        self.ShowFields.setVisible(False)
+        self.DisplayFleetIcons()
         self.ItemInfo.setCurrentIndex(1)
+        self.SelectedFleets[index].ShowCourse(self.ShowFleetMovements)
         nmax = len(self.SelectedFleets)
         n = (index + offset) % nmax
         while n < nmax:
@@ -407,6 +438,7 @@ class Gui(QMainWindow):
             if f.ShipCounter > 0 and f.FriendOrFoe in fof:
                 self.SelectedObject.setText(f.Name)
                 self.FleetInfo.UpdateCargo(f)
+                f.ShowCourse(True)
                 return n
             n += 1
         n = 0
@@ -415,6 +447,7 @@ class Gui(QMainWindow):
             if f.ShipCounter > 0 and f.FriendOrFoe in fof:
                 self.SelectedObject.setText(f.Name)
                 self.FleetInfo.UpdateCargo(f)
+                f.ShowCourse(True)
                 return n
             n += 1
 
@@ -428,7 +461,9 @@ class Gui(QMainWindow):
 
 
     def InspectEnemyFleet(self):
+        self.HostileFleets -= 1
         self.EnemyFleetIndex = self.NextFleet(self.EnemyFleetIndex, self.EnemyFleetOffset, [Stance.hostile])
+        self.HostileFleets += 1
         self.EnemyFleetOffset = 1
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
@@ -436,14 +471,18 @@ class Gui(QMainWindow):
 
     def InspectNeutralFleet(self):
         fof = [Stance.friendly, Stance.neutral]
+        self.NeutralFleets -= 1
         self.NeutralFleetIndex = self.NextFleet(self.NeutralFleetIndex, self.NeutralFleetOffset, fof)
+        self.NeutralFleets += 1
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 1
         self.FleetOffset = 0
 
 
     def InspectAlliedFleet(self):
+        self.AlliedFleets -= 1
         self.FleetIndex = self.NextFleet(self.FleetIndex, self.FleetOffset, [Stance.allied])
+        self.AlliedFleets += 1
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
         self.FleetOffset = 1
@@ -525,3 +564,8 @@ class Gui(QMainWindow):
     def ShowPercentageView(self, event):
         if event:
             self.Map.Universe.ShowPercentageView()
+
+
+    def ShowMovements(self, show):
+        self.ShowFleetMovements = show
+        self.Map.Universe.ShowMovements(show)

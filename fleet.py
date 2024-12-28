@@ -1,20 +1,19 @@
 
 from PyQt6.QtCore import QPointF
-from PyQt6.QtCore import QLineF
-from PyQt6.QtGui import QPolygonF
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPolygonF, QPen
 
 import math
 
 from design import Design
 from faction import Faction
 from guiprop import GuiProps
-from defines import Stance, Task
+from defines import Stance
 from colours import Pen, Brush
 from math import sqrt
 from system import SystemType
 from defines import Perks
 from ruleset import Ruleset
-from waypoint import Waypoint
 from guiprop import GuiProps as GP
 
 
@@ -46,7 +45,7 @@ class Fleet:
     self.FirstWaypoint = None
     self.ActiveWaypoint = None
     self.LastWaypoint = None
-    self.CurrentWaypoint = None
+    self.NextWaypoint = None
     self.MineFields = []
     self.RepeatSchedule = False
     self.Idle = True
@@ -77,7 +76,7 @@ class Fleet:
     self.MovingFleet = None
     self.RestingFleet = None
     self.ShipCount = None
-    self.Universe = None
+    self.Course = None
     self.CloakingFactor = self.ComputeCloaking()
     self.setFleetNameAndIndex()
 
@@ -166,53 +165,6 @@ class Fleet:
       return (Pen.green, Brush.green)
 
 
-  def addWaypoint(self, x, y):
-    wa = Waypoint(x, y)
-    if self.FirstWaypoint:
-      xa = GP.Xscale * wa.xo
-      ya = GP.Xscale * wa.yo
-      if self.FriendOrFoe == Stance.allied:
-        pen = Pen.blue_l
-        pen.setWidthF(self.Universe.CurrentPathWidth)
-      else:
-        pen = None
-      w0 = self.ActiveWaypoint
-      x0 = GP.Xscale * w0.xo
-      y0 = GP.Xscale * w0.yo
-      wa.warp = w0.warp
-      if w0.next:
-        wa.task = Task.MOVE
-        if w0.segment:
-          self.Universe.removeItem(w0.segment)
-          w0.segment = None
-        w1 = w0.next
-        x1 = GP.Xscale * w1.xo
-        y1 = GP.Xscale * w1.yo
-        w1.previous = wa
-        wa.next = w1
-        wa.previous = w0
-        w0.next = wa
-        if pen:
-          line = QLineF(xa, ya, x1, y1)
-          wa.segment = self.Universe.addLine(line)
-          wa.segment.setPen(pen)
-          wa.segment.setZValue(-1)
-      else:
-        self.LastWaypoint = wa
-        w0.next = wa
-        wa.previous = w0
-      if pen:
-        line = QLineF(x0, y0, xa, ya)
-        w0.segment = self.Universe.addLine(line)
-        w0.segment.setPen(pen)
-        w0.segment.setZValue(-1)
-    else:
-      self.FirstWaypoint = wa
-      self.LastWaypoint = wa
-      self.CurrentWaypoint = wa
-    self.ActiveWaypoint = wa
-
-
   def UpdateShipCount(self):
     self.ShipCount.setText(str(self.ShipCounter))
     h = self.ShipCount.boundingRect().height() - 2
@@ -224,3 +176,45 @@ class Fleet:
       w = self.ShipCount.boundingRect().width()
       xs -= GP.f_radius + GP.f_dist + w
     self.ShipCount.setPos(xs, ys - h / 2)
+
+
+  def PlotCourse(self, pen0):
+    pen = QPen(pen0)
+    pen.setWidthF(GP.fp_width)
+    pen.setCosmetic(True)
+    x0 = GP.Xscale * self.xc
+    y0 = GP.Xscale * self.yc
+    wp = self.NextWaypoint
+    if wp:
+      dx, dy = self.getOffset(wp)
+      x0 += dx
+      y0 += dy
+      x1 = GP.Xscale * wp.xo
+      y1 = GP.Xscale * wp.yo
+    else:
+      x1 = x0
+      y1 = y0
+    if self.FriendOrFoe != Stance.allied:
+      pen.setDashPattern((6, 10))
+    self.Course.setPen(pen)
+    self.Course.setLine(x0, y0, x1, y1)
+
+
+  def ShowCourse(self, show):
+    wp = self.FirstWaypoint
+    while wp.segment and wp != self.NextWaypoint:
+      wp.segment.setVisible(False)
+      wp = wp.next
+    while wp and wp.segment:
+      wp.segment.setVisible(show)
+      wp = wp.next
+    self.Course.setVisible(show)
+
+
+  def getOffset(self, wp):
+    dx = self.xc - wp.xo
+    dy = self.yc - wp.yo
+    dist = GP.c_dist * math.sqrt(dx * dx + dy * dy)
+    dx = dist * math.cos(self.Heading)
+    dy = dist * math.sin(self.Heading)
+    return dx, dy
