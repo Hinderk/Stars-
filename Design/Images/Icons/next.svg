@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+<!-- CreationDate: 2024-11-10 18:03:35 -->
+<!-- Magnification: 1.05 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="272pt" height="238pt"
+	viewBox="-2291 -1886 4312 3772">
+<g fill="none">
+<!-- Line -->
+<polyline points=" -2205,-1800 -855,-1800 45,0 -855,1800 -2205,1800 -2205,1350 -1215,1350 -540,0
+ -1215,-1350 -2205,-1350 -2205,-1800" fill="#00b0b0"
+	stroke="#008f8f" stroke-width="105px"/>
+<!-- Line -->
+<polyline points=" -315,-1800 1035,-1800 1935,0 1035,1800 -315,1800 -315,1350 675,1350 1350,0 675,-1350
+ -315,-1350 -315,-1800" fill="#00b0b0"
+	stroke="#008f8f" stroke-width="105px"/>
+</g>
+</svg>

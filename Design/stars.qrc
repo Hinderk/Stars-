@@ -1,0 +1,65 @@
+<RCC>
+  <qresource prefix="Technology"/>
+  <qresource prefix="Ships"/>
+  <qresource prefix="Toolbar">
+    <file alias="Zoomlevel">Images/Toolbar/zoom.svg</file>
+    <file alias="Paths">Images/Toolbar/path.svg</file>
+    <file alias="Foes">Images/Toolbar/foes.svg</file>
+    <file alias="Friendlies">Images/Toolbar/friendlies.svg</file>
+    <file alias="Orbiting">Images/Toolbar/orbit.svg</file>
+    <file alias="Names">Images/Toolbar/names.svg</file>
+    <file alias="Waiting">Images/Toolbar/standby.svg</file>
+    <file alias="Scanner">Images/Toolbar/radar.svg</file>
+    <file alias="Cancel">Images/Toolbar/cancel.svg</file>
+    <file alias="Minerals">Images/Toolbar/minerals.svg</file>
+    <file alias="Waypoint">Images/Toolbar/add.svg</file>
+    <file alias="Default">Images/Toolbar/default.svg</file>
+    <file alias="Percent">Images/Toolbar/percent.svg</file>
+    <file alias="Surface">Images/Toolbar/surface.svg</file>
+    <file alias="Mine">Images/Toolbar/mine.svg</file>
+    <file alias="People">Images/Toolbar/growth.svg</file>
+  </qresource>
+  <qresource prefix="Factions">
+    <file alias="Faction-A">Images/Factions/faction-a.svg</file>
+    <file alias="Faction-B">Images/Factions/faction-b.svg</file>
+    <file alias="Faction-C">Images/Factions/faction-c.svg</file>
+    <file alias="Faction-D">Images/Factions/faction-d.svg</file>
+    <file alias="Faction-E">Images/Factions/faction-e.svg</file>
+    <file alias="Faction-F">Images/Factions/faction-f.svg</file>
+    <file alias="Faction-G">Images/Factions/faction-g.svg</file>
+    <file alias="Faction-H">Images/Factions/faction-h.svg</file>
+    <file alias="Faction-I">Images/Factions/faction-i.svg</file>
+    <file alias="Faction-J">Images/Factions/faction-j.svg</file>
+    <file alias="Faction-K">Images/Factions/faction-k.svg</file>
+    <file alias="Faction-L">Images/Factions/faction-l.svg</file>
+    <file alias="Faction-M">Images/Factions/faction-m.svg</file>
+    <file alias="Faction-N">Images/Factions/faction-n.svg</file>
+    <file alias="Faction-O">Images/Factions/faction-o.svg</file>
+    <file alias="Faction-P">Images/Factions/faction-p.svg</file>
+    <file alias="Faction-Q">Images/Factions/faction-q.svg</file>
+    <file alias="Faction-R">Images/Factions/faction-r.svg</file>
+    <file alias="Faction-S">Images/Factions/faction-s.svg</file>
+    <file alias="Faction-T">Images/Factions/faction-t.svg</file>
+  </qresource>
+  <qresource prefix="Graphics">
+    <file alias="Mines">Images/Graphics/minefield.svg</file>
+    <file alias="Enigma">Images/Graphics/enigma.svg</file>
+    <file alias="Frigate">Images/Graphics/ship-a.svg</file>
+  </qresource>
+  <qresource prefix="Icons">
+    <file alias="Stars">Images/Icons/stars.ico</file>
+    <file alias="Fleets">Images/Icons/fleets.svg</file>
+    <file alias="Neutrals">Images/Icons/neutrals.svg</file>
+    <file alias="Enemies">Images/Icons/enemies.svg</file>
+    <file alias="Fortress">Images/Icons/alienbase.svg</file>
+    <file alias="Tradehub">Images/Icons/tradehub.svg</file>
+    <file alias="Starbase">Images/Icons/starbase.svg</file>
+    <file alias="ShowNews">Images/Icons/showme.svg</file>
+    <file alias="NoNews">Images/Icons/ignore.svg</file>
+    <file alias="Mines">Images/Icons/mines.svg</file>
+    <file alias="Ships">Images/Icons/ships.svg</file>
+    <file alias="Planet">Images/Icons/planet.svg</file>
+    <file alias="Previous">Images/Icons/previous.svg</file>
+    <file alias="Next">Images/Icons/next.svg</file>
+  </qresource>
+</RCC>

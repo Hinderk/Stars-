@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+
+<!-- CreationDate: 2024-11-19 10:30:36 -->
+
+<!-- Magnification: 1.05 -->
+
+<svg
+   width="569pt"
+   height="569pt"
+   viewBox="-12 -12 9024 9024"
+   version="1.1"
+   id="svg3"
+   sodipodi:docname="ship-b.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="pt"
+     inkscape:zoom="2.4477153"
+     inkscape:cx="379.12906"
+     inkscape:cy="379.33333"
+     inkscape:window-width="3840"
+     inkscape:window-height="2071"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg3" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Layer 2">
+    <path
+       id="rect1"
+       d="M 0.010709256 0.010709256 L 0.010709256 9000.0045 L 9000.0045 9000.0045 L 9000.0045 0.010709256 L 0.010709256 0.010709256 z M 3149.9993 1785.0065 L 3599.9943 2684.9966 L 3797.0675 3079.143 A 1980 1980 0 0 1 5130.0007 4950.0027 A 1980 1980 0 0 1 4047.8056 6709.9781 L 4185.0111 7200.0011 L 4950.0027 8099.9912 L 3149.9993 8085.0069 L 1349.9958 8099.9912 L 2115.0107 7200.0011 L 2252.2162 6709.9781 A 1980 1980 0 0 1 1169.9978 4950.0027 A 1980 1980 0 0 1 2500.2594 3084.4863 L 2700.0042 2684.9966 L 3149.9993 1785.0065 z " />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Layer 1">
+    <text
+       xml:space="preserve"
+       x="5643.1729"
+       y="3852.0276"
+       fill="#ffffff"
+       font-family="Courier"
+       font-style="normal"
+       font-weight="bold"
+       font-size="1296"
+       text-anchor="start"
+       id="text3"
+       style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1427.35px;font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI, Bold Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-anchor:start;fill:#ffffff">50m</text>
+    <text
+       xml:space="preserve"
+       x="4126.2231"
+       y="2007.6914"
+       fill="#ffffff"
+       font-family="Courier"
+       font-style="normal"
+       font-weight="bold"
+       font-size="1584"
+       text-anchor="start"
+       id="text2"
+       style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2283.75px;font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI, Bold Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-anchor:start;fill:#ffffff">APB</text>
+    <rect
+       x="7875"
+       y="4995"
+       width="225"
+       height="3150"
+       fill="#ffffff"
+       stroke="#000000"
+       stroke-width="8px"
+       id="rect2" />
+  </g>
+</svg>

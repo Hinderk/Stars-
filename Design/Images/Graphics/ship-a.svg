@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+
+<!-- CreationDate: 2024-10-19 19:58:10 -->
+
+<!-- Magnification: 1.05 -->
+
+<svg
+   width="569pt"
+   height="569pt"
+   viewBox="-12 -12 9024 9024"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="ship-test.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="pt"
+     inkscape:zoom="2.4477153"
+     inkscape:cx="379.12906"
+     inkscape:cy="379.33333"
+     inkscape:window-width="3840"
+     inkscape:window-height="2071"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <g
+     id="layer1">
+    <path
+       id="rect1"
+       d="M 0.010709256 0.010709256 L 0.010709256 9000.0045 L 9000.0045 9000.0045 L 9000.0045 0.010709256 L 0.010709256 0.010709256 z M 3599.9943 1830.006 L 4049.9893 2729.9961 L 4049.9893 3630.0095 L 4500.0076 3630.0095 L 4950.0027 4979.9946 L 4950.0027 6330.003 L 6300.011 8130.0064 L 3599.9943 8130.0064 L 900.0008 8130.0064 L 2250.0092 6330.003 L 2250.0092 4979.9946 L 2700.0042 3630.0095 L 3149.9993 3630.0095 L 3149.9993 2729.9961 L 3599.9943 1830.006 z "
+       style="stroke-width:5.75696294;stroke-dasharray:none;fill:#000000;fill-opacity:1" />
+  </g>
+  <rect
+     x="7875"
+     y="4995"
+     width="225"
+     height="3150"
+     fill="#ffffff"
+     stroke="#000000"
+     stroke-width="8px"
+     id="rect2" />
+  <g
+     id="layer2">
+    <text
+       xml:space="preserve"
+       x="5146.7075"
+       y="1983.3942"
+       id="text2"
+       style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2283.75px;font-family:'Segoe UI';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-anchor:start;fill:#ffffff">FFL</text>
+    <text
+       xml:space="preserve"
+       x="5745.2212"
+       y="4255.3618"
+       id="text3"
+       style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1427.35px;font-family:'Segoe UI';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-anchor:start;fill:#ffffff">50m</text>
+  </g>
+</svg>

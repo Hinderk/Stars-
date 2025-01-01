@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+<!-- CreationDate: 2024-07-19 17:29:06 -->
+<!-- Magnification: 1.05 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="285pt" height="285pt"
+	viewBox="-2352 -2262 4524 4524">
+<g fill="none">
+<!-- Line -->
+<rect x="-2340" y="-2250" width="4500" height="4500" fill="#ffffff"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Circle -->
+<circle cx="-90" cy="-630" r="891" fill="#a14000"
+	stroke="#a14000" stroke-width="8px"/>
+<!-- Text -->
+<text xml:space="preserve" x="-90" y="1800" fill="#000000" font-family="Courier" font-style="normal" font-weight="bold" font-size="1584" text-anchor="middle">Abc</text>
+<!-- Circle -->
+<circle cx="1080" cy="-1530" r="302" fill="#ffff00"
+	stroke="#b46100" stroke-width="75px"/>
+</g>
+</svg>

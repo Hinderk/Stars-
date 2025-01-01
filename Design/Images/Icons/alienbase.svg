@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+<!-- CreationDate: 2024-08-04 18:50:27 -->
+<!-- Magnification: 1.05 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="250pt" height="249pt"
+	viewBox="-1983 -1974 3964 3947">
+<g fill="none">
+<!-- Circle -->
+<circle cx="0" cy="0" r="1786"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="-695" cy="-1619" r="290" fill="#d10000"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="-1620" cy="-675" r="318" fill="#d10000"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="-1637" cy="692" r="288" fill="#d10000"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="-695" cy="1623" r="305" fill="#d10000"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="1618" cy="693" r="318" fill="#d10000"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="694" cy="-1620" r="309" fill="#d10000"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="1618" cy="-689" r="317" fill="#d10000"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="700" cy="1624" r="302" fill="#d10000"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Line -->
+<polyline points=" -1260,-1035 990,1215 1215,990 -1035,-1260 -1260,-1035" fill="#d10000"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Line -->
+<polyline points=" 1035,-1215 -1215,1035 -990,1260 1260,-990 1035,-1215" fill="#d10000"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="0" cy="0" r="1620"
+	stroke="#d10000" stroke-width="285px"/>
+<!-- Arc -->
+<path d="M -918,-1112 A 1447 1447 0 0 1 936 -1100"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Arc -->
+<path d="M -1104,925 A 1418 1418 0 0 1 -1116 -915"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Arc -->
+<path d="M 1121,912 A 1408 1408 0 0 0 1146 -876"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Arc -->
+<path d="M -879,1149 A 1460 1460 0 0 0 917 1119"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Arc -->
+<path d="M -401,-170 A 456 456 0 0 0 -378 194"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Arc -->
+<path d="M -177,-388 A 443 443 0 0 1 203 -378"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Arc -->
+<path d="M 396,-141 A 323 323 0 0 1 392 163"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Arc -->
+<path d="M -133,401 A 373 373 0 0 0 168 389"
+	stroke="#000000" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="0" cy="0" r="360" fill="#ffbfbf"
+	stroke="#d10000" stroke-width="75px"/>
+</g>
+</svg>

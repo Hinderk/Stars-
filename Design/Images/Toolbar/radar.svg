@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+<!-- CreationDate: 2024-07-27 19:20:26 -->
+<!-- Magnification: 1.05 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="285pt" height="285pt"
+	viewBox="-2262 -2262 4524 4524">
+<g fill="none">
+<!-- Line -->
+<rect x="-2250" y="-2250" width="4500" height="4500" fill="#ffffff"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Circle -->
+<circle cx="0" cy="0" r="1800" fill="#999999"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Arc -->
+<path d="M 7,-1792 A 1839 1839 0 0 0 -1272 -1270" fill="#dddddd"
+	stroke="#dddddd" stroke-width="15px"/>
+<!-- Line -->
+<polyline points=" -1283,-1267 0,0 0,-1800" fill="#dddddd"/>
+<!-- Arc -->
+<path d="M -1276,-1271 A 1765 1765 0 0 0 -1740 -455" fill="#cccccc"
+	stroke="#cccccc" stroke-width="8px"/>
+<!-- Line -->
+<polyline points=" 0,0 -1278,-1270 -1741,-457 0,0" fill="#cccccc"/>
+<!-- Line -->
+<polyline points=" 0,0 0,-1800"
+	stroke="#ffffff" stroke-width="75px"/>
+<!-- Circle -->
+<circle cx="630" cy="-450" r="90" fill="#ff0000"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Circle -->
+<circle cx="1260" cy="45" r="90" fill="#ff0000"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Circle -->
+<circle cx="-900" cy="-540" r="90" fill="#0000ff"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Circle -->
+<circle cx="-1395" cy="270" r="90" fill="#0000ff"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Circle -->
+<circle cx="-675" cy="945" r="90" fill="#0000ff"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Circle -->
+<circle cx="900" cy="990" r="90" fill="#ff0000"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Circle -->
+<circle cx="0" cy="0" r="1800"
+	stroke="#000000" stroke-width="30px"/>
+<!-- Circle -->
+<circle cx="0" cy="0" r="45" fill="#000000"
+	stroke="#000000" stroke-width="8px"/>
+</g>
+</svg>
