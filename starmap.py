@@ -30,4 +30,5 @@ class Starmap(QGraphicsView):
       else:
         ratio = (1.0 * level) / self.CurrentScaling
         self.scale(ratio, ratio)
+      self.Universe.ResizeFlightPaths(GP.fp_width[level])
       self.CurrentScaling = level

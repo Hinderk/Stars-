@@ -1,6 +1,5 @@
 
 from PyQt6.QtCore import QPointF
-from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPolygonF, QPen
 
 import math
@@ -43,7 +42,7 @@ class Fleet:
     self.WarpSpeed = 0
     self.Heading = 0.0
     self.FirstWaypoint = None
-    self.ActiveWaypoint = None
+    self.ActiveWaypoint = []
     self.LastWaypoint = None
     self.NextWaypoint = None
     self.MineFields = []
@@ -140,12 +139,11 @@ class Fleet:
         val = n * r
 
 
-  def ApplyFoeFilter(self, idle, select):
+  def ApplyFoeFilter(self, select):
     self.ShipCounter = 0
-    if self.Idle or not idle:
-      for s in self.ShipList:
-        if select[s.Design.Hull.value[2].name]:
-          self.ShipCounter += 1
+    for s in self.ShipList:
+      if select[s.Design.Hull.value[2].name]:
+        self.ShipCounter += 1
 
 
   def ApplyMyFilter(self, idle, select):
@@ -158,11 +156,11 @@ class Fleet:
 
   def getColours(self):
     if self.FriendOrFoe == Stance.allied:
-      return (Pen.blue_l, Brush.blue)
+      return (QPen(Pen.blue_l), Brush.blue)
     elif self.FriendOrFoe == Stance.hostile:
-      return (Pen.red_l, Brush.red)
+      return (QPen(Pen.red_l), Brush.red)
     else:
-      return (Pen.green, Brush.green)
+      return (QPen(Pen.green), Brush.green)
 
 
   def UpdateShipCount(self):
@@ -176,28 +174,6 @@ class Fleet:
       w = self.ShipCount.boundingRect().width()
       xs -= GP.f_radius + GP.f_dist + w
     self.ShipCount.setPos(xs, ys - h / 2)
-
-
-  def PlotCourse(self, pen0):
-    pen = QPen(pen0)
-    pen.setWidthF(GP.fp_width)
-    pen.setCosmetic(True)
-    x0 = GP.Xscale * self.xc
-    y0 = GP.Xscale * self.yc
-    wp = self.NextWaypoint
-    if wp:
-      dx, dy = self.getOffset(wp)
-      x0 += dx
-      y0 += dy
-      x1 = GP.Xscale * wp.xo
-      y1 = GP.Xscale * wp.yo
-    else:
-      x1 = x0
-      y1 = y0
-    if self.FriendOrFoe != Stance.allied:
-      pen.setDashPattern((6, 10))
-    self.Course.setPen(pen)
-    self.Course.setLine(x0, y0, x1, y1)
 
 
   def ShowCourse(self, show):
@@ -214,7 +190,9 @@ class Fleet:
   def getOffset(self, wp):
     dx = self.xc - wp.xo
     dy = self.yc - wp.yo
-    dist = GP.c_dist * math.sqrt(dx * dx + dy * dy)
+    dist = GP.Xscale * GP.c_dist * math.sqrt(dx * dx + dy * dy)
+    if dist > GP.max_dist:
+      dist = GP.max_dist
     dx = dist * math.cos(self.Heading)
     dy = dist * math.sin(self.Heading)
     return dx, dy

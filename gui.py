@@ -16,6 +16,7 @@ from inspector import Inspector
 from fleetdata import Fleetdata
 from minedata import Minedata
 from starmap import Starmap
+from universe import Universe
 
 
 
@@ -39,10 +40,14 @@ class Gui(QMainWindow):
         self.SelectedPlanet = None
         self.SelectedFields = []
         self.SelectedFleets = []
+        self.MineFilter = Universe.SetupMineFilter()
+        self.NumberOfFields = 0
+        self.FilteredFields = 0
         self.EnemyFleetIndex = 0
         self.NeutralFleetIndex = 0
         self.FleetIndex = 0
         self.MineIndex = 0
+        self.FieldIndex = 0
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
@@ -51,6 +56,7 @@ class Gui(QMainWindow):
         self.NeutralFleets = 0
         self.HostileFleets = 0
         self.ShowFleetMovements = False
+        self.WaypointMode = False
         self.setStyleSheet(GuiDesign.getGuiStyle())
         self.Action = dict()
         self.SetupUI(people, rules)
@@ -68,6 +74,7 @@ class Gui(QMainWindow):
         self.Buttons.actionShipCount.toggled.connect(self.Map.Universe.ShowShipCount)
         self.Buttons.actionWaitingFleets.toggled.connect(self.Map.Universe.FilterIdleFleets)
         self.Buttons.actionPathOverlay.toggled.connect(self.ShowMovements)
+        self.Buttons.actionAddWaypoint.toggled.connect(self.AddWaypoints)
         self.NextField.clicked.connect(self.ShowNextMineField)
         self.PreviousField.clicked.connect(self.ShowPreviousMineField)
         self.Buttons.actionNoInfoView.setChecked(True)
@@ -79,6 +86,7 @@ class Gui(QMainWindow):
         self.Map.Universe.SelectFleet.connect(self.InspectFleet)
         self.Map.Universe.SelectPlanet.connect(self.InspectPlanet)
         self.Map.Universe.UpdatePlanet.connect(self.UpdatePlanetView)
+        self.Map.Universe.UpdateFilter.connect(self.UpdateFields)
         self.ShowPlanet.clicked.connect(self.InspectPlanets)
         self.SelectNextEnemy.clicked.connect(self.InspectEnemyFleet)
         self.SelectNextNeutral.clicked.connect(self.InspectNeutralFleet)
@@ -87,8 +95,7 @@ class Gui(QMainWindow):
         self.ShowFleets.clicked.connect(self.InspectFleets)
         self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
         self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFriendlies)
-        home = self.Map.Universe.planets[-1]
-        self.Map.Universe.HighlightPlanet(home)
+        self.Map.Universe.HighlightPlanet(self.Map.Universe.planets[-1])
 
 
     def SetupUI(self, people, rules):
@@ -342,16 +349,16 @@ class Gui(QMainWindow):
         self.SelectedPlanet = p
         self.SelectedFleets = p.fleets_in_orbit
         self.SelectedFields = p.mine_fields
+        self.ApplyMineFilter()
         self.PreviousField.setVisible(False)
         self.NextField.setVisible(False)
         self.ShowPlanet.setVisible(False)
         self.ShowFleets.setVisible(False)
-        self.ShowFields.setVisible(len(p.mine_fields) > 0)
+        self.ShowFields.setVisible(self.FilteredFields > 0)
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
         self.MineOffset = 0
-#        self.MineIndex = 0
         if p.Discovered:
             self.ItemInfo.setCurrentIndex(0)
             self.PlanetInfo.UpdateMinerals(p)
@@ -394,10 +401,11 @@ class Gui(QMainWindow):
                 fleets += 1
         self.NextField.setVisible(False)
         self.PreviousField.setVisible(False)
+        self.ShowFleets.setVisible(False)
         if fleets > 0:
             self.DisplayStarbaseIcons(planet)
-#            self.ItemInfo.setCurrentIndex(1)
-            self.ShowFields.setVisible(len(m_list) > 0)
+            self.ApplyMineFilter()
+            self.ShowFields.setVisible(self.FilteredFields > 0)
             fof = f_list[index].FriendOrFoe
             if fof == Stance.allied:
                 self.InspectAlliedFleet()
@@ -411,7 +419,27 @@ class Gui(QMainWindow):
             self.ItemInfo.setCurrentIndex(3)
             self.ShowFields.setVisible(False)
             self.DisplayFleetIcons()
-            self.SelectedObject.setText('')
+            self.SelectedObject.setText("Deep Space")
+
+
+    def UpdateFields(self, NewFilter):
+        self.MineFilter = NewFilter
+        self.ApplyMineFilter()
+        if self.ItemInfo.currentIndex() < 2:
+            self.ShowFields.setVisible(self.FilteredFields > 0)
+        elif self.ItemInfo.currentIndex() < 3:
+            if self.FilteredFields > 0:
+                self.InspectMines()
+            elif self.SelectedPlanet:
+                self.InspectPlanets()
+            elif self.SelectedFleets:
+                self.InspectFleets()
+            else:
+                self.ItemInfo.setCurrentIndex(3)
+                self.PreviousField.setVisible(False)
+                self.NextField.setVisible(False)
+                self.ShowFleets.setVisible(False)
+                self.SelectedObject.setText("Deep Space")
 
 
     def InspectMineField(self, planet, index, m_list):
@@ -452,12 +480,25 @@ class Gui(QMainWindow):
             n += 1
 
 
-    def NextMinefield(self, index, offset):
-        n = (index + self.NumberOfFields + offset) % self.NumberOfFields
-        field = self.SelectedFields[n]
-        self.MineInfo.UpdateData(field, n + 1, self.NumberOfFields)
-        self.SelectedObject.setText(field.model.value + ' Mine Field')
-        return n
+    def NextMinefield(self, i0, offset):
+        self.FieldIndex += self.FilteredFields + offset
+        self.FieldIndex %= self.FilteredFields
+        i = (i0 + self.NumberOfFields + offset) % self.NumberOfFields
+        while i < self.NumberOfFields:
+            m = self.SelectedFields[i]
+            if self.MineFilter[m.fof]:
+                self.MineInfo.UpdateData(m, self.FieldIndex + 1, self.FilteredFields)
+                self.SelectedObject.setText(m.model.value + ' Mine Field #' + str(m.id))
+                return i
+            i += 1
+        i = 0
+        while i <= i0:
+            m = self.SelectedFields[i]
+            if self.MineFilter[m.fof]:
+                self.MineInfo.UpdateData(m, self.FieldIndex + 1, self.FilteredFields)
+                self.SelectedObject.setText(m.model.value + ' Mine Field #' + str(m.id))
+                return i
+            i += 1
 
 
     def InspectEnemyFleet(self):
@@ -501,7 +542,6 @@ class Gui(QMainWindow):
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
-        self.ItemInfo.setCurrentIndex(2)
         self.SelectNextEnemy.setVisible(False)
         self.SelectNextNeutral.setVisible(False)
         self.SelectNextFleet.setVisible(False)
@@ -518,10 +558,26 @@ class Gui(QMainWindow):
             self.ShowPlanet.setVisible(False)
             self.ShowFleets.setVisible(False)
         self.ShowFields.setVisible(False)
-        self.NumberOfFields = len(self.SelectedFields)
-        self.NextField.setVisible(self.NumberOfFields > 1)
-        self.PreviousField.setVisible(self.NumberOfFields > 1)
-        self.NextMinefield(self.MineIndex, 0)
+        self.ApplyMineFilter()
+        if self.FilteredFields > 0:
+            self.ItemInfo.setCurrentIndex(2)
+            self.NextField.setVisible(self.FilteredFields > 1)
+            self.PreviousField.setVisible(self.FilteredFields > 1)
+            self.NextMinefield(self.MineIndex, 0)
+        else:
+            print('filtered fields should always be > 0')
+            self.SelectedObject.setText('Error : FilteredFields < 1!')
+            self.ItemInfo.setCurrentIndex(3)
+
+
+    def ApplyMineFilter(self):
+        self.FilteredFields = 0
+        self.NumberOfFields = 0
+        if self.SelectedFields:
+            self.NumberOfFields = len(self.SelectedFields)
+            for m in self.SelectedFields:
+                if self.MineFilter[m.fof]:
+                    self.FilteredFields += 1
 
 
     def ShowNextMineField(self, event):
@@ -566,6 +622,12 @@ class Gui(QMainWindow):
             self.Map.Universe.ShowPercentageView()
 
 
-    def ShowMovements(self, show):
-        self.ShowFleetMovements = show
-        self.Map.Universe.ShowMovements(show)
+    def ShowMovements(self, event):
+        self.ShowFleetMovements = event
+        self.Map.Universe.ShowMovements(event)
+
+
+    def AddWaypoints(self, event):
+        self.WaypointMode = event
+        self.Map.Universe.SetWaypointMode(event)
+

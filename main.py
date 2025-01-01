@@ -63,9 +63,11 @@ def main():
     fleet_5 = Fleet([ship], 9)
     fleet_6 = Fleet([ship, ship], 0)
     fleet_7 = Fleet([ship, ship, ship], 0)
+    fleet_8 = Fleet([ship, ship, ship, ship], 4)
 
     fleet_3.Idle = False
     fleet_7.Idle = False
+    fleet_8.WarpSpeed = 10
 
     p = form.Map.Universe.planets[2]
 
@@ -87,6 +89,12 @@ def main():
     form.Map.Universe.addWaypoint(fleet_7, 180, 350)
     form.Map.Universe.addWaypoint(fleet_7, 280, 600)
     form.Map.Universe.addWaypoint(fleet_7, 500, 400)
+
+    form.Map.Universe.RegisterFleet(fleet_8, 140, -150)
+    form.Map.Universe.addWaypoint(fleet_8, -120, 600)
+    form.Map.Universe.addWaypoint(fleet_8, 280, 450)
+    form.Map.Universe.addWaypoint(fleet_8, 280, 600)
+    form.Map.Universe.addWaypoint(fleet_8, 600, 600)
 
     form.Map.Universe.planets[0].BuildStarbase()
     form.Map.Universe.planets[0].Relation = Stance.neutral

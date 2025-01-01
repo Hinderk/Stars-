@@ -27,11 +27,16 @@ class Minefield:
   caret << QPointF(0, GuiProps.center_size)
   caret << QPointF(-GuiProps.center_size, 0)
 
+  Counter = dict()
+  for m in Model:
+    Counter[m] = 0
+
   def __init__(self, scene, x, y, m, model, fID):
 
     r = sqrt(m) * GuiProps.Xscale
+    Minefield.Counter[model] += 1
 
-    self.name = 'Mine Field - X' #  TODO: Fix Me!
+    self.id = Minefield.Counter[model]
     self.fleets_en_route = []
     self.TotalFriends = 0
     self.TotalFoes = 0
