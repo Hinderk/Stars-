@@ -94,7 +94,7 @@ class Gui(QMainWindow):
         self.ShowFields.clicked.connect(self.InspectMines)
         self.ShowFleets.clicked.connect(self.InspectFleets)
         self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
-        self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFriendlies)
+        self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFleets)
         self.Map.Universe.HighlightPlanet(self.Map.Universe.planets[-1])
 
 
@@ -382,7 +382,7 @@ class Gui(QMainWindow):
         self.EnemyFleetOffset = 0
         self.NeutralFleetOffset = 0
         self.FleetOffset = 0
-        self.FleetIndex = index
+        self.FleetIndex = index % len(f_list)
         self.SelectedFleets = f_list
         self.SelectedPlanet = planet
         self.SelectedFields = m_list
@@ -406,7 +406,7 @@ class Gui(QMainWindow):
             self.DisplayStarbaseIcons(planet)
             self.ApplyMineFilter()
             self.ShowFields.setVisible(self.FilteredFields > 0)
-            fof = f_list[index].FriendOrFoe
+            fof = f_list[self.FleetIndex].FriendOrFoe
             if fof == Stance.allied:
                 self.InspectAlliedFleet()
             elif fof == Stance.hostile:
@@ -458,24 +458,31 @@ class Gui(QMainWindow):
             self.ShowPlanet.setVisible(False)
         self.DisplayFleetIcons()
         self.ItemInfo.setCurrentIndex(1)
+        self.SelectedFleets[index].ColourCourse(False)
         self.SelectedFleets[index].ShowCourse(self.ShowFleetMovements)
         nmax = len(self.SelectedFleets)
         n = (index + offset) % nmax
         while n < nmax:
             f = self.SelectedFleets[n]
             if f.ShipCounter > 0 and f.FriendOrFoe in fof:
-                self.SelectedObject.setText(f.Name)
+                self.SelectedObject.setText(f.Name + ' #' + str(f.id))
                 self.FleetInfo.UpdateCargo(f)
                 f.ShowCourse(True)
+                f.ColourCourse(True)
+                self.Map.Universe.SelectedFleet = f
+                self.Map.Universe.FleetIndex = n
                 return n
             n += 1
         n = 0
         while n <= index:
             f = self.SelectedFleets[n]
             if f.ShipCounter > 0 and f.FriendOrFoe in fof:
-                self.SelectedObject.setText(f.Name)
+                self.SelectedObject.setText(f.Name + ' #' + str(f.id))
                 self.FleetInfo.UpdateCargo(f)
                 f.ShowCourse(True)
+                f.ColourCourse(True)
+                self.Map.Universe.SelectedFleet = f
+                self.Map.Universe.FleetIndex = n
                 return n
             n += 1
 

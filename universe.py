@@ -10,7 +10,6 @@ from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtCore import pyqtSignal as QSignal
 
 from guidesign import GuiDesign
-from fleet import Fleet
 from scanner import Scanner
 from ruleset import Ruleset
 from planet import Planet
@@ -31,6 +30,12 @@ class Universe(QGraphicsScene):
   SelectFleet = QSignal(object, int, list, list)
   SelectField = QSignal(object, int, list)
 
+  arrow = QPolygonF()
+  arrow << QPointF(GP.h_vector - GP.dh_vector, 0)
+  arrow << QPointF(-GP.dh_vector, -GP.w_vector)
+  arrow << QPointF(0, 0)
+  arrow << QPointF(-GP.dh_vector, GP.w_vector)
+
   flag = QPolygonF()
   flag << QPointF(0, 0)
   flag << QPointF(0, - GP.flag_height - GP.flag_width)
@@ -38,6 +43,13 @@ class Universe(QGraphicsScene):
   flag << QPointF(GP.flag_width + GP.flag_stem, -GP.flag_height)
   flag << QPointF(GP.flag_stem, -GP.flag_height)
   flag << QPointF(GP.flag_stem, 0)
+
+  triangle = QPolygonF()
+  triangle << QPointF(0, 0)
+  triangle << QPointF(GP.pointer_size / 2, GP.pointer_size * math.sqrt(3.0) / 2)
+  triangle << QPointF(-GP.pointer_size / 2, GP.pointer_size * math.sqrt(3.0) / 2)
+
+  CurrentPathWidth = GP.fp_width[100]
 
 
   def SetupMineFilter():
@@ -57,6 +69,11 @@ class Universe(QGraphicsScene):
     self.minefields = []
     self.debris = []
 
+    self.xs = 0
+    self.ys = 0
+    self.xo = 0
+    self.yo = 0
+
     self.SelectedPlanet = None
     self.SelectedFleet = None
     self.SelectedWaypoint = None
@@ -74,11 +91,11 @@ class Universe(QGraphicsScene):
     self.ActiveFoeFilter = None
     self.ActiveFriendFilter = None
     self.FieldsVisible = False
+    self.MovementApproved = False
     self.WaypointSelected = False
 
     self.ShowField = Universe.SetupMineFilter()
     self.PopulationCeiling = Ruleset.GetPopulationCeiling()
-    self.CurrentPathWidth = GP.fp_width[100]
 
     self.pointer = None
     self.select = None
@@ -95,6 +112,22 @@ class Universe(QGraphicsScene):
   def ColonizePlanets(self):
 #    for p in self.planets:
     pass
+
+
+  def focusOutEvent(self, event):
+    self.MovementApproved = False
+
+
+  def keyPressEvent(self, keyPress):
+    key = keyPress.key()
+    if key == Qt.Key.Key_Shift:
+      self.MovementApproved = True
+
+
+  def keyReleaseEvent(self, keyPress):
+    key = keyPress.key()
+    if key == Qt.Key.Key_Shift:
+      self.MovementApproved = False
 
 
   def contextMenuEvent(self, mouseClick):
@@ -140,9 +173,51 @@ class Universe(QGraphicsScene):
 
   def mousePressEvent(self, mouseClick):
     self.WaypointSelected = False
-    pos = mouseClick.scenePos()
-    xo = round(0.5 + pos.x() / GP.Xscale)
-    yo = round(0.5 + pos.y() / GP.Xscale)
+    self.xo = round(0.5 + self.xs / GP.Xscale)
+    self.yo = round(0.5 + self.ys / GP.Xscale)
+    self.Context = self.IdentifyContext(self.xo, self.yo)
+    if mouseClick.buttons() == Qt.MouseButton.LeftButton:
+      if self.Context[3]:
+        self.HighlightWaypoint()
+      elif self.Context[1]:
+        self.WaypointOffset = 0
+        self.FleetOffset = 0
+        self.HighlightMinefield(0)
+      elif self.Context[2]:
+        self.WaypointOffset = 0
+        self.HighlightFleet()
+      else:
+        self.WaypointOffset = 0
+        self.FleetOffset = 0
+        self.HighlightPlanet(self.Context[0])
+
+
+  def mouseMoveEvent(self, event):
+    p0 = event.scenePos()
+    self.xs = p0.x()
+    self.ys = p0.y()
+    if self.WaypointSelected and self.MovementApproved:
+      w0 = self.SelectedWaypoint[0]
+      wp = w0.previous
+      p0 = event.scenePos()
+      w0.xo = round(0.5 + self.xs / GP.Xscale)
+      w0.yo = round(0.5 + self.ys / GP.Xscale)
+      p0 = QPointF(GP.Xscale * w0.xo, GP.Xscale * w0.yo)
+      s0 = wp.segment.line()
+      s0.setP2(p0)
+      wp.segment.setLine(s0)
+      if w0.segment:
+        s1 = w0.segment.line()
+        s1.setP1(p0)
+        w0.segment.setLine(s1)
+      f = self.SelectedFleet
+      if f.NextWaypoint == w0:
+        f.Heading = math.atan2(w0.yo - f.yc, w0.xo - f.xc)
+        self.PlotCourse(f, True)
+      self.wpselect.setPos(p0)
+
+
+  def IdentifyContext(self, xo, yo):
     dist = 1e20
     for p in self.planets:
       d = (p.x - xo) * (p.x - xo) + (p.y - yo) * (p.y - yo)
@@ -159,25 +234,24 @@ class Universe(QGraphicsScene):
           f_list = [f]
         elif f_list and d == dist:
           f_list.append(f)
-        if self.ShowFleetMovements or f == self.SelectedFleet:
-          if f.FriendOrFoe != Stance.allied:
-            continue
-          wp = f.FirstWaypoint
-          n = 1
-          while wp:
-            d = (wp.xo - xo) * (wp.xo - xo) + (wp.yo - yo) * (wp.yo - yo)
-            if d < dist:
-              n = 1
-              w_list = [(wp, n)]
-              f_list = [f]
-              f.ActiveWaypoint = [wp]
-              dist = d
-            elif w_list and d == dist:
-              f.ActiveWaypoint.append(wp)
-              f_list.append(f)
-              w_list.append((wp, n))
-              n += 1
-            wp = wp.next
+        if f.FriendOrFoe == Stance.allied:
+          if self.ShowFleetMovements or f == self.SelectedFleet:
+            wp = f.FirstWaypoint
+            n = 1
+            while wp:
+              d = (wp.xo - xo) * (wp.xo - xo) + (wp.yo - yo) * (wp.yo - yo)
+              if d < dist:
+                n = 1
+                w_list = [(wp, n)]
+                f_list = [f]
+                f.ActiveWaypoint = [wp]
+                dist = d
+              elif w_list and d == dist:
+                f.ActiveWaypoint.append(wp)
+                f_list.append(f)
+                w_list.append((wp, n))
+                n += 1
+              wp = wp.next
     m_list = []
     for m in self.minefields:
       if m.Detected:
@@ -188,52 +262,11 @@ class Universe(QGraphicsScene):
             dist = d
           elif m_list and d == dist:
             m_list.append(m)
-    self.Context = (po, m_list, f_list, w_list)
-    if mouseClick.buttons() == Qt.MouseButton.LeftButton:
-      if w_list:
-        self.HighlightWaypoint(w_list, f_list)
-      elif m_list:
-        self.WaypointOffset = 0
-        self.FleetOffset = 0
-        self.HighlightMinefield(m_list, 0)
-      elif f_list:
-        self.WaypointOffset = 0
-        self.HighlightFleet(f_list)
-      else:
-        self.WaypointOffset = 0
-        self.FleetOffset = 0
-        self.HighlightPlanet(po)
-
-
-  def mouseMoveEvent(self, event):
-    if self.WaypointSelected:
-      w0 = self.SelectedWaypoint[0]
-      wp = w0.previous
-      p0 = event.scenePos()
-      w0.xo = round(0.5 + p0.x() / GP.Xscale)
-      w0.yo = round(0.5 + p0.y() / GP.Xscale)
-      p0 = QPointF(GP.Xscale * w0.xo, GP.Xscale * w0.yo)
-      s0 = wp.segment.line()
-      s0.setP2(p0)
-      wp.segment.setLine(s0)
-      if w0.segment:
-        s1 = w0.segment.line()
-        s1.setP1(p0)
-        w0.segment.setLine(s1)
-      f = self.SelectedFleet
-      if f.NextWaypoint == w0:
-        f.Heading = math.atan2(w0.yo - f.yc, w0.xo - f.xc)
-        pen, brush = f.getColours()
-        self.PlotCourse(f, pen, brush)
-      self.wpselect.setPos(p0)
+    return (po, m_list, f_list, w_list)
 
 
   def CreateIndicator(self):
-    w = GP.pointer_size * math.sqrt(3.0) / 2
-    triangle = QPolygonF()
-    triangle << QPointF(0, 0) << QPointF(GP.pointer_size / 2, w)
-    triangle << QPointF(- GP.pointer_size / 2, w)
-    self.pointer = self.addPolygon(triangle, Pen.white_08, Brush.yellow)
+    self.pointer = self.addPolygon(self.triangle, Pen.white_08, Brush.yellow)
     self.pointer.setZValue(8)
     w = GP.fp_radius
     self.select = self.addEllipse(-w, -w, w + w, w + w, Pen.white_08, Brush.yellow)
@@ -252,10 +285,11 @@ class Universe(QGraphicsScene):
       self.SelectedPlanet.label.setPen(Pen.white_l)
       self.SelectedPlanet.label.setBrush(Brush.white_l)
     if self.SelectedFleet:
+      self.SelectedFleet.ColourCourse(False)
       self.SelectedFleet.ShowCourse(self.ShowFleetMovements)
     self.SelectedWaypoint = None
     self.SelectedFleet = None
-    self.SelectedFleets = None
+    self.SelectedFleets = []
     if self.NamesVisible:
       p.label.setPen(Pen.white)
       p.label.setBrush(Brush.white)
@@ -269,7 +303,7 @@ class Universe(QGraphicsScene):
     self.SelectPlanet.emit(p)
 
 
-  def HighlightFleet(self, f_list, index=-1):
+  def HighlightFleet(self, index=-1):
     self.wpselect.setVisible(False)
     self.pointer.setVisible(False)
     if self.SelectedPlanet:
@@ -278,63 +312,68 @@ class Universe(QGraphicsScene):
     self.SelectedPlanet = None
     self.SelectedWaypoint = None
     if self.SelectedFleet:
+      self.SelectedFleet.ColourCourse(False)
       self.SelectedFleet.ShowCourse(self.ShowFleetMovements)
     if index < 0:
-      index = (self.FleetIndex + self.FleetOffset) % len(f_list)
-    f0 = f_list[index]
+      index = (self.FleetIndex + self.FleetOffset) % len(self.Context[2])
+    f0 = self.Context[2][index]
     self.select.setPos(GP.Xscale * f0.xc, GP.Xscale * f0.yc)
     self.select.setVisible(True)
+    f0.ColourCourse(True)
     f0.ShowCourse(True)
     self.SelectedFleet = f0
     self.FleetIndex = index
     self.FleetOffset = 1
-    self.SelectedFleets = f_list
-    self.SelectFleet.emit(None, index, f_list, f0.MineFields)
+    self.SelectedFleets = self.Context[2]
+    self.SelectFleet.emit(None, index, self.Context[2], f0.MineFields)
 
 
-  def HighlightMinefield(self, m_list, index):
+  def HighlightMinefield(self, index):
     self.select.setVisible(False)
     if self.SelectedPlanet:
       self.SelectedPlanet.label.setPen(Pen.white_l)
       self.SelectedPlanet.label.setBrush(Brush.white_l)
     if self.SelectedFleet:
+      self.SelectedFleet.ColourCourse(False)
       self.SelectedFleet.ShowCourse(self.ShowFleetMovements)
     self.SelectedWaypoint = None
     self.SelectedFleet = None
-    self.SelectedFleets = None
+    self.SelectedFleets = []
     self.SelectedPlanet = None
-    xp = GP.Xscale * m_list[0].x
-    yp = GP.Xscale * m_list[0].y + GP.dy_pointer
+    xp = GP.Xscale * self.Context[1][0].x
+    yp = GP.Xscale * self.Context[1][0].y + GP.dy_pointer
     self.pointer.setPos(xp, yp)
     self.pointer.setVisible(True)
-    self.SelectField.emit(None, index, m_list)
+    self.SelectField.emit(None, index, self.Context[1])
 
 
-  def HighlightWaypoint(self, w_list, f_list, index=-1):
+  def HighlightWaypoint(self, index=-1):
     self.pointer.setVisible(False)
     if self.SelectedPlanet:
       self.SelectedPlanet.label.setPen(Pen.white_l)
       self.SelectedPlanet.label.setBrush(Brush.white_l)
     self.SelectedPlanet = None
     if self.SelectedFleet:
+      self.SelectedFleet.ColourCourse(False)
       self.SelectedFleet.ShowCourse(self.ShowFleetMovements)
     if index < 0:
-      index = (self.WaypointIndex + self.WaypointOffset) % len(w_list)
-    w0, n0 = w_list[index]
-    f0 = f_list[index]
+      index = (self.WaypointIndex + self.WaypointOffset) % len(self.Context[3])
+    w0, n0 = self.Context[3][index]
+    f0 = self.Context[2][index]
     self.wpselect.setPos(GP.Xscale * w0.xo, GP.Xscale * w0.yo)
     self.select.setPos(GP.Xscale * f0.xc, GP.Xscale * f0.yc)
     self.wpselect.setVisible(True)
     self.select.setVisible(True)
+    f0.ColourCourse(True)
     f0.ShowCourse(True)
     self.SelectedWaypoint = (w0, n0)
     self.SelectedFleet = f0
     self.WaypointIndex = index
     self.FleetIndex = index
     self.WaypointOffset = 1
-    self.SelectedFleets = f_list
+    self.SelectedFleets = self.Context[2]
     self.WaypointSelected = True
-    self.SelectFleet.emit(None, index, f_list, [])
+    self.SelectFleet.emit(None, index, self.Context[2], [])
 
 
   def ShowMines(self, switch, fof):
@@ -716,6 +755,9 @@ class Universe(QGraphicsScene):
           f.ShowCourse(False)
           f.RestingFleet.setVisible(False)
     if self.SelectedFleets:
+      if self.SelectedFleet.ShipCounter == 0:
+        self.FleetIndex += 1
+        self.SelectedFleet.ColourCourse(False)
       total = 0
       for f in self.SelectedFleets:
         total += f.ShipCounter
@@ -727,14 +769,17 @@ class Universe(QGraphicsScene):
         self.wpselect.setVisible(False)
         self.select.setVisible(False)
       self.SelectFleet.emit(self.SelectedPlanet, self.FleetIndex, self.SelectedFleets, self.SelectedFleet.MineFields)
-    self.update()
 
 
   def FilterFoes(self, enabled, select):
     self.FoeFilterEnabled = enabled
     if select:
       self.ActiveFoeFilter = select
-    if enabled:
+    if self.ShowIdleFleetsOnly:
+      for f in self.fleets:
+        if f.FriendOrFoe != Stance.allied:
+          f.ShipCounter = 0
+    elif enabled:
       for f in self.fleets:
         if f.FriendOrFoe != Stance.allied:
           f.ApplyFoeFilter(select)
@@ -762,7 +807,7 @@ class Universe(QGraphicsScene):
     self.update()
 
 
-  def FilterFriendlies(self, enabled, select):
+  def FilterFleets(self, enabled, select):
     self.FriendFilterEnabled = enabled
     if select:
       self.ActiveFriendFilter = select
@@ -807,32 +852,31 @@ class Universe(QGraphicsScene):
 
   def EnableFriendFilter(self, event):
     if event and self.ActiveFriendFilter:
-      self.FilterFriendlies(True, self.ActiveFriendFilter)
+      self.FilterFleets(True, self.ActiveFriendFilter)
     else:
-      self.FilterFriendlies(False, None)
+      self.FilterFleets(False, None)
 
 
   def FilterIdleFleets(self, event):
     self.ShowIdleFleetsOnly = event
     self.FilterFoes(self.FoeFilterEnabled, self.ActiveFoeFilter)
-    self.FilterFriendlies(self.FriendFilterEnabled, self.ActiveFriendFilter)
+    self.FilterFleets(self.FriendFilterEnabled, self.ActiveFriendFilter)
 
 
   def ResizeFlightPaths(self, width):
     for f in self.fleets:
-      pen = f.getColours()[0]
+      pen = f.Course.pen()
       pen.setWidthF(width)
       wp = f.FirstWaypoint
       while wp and wp.segment:
         wp.segment.setPen(pen)
         wp = wp.next
-#      if f.FriendOrFoe != Stance.allied:
-#        pen.setDashPattern((6, 10))
       f.Course.setPen(pen)
-    self.CurrentPathWidth = width
+    Universe.CurrentPathWidth = width
 
 
-  def PlotCourse(self, f, pen, brush):
+  def PlotCourse(self, f, selected=False):
+    pen, brush = f.GetColours(selected)
     x0 = GP.Xscale * f.xc
     y0 = GP.Xscale * f.yc
     if f.WarpSpeed > 0:
@@ -841,7 +885,7 @@ class Universe(QGraphicsScene):
       Q0 = QTransform()
       Q0.translate(x0, y0)
       Q0.rotateRadians(f.Heading)
-      f.MovingFleet = self.addPolygon(Q0.map(Fleet.arrow), pen, brush)
+      f.MovingFleet = self.addPolygon(Q0.map(self.arrow), pen, brush)
     else:
       f.RestingFleet.setPos(x0, y0)
       f.RestingFleet.setPen(pen)
@@ -849,7 +893,7 @@ class Universe(QGraphicsScene):
       f.RestingFleet.setVisible(True)
     wp = f.NextWaypoint
     if wp and f.FriendOrFoe == Stance.allied:
-      dx, dy = f.getOffset(wp)
+      dx, dy = f.GetOffset(wp)
       x0 += dx
       y0 += dy
       x1 = GP.Xscale * wp.xo
@@ -868,9 +912,11 @@ class Universe(QGraphicsScene):
     else:
       x1 = x0
       y1 = y0
-#    if f.FriendOrFoe != Stance.allied:
-#      pen.setDashPattern((6, 10))
     pen.setWidthF(self.CurrentPathWidth)
+    wp = f.FirstWaypoint
+    while wp and wp.segment:
+      wp.segment.setPen(pen)
+      wp = wp.next
     f.Course.setPen(pen)
     f.Course.setLine(x0, y0, x1, y1)
 
@@ -894,7 +940,6 @@ class Universe(QGraphicsScene):
       f.ShipCount.setVisible(False)
       f.ShowCourse(False)
       if f.ShipCounter > 0 and f.Discovered and not f.Orbiting:
-        pen, brush = f.getColours()
         f.Heading = math.pi
         if f.NextWaypoint.previous:
           x0 = f.NextWaypoint.previous.xo
@@ -902,7 +947,7 @@ class Universe(QGraphicsScene):
           x1 = f.NextWaypoint.xo
           y1 = f.NextWaypoint.yo
           f.Heading = math.atan2(y1 - y0, x1 - x0)
-        self.PlotCourse(f, pen, brush)
+        self.PlotCourse(f)
         f.UpdateShipCount()
         f.ShipCount.setVisible(self.ShowFleetStrength)
         f.ShowCourse(self.ShowFleetMovements)

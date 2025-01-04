@@ -1,15 +1,13 @@
 
-from PyQt6.QtCore import QPointF
-from PyQt6.QtGui import QPolygonF, QPen
+from PyQt6.QtGui import QPen
 
 import math
 
+from universe import Universe
 from design import Design
 from faction import Faction
-from guiprop import GuiProps
 from defines import Stance
 from colours import Pen, Brush
-from math import sqrt
 from system import SystemType
 from defines import Perks
 from ruleset import Ruleset
@@ -19,12 +17,7 @@ from guiprop import GuiProps as GP
 
 class Fleet:
 
-  arrow = QPolygonF()
-  arrow << QPointF(GuiProps.h_vector - GuiProps.dh_vector, 0)
-  arrow << QPointF(-GuiProps.dh_vector, -GuiProps.w_vector)
-  arrow << QPointF(0, 0)
-  arrow << QPointF(-GuiProps.dh_vector, GuiProps.w_vector)
-
+  Counter = dict()
 
   def getDelta(dx, dy):
     length = math.sqrt(dx * dx + dy * dy)
@@ -78,6 +71,11 @@ class Fleet:
     self.Course = None
     self.CloakingFactor = self.ComputeCloaking()
     self.setFleetNameAndIndex()
+    if self.Name in Fleet.Counter:
+      Fleet.Counter[self.Name] += 1
+    else:
+      Fleet.Counter[self.Name] = 1
+    self.id = Fleet.Counter[self.Name]
 
 
   def AddShip(self, ship):
@@ -107,11 +105,11 @@ class Fleet:
         maxrange += s.itemCount * mr * mr * mr * mr
         penrange += s.itemCount * pr * pr * pr * pr
     if maxrange > 0:
-      maxrange = sqrt(sqrt(maxrange))
+      maxrange = math.sqrt(math.sqrt(maxrange))
       if maxrange > self.MaxRange:
         self.MaxRange = maxrange
     if penrange > 0:
-      penrange = sqrt(sqrt(penrange))
+      penrange = math.sqrt(math.sqrt(penrange))
       if penrange > self.PenRange:
         self.PenRange = penrange
 
@@ -154,9 +152,12 @@ class Fleet:
           self.ShipCounter += 1
 
 
-  def getColours(self):
+  def GetColours(self, selected=False):
     if self.FriendOrFoe == Stance.allied:
-      return (QPen(Pen.blue_l), Brush.blue)
+      if selected:
+        return (QPen(Pen.blue_h), Brush.blue)
+      else:
+        return (QPen(Pen.blue_l), Brush.blue)
     elif self.FriendOrFoe == Stance.hostile:
       return (QPen(Pen.red_l), Brush.red)
     else:
@@ -177,17 +178,36 @@ class Fleet:
 
 
   def ShowCourse(self, show):
+    if self.Orbiting:
+      visible = False
+    else:
+      visible = show
     wp = self.FirstWaypoint
     while wp.segment and wp != self.NextWaypoint:
       wp.segment.setVisible(False)
       wp = wp.next
     while wp and wp.segment:
-      wp.segment.setVisible(show)
+      wp.segment.setVisible(visible)
       wp = wp.next
-    self.Course.setVisible(show)
+    self.Course.setVisible(visible)
 
 
-  def getOffset(self, wp):
+  def ColourCourse(self, selected=False):
+    pen, brush = self.GetColours(selected)
+    if self.MovingFleet:
+      self.MovingFleet.setPen(pen)
+      self.MovingFleet.setBrush(brush)
+    self.RestingFleet.setPen(pen)
+    self.RestingFleet.setBrush(brush)
+    pen.setWidthF(Universe.CurrentPathWidth)
+    wp = self.FirstWaypoint
+    while wp and wp.segment:
+      wp.segment.setPen(pen)
+      wp = wp.next
+    self.Course.setPen(pen)
+
+
+  def GetOffset(self, wp):
     dx = self.xc - wp.xo
     dy = self.yc - wp.yo
     dist = GP.Xscale * GP.c_dist * math.sqrt(dx * dx + dy * dy)

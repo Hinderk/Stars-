@@ -20,10 +20,10 @@ class Design:
         name = hull.value[1]
         if (name,fID) in self.DesignCounter:
             nr = self.DesignCounter[(name, fID)]
-            self.Name = name + ' - #' + str(nr)
+            self.Name = name + ' Mk ' + str(nr)
             self.DesignCounter[(name, fID)] = nr + 1
         else:
-            self.Name = name + ' - #1'
+            self.Name = name + ' Mk 1'
             self.DesignCounter[(name, fID)] = 1
         self.PictureIndex = hull.value[0]
         self.LatestIndex += 1

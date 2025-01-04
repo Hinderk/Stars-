@@ -30,7 +30,7 @@ def main():
 
     form = Gui(People, Rules)            # Create the main user interface
 
-    form.Buttons.UpdateMyDesigns(['Scout - #1', 'Freighter - #1', 'C'])
+    form.Buttons.UpdateMyDesigns(['Scout Mk 1', 'Freighter Mk 1', 'C'])
 
     s = System()
     s.itemCount = 1
@@ -63,7 +63,7 @@ def main():
     fleet_5 = Fleet([ship], 9)
     fleet_6 = Fleet([ship, ship], 0)
     fleet_7 = Fleet([ship, ship, ship], 0)
-    fleet_8 = Fleet([ship, ship, ship, ship], 4)
+    fleet_8 = Fleet([ship, ship, ship, ship], 0)
 
     fleet_3.Idle = False
     fleet_7.Idle = False

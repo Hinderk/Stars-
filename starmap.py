@@ -15,6 +15,7 @@ class Starmap(QGraphicsView):
 
     self.Universe = Universe(rules)
     self.setScene(self.Universe)
+    self.setMouseTracking(True)
     self.CurrentScaling = 100
     pol = QSizePolicy()
     pol.setHorizontalPolicy(pol.Policy.MinimumExpanding)
