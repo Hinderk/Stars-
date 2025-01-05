@@ -38,6 +38,7 @@ class Gui(QMainWindow):
         super(self.__class__, self).__init__()
         self.CurrentYear = rules.FirstYear()
         self.SelectedPlanet = None
+        self.SelectedFleet = None
         self.SelectedFields = []
         self.SelectedFleets = []
         self.MineFilter = Universe.SetupMineFilter()
@@ -88,7 +89,7 @@ class Gui(QMainWindow):
         self.Map.Universe.UpdatePlanet.connect(self.UpdatePlanetView)
         self.Map.Universe.UpdateFilter.connect(self.UpdateFields)
         self.ShowPlanet.clicked.connect(self.InspectPlanets)
-        self.SelectNextEnemy.clicked.connect(self.InspectEnemyFleet)
+        self.SelectNextEnemy.clicked.connect(self.InspectHostileFleet)
         self.SelectNextNeutral.clicked.connect(self.InspectNeutralFleet)
         self.SelectNextFleet.clicked.connect(self.InspectAlliedFleet)
         self.ShowFields.clicked.connect(self.InspectMines)
@@ -442,11 +443,11 @@ class Gui(QMainWindow):
                 self.SelectedObject.setText("Deep Space")
 
 
-    def InspectMineField(self, planet, index, m_list):
+    def InspectMineField(self, planet, index, m_list, f_list):
         self.SelectedFields = m_list
         self.MineIndex = index
         self.SelectedPlanet = planet
-        self.SelectedFleets = []
+        self.SelectedFleets = f_list
         self.InspectMines()
 
 
@@ -456,10 +457,11 @@ class Gui(QMainWindow):
             self.ShowFields.setVisible(False)
         else:
             self.ShowPlanet.setVisible(False)
+        if self.SelectedFleet:
+            self.SelectedFleet.ColourCourse(False)
+            self.SelectedFleet.ShowCourse(self.ShowFleetMovements)
         self.DisplayFleetIcons()
         self.ItemInfo.setCurrentIndex(1)
-        self.SelectedFleets[index].ColourCourse(False)
-        self.SelectedFleets[index].ShowCourse(self.ShowFleetMovements)
         nmax = len(self.SelectedFleets)
         n = (index + offset) % nmax
         while n < nmax:
@@ -469,6 +471,7 @@ class Gui(QMainWindow):
                 self.FleetInfo.UpdateCargo(f)
                 f.ShowCourse(True)
                 f.ColourCourse(True)
+                self.SelectedFleet = f
                 self.Map.Universe.SelectedFleet = f
                 self.Map.Universe.FleetIndex = n
                 return n
@@ -508,7 +511,7 @@ class Gui(QMainWindow):
             i += 1
 
 
-    def InspectEnemyFleet(self):
+    def InspectHostileFleet(self):
         self.HostileFleets -= 1
         self.EnemyFleetIndex = self.NextFleet(self.EnemyFleetIndex, self.EnemyFleetOffset, [Stance.hostile])
         self.HostileFleets += 1
@@ -564,6 +567,9 @@ class Gui(QMainWindow):
         else:
             self.ShowPlanet.setVisible(False)
             self.ShowFleets.setVisible(False)
+        if self.SelectedFleet:
+            self.SelectedFleet.ColourCourse(False)
+            self.SelectedFleet.ShowCourse(self.ShowFleetMovements)
         self.ShowFields.setVisible(False)
         self.ApplyMineFilter()
         if self.FilteredFields > 0:

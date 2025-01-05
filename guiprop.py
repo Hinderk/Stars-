@@ -18,7 +18,7 @@ class GuiProps:
     dh_vector = 4
     w_vector = 6
     f_radius = 4
-    f_dist = 6
+    f_dist = 8
     fp_radius = 8
     wp_radius = 3
     wp_width = 2.0
