@@ -88,6 +88,7 @@ class Gui(QMainWindow):
         self.Map.Universe.SelectPlanet.connect(self.InspectPlanet)
         self.Map.Universe.UpdatePlanet.connect(self.UpdatePlanetView)
         self.Map.Universe.UpdateFilter.connect(self.UpdateFields)
+        self.Map.Universe.UpdateRoute.connect(self.FleetInfo.UpdateInfo)
         self.ShowPlanet.clicked.connect(self.InspectPlanets)
         self.SelectNextEnemy.clicked.connect(self.InspectHostileFleet)
         self.SelectNextNeutral.clicked.connect(self.InspectNeutralFleet)
@@ -97,7 +98,6 @@ class Gui(QMainWindow):
         self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
         self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFleets)
         self.Map.Universe.HighlightPlanet(self.Map.Universe.planets[-1])
-
 
     def SetupUI(self, people, rules):
 

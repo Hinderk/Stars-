@@ -68,6 +68,8 @@ class ShipClass(Enum):
 
 
 class Task(Enum):
-    IDLE = 0
-    MOVE = 1
+    IDLE = 'None'
+    MOVE = 'Travel'
+    HAUL = 'Transport'
+    MINE = 'Mining'
         

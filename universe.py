@@ -3,6 +3,7 @@ import math
 
 from PyQt6.QtGui import QPolygonF, QPen
 from PyQt6.QtGui import QTransform
+from PyQt6.QtGui import QPainterPath
 from PyQt6.QtCore import QPointF, QLineF, QRectF, Qt
 from PyQt6.QtWidgets import QMenu
 from PyQt6.QtWidgets import QGraphicsScene
@@ -27,6 +28,7 @@ class Universe(QGraphicsScene):
   SelectPlanet = QSignal(Planet)
   UpdatePlanet = QSignal(Planet)
   UpdateFilter = QSignal(dict)
+  UpdateRoute = QSignal(int, object)
   SelectFleet = QSignal(object, int, list, list)
   SelectField = QSignal(object, int, list, list)
 
@@ -117,6 +119,21 @@ class Universe(QGraphicsScene):
     key = keyPress.key()
     if key == Qt.Key.Key_Shift:
       self.MovementApproved = True
+    elif key == Qt.Key.Key_Delete:
+      if self.WaypointSelected:
+        wp = self.SelectedFleet.DeleteWaypoint(self.SelectedWaypoint[1])
+        if wp:
+          dx = wp.xo - self.SelectedFleet.xc
+          dy = wp.yo - self.SelectedFleet.yc
+          self.SelectedFleet.Heading = math.atan2(dy, dx)
+        else:
+          self.SelectedFleet.WarpSpeed = 0
+          self.removeItem(self.SelectedFleet.MovingFleet)
+          self.SelectedFleet.MovingFleet = None
+        self.PlotCourse(self.SelectedFleet, True)
+        self.WaypointSelected = False
+        self.wpselect.setVisible(False)
+        
 
 
   def keyReleaseEvent(self, keyPress):
@@ -133,6 +150,7 @@ class Universe(QGraphicsScene):
       p = self.Context[0]
       a = Select.addAction(p.Name)
       a.setData((0, 0))
+      n = 1
       if p.fleets_in_orbit:
         Select.addSeparator()
         n = 0
@@ -190,7 +208,8 @@ class Universe(QGraphicsScene):
       elif itemtype == 3:
         self.HighlightFleet(item)
       elif itemtype == 4:
-        self.HighlightFleet(self.FleetIndex)
+        self.FleetOffset = 0
+        self.HighlightFleet()
         self.SelectField.emit(None, item, fields, self.Context[2])
       elif itemtype == 5:
         self.HighlightMinefield(item)
@@ -226,25 +245,20 @@ class Universe(QGraphicsScene):
 
   def mouseMoveEvent(self, event):
     if self.WaypointSelected and self.MovementApproved:
-      p0 = event.scenePos()
       w0 = self.SelectedWaypoint[0]
-      wp = w0.previous
+      f0 = self.SelectedFleet
+      p0 = event.scenePos()
       w0.xo = round(0.5 + p0.x() / GP.Xscale)
       w0.yo = round(0.5 + p0.y() / GP.Xscale)
+      f0.UpdateCourse(w0, self.planets)
       p0 = QPointF(GP.Xscale * w0.xo, GP.Xscale * w0.yo)
-      if wp:
-        s0 = wp.segment.line()
-        s0.setP2(p0)
-        wp.segment.setLine(s0)
-      if w0.segment:
-        s1 = w0.segment.line()
-        s1.setP1(p0)
-        w0.segment.setLine(s1)
-      f = self.SelectedFleet
-      if f.NextWaypoint == w0:
-        f.Heading = math.atan2(w0.yo - f.yc, w0.xo - f.xc)
-        f.UpdateShipCount()
-        self.PlotCourse(f, True)
+      if f0.NextWaypoint == w0:
+        f0.Heading = math.atan2(w0.yo - f0.yc, w0.xo - f0.xc)
+        f0.UpdateShipCount()
+        self.UpdateRoute.emit(f0.WarpSpeed, w0)
+      else:
+        self.UpdateRoute.emit(f0.WarpSpeed, None)
+      self.PlotCourse(f0, True)
       self.wpselect.setPos(p0)
 
 
@@ -269,7 +283,7 @@ class Universe(QGraphicsScene):
           f_list.append(f)
         if f.FriendOrFoe == Stance.allied:
           if self.ShowFleetMovements or f == self.SelectedFleet:
-            wp = f.FirstWaypoint
+            wp = f.NextWaypoint
             n = 0
             while wp:
               n += 1
@@ -614,7 +628,6 @@ class Universe(QGraphicsScene):
     w = GP.f_radius + GP.f_radius
     fleet.RestingFleet = self.addEllipse(-GP.f_radius, -GP.f_radius, w, w)
     fleet.RestingFleet.setVisible(False)
-    fleet.Course = self.addLine(0, 0, 0, 1)
     if y:
       xo = p
       yo = y
@@ -637,34 +650,15 @@ class Universe(QGraphicsScene):
   def addWaypoint(self, fleet, x, y, index=0):
     wa = Waypoint(x, y)
     if fleet.FirstWaypoint:
-      xa = GP.Xscale * wa.xo
-      ya = GP.Xscale * wa.yo
-      if fleet.FriendOrFoe == Stance.allied:
-        pen = QPen(Pen.blue_l)
-        pen.setWidthF(self.CurrentPathWidth)
-      else:
-        pen = None
       w0 = fleet.ActiveWaypoint[index]
-      x0 = GP.Xscale * w0.xo
-      y0 = GP.Xscale * w0.yo
       wa.warp = w0.warp
       if w0.next:
         wa.task = Task.MOVE
-        if w0.segment:
-          self.removeItem(w0.segment)
-          w0.segment = None
         w1 = w0.next
-        x1 = GP.Xscale * w1.xo
-        y1 = GP.Xscale * w1.yo
         w1.previous = wa
         wa.next = w1
         if w1 == fleet.NextWaypoint:
           fleet.NextWaypoint = wa
-        if pen:
-          line = QLineF(xa, ya, x1, y1)
-          wa.segment = self.addLine(line)
-          wa.segment.setPen(pen)
-          wa.segment.setZValue(-1)
       elif fleet.NextWaypoint:
         fleet.LastWaypoint = wa
       else:
@@ -672,11 +666,6 @@ class Universe(QGraphicsScene):
         fleet.LastWaypoint = wa
       w0.next = wa
       wa.previous = w0
-      if pen:
-        line = QLineF(x0, y0, xa, ya)
-        w0.segment = self.addLine(line)
-        w0.segment.setPen(pen)
-        w0.segment.setZValue(-1)
     else:
       fleet.FirstWaypoint = wa
       fleet.LastWaypoint = wa
@@ -901,13 +890,10 @@ class Universe(QGraphicsScene):
 
   def ResizeFlightPaths(self, width):
     for f in self.fleets:
-      pen = f.Course.pen()
-      pen.setWidthF(width)
-      wp = f.FirstWaypoint
-      while wp and wp.segment:
-        wp.segment.setPen(pen)
-        wp = wp.next
-      f.Course.setPen(pen)
+      if f.Course:
+        pen = f.Course.pen()
+        pen.setWidthF(width)
+        f.Course.setPen(pen)
     Universe.CurrentPathWidth = width
 
 
@@ -915,6 +901,9 @@ class Universe(QGraphicsScene):
     pen, brush = f.GetColours(selected)
     x0 = GP.Xscale * f.xc
     y0 = GP.Xscale * f.yc
+    if f.Course:
+      self.removeItem(f.Course)
+    f.Course = None
     if f.WarpSpeed > 0:
       if f.MovingFleet:
         self.removeItem(f.MovingFleet)
@@ -927,13 +916,22 @@ class Universe(QGraphicsScene):
       f.RestingFleet.setPen(pen)
       f.RestingFleet.setBrush(brush)
       f.RestingFleet.setVisible(True)
-    wp = f.NextWaypoint
-    if wp and f.FriendOrFoe == Stance.allied:
-      dx, dy = f.GetOffset(wp)
-      x0 += dx
-      y0 += dy
-      x1 = GP.Xscale * wp.xo
-      y1 = GP.Xscale * wp.yo
+    pen.setWidthF(self.CurrentPathWidth)
+    if f.FriendOrFoe == Stance.allied:
+      path = QPainterPath()
+      render = False
+      a = f.FirstWaypoint
+      b = a.next
+      while b:
+        if render or a.retain:
+          f.ExtendPath(path, a.xo, a.yo, b)
+        elif b == f.NextWaypoint:
+          render = True
+          f.ExtendPath(path, f.xc, f.yc, b)
+        a = b
+        b = b.next
+      if f.NextWaypoint:
+        f.Course = self.addPath(path, pen)
     elif f.WarpSpeed > 0:
       length = f.WarpSpeed * f.WarpSpeed * GP.Xscale
       dist = GP.c_dist * length
@@ -945,16 +943,8 @@ class Universe(QGraphicsScene):
       y1 = y0 + dy
       x0 += dx * dist / length
       y0 += dy * dist / length
-    else:
-      x1 = x0
-      y1 = y0
-    pen.setWidthF(self.CurrentPathWidth)
-    wp = f.FirstWaypoint
-    while wp and wp.segment:
-      wp.segment.setPen(pen)
-      wp = wp.next
-    f.Course.setPen(pen)
-    f.Course.setLine(x0, y0, x1, y1)
+      f.Course = self.addLine(x0, y0, x1, y1)
+      f.Course.setPen(pen)
 
 
   def ComputeTurn(self):

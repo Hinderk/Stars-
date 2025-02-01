@@ -1,12 +1,13 @@
 
-from PyQt6.QtGui import QPen
+from PyQt6.QtGui import QPen, QPolygonF
+from PyQt6.QtCore import QPointF
 
 import math
 
 from universe import Universe
 from design import Design
 from faction import Faction
-from defines import Stance
+from defines import Stance, Task
 from colours import Pen, Brush
 from system import SystemType
 from defines import Perks
@@ -41,6 +42,7 @@ class Fleet:
     self.MineFields = []
     self.RepeatSchedule = False
     self.Idle = True
+    self.Task = Task.IDLE
     self.Discovered = True           # TODO: Depends on scanners!
     self.Orbiting = None
     self.TotalWeight = 0
@@ -178,41 +180,104 @@ class Fleet:
 
 
   def ShowCourse(self, show):
-    if self.Orbiting:
-      visible = False
-    else:
-      visible = show
-    wp = self.FirstWaypoint
-    while wp.segment and wp != self.NextWaypoint:
-      wp.segment.setVisible(False)
-      wp = wp.next
-    while wp and wp.segment:
-      wp.segment.setVisible(visible)
-      wp = wp.next
-    self.Course.setVisible(visible)
+    if self.Course:
+      self.Course.setVisible(show)
 
 
   def ColourCourse(self, selected=False):
     pen, brush = self.GetColours(selected)
+    z = 1
+    if selected:
+      z = 2
     if self.MovingFleet:
       self.MovingFleet.setPen(pen)
       self.MovingFleet.setBrush(brush)
+      self.MovingFleet.setZValue(z)
     self.RestingFleet.setPen(pen)
     self.RestingFleet.setBrush(brush)
-    pen.setWidthF(Universe.CurrentPathWidth)
+    if self.Course:
+      pen.setWidthF(Universe.CurrentPathWidth)
+      self.Course.setPen(pen)
+      self.Course.setZValue(z)
+    self.RestingFleet.setZValue(z)
+
+    
+  def ExtendPath(self, path, xc, yc, b):
+    dx = GP.Xscale * (b.xo - xc)
+    dy = GP.Xscale * (b.yo - yc)
+    d2 = float(dx * dx + dy * dy)
+    if d2 > 0.0:
+      fx = GP.Xscale * (xc - self.xc)
+      fy = GP.Xscale * (yc - self.yc)
+      p = (fx * dx + fy * dy) / d2
+      q2 = (fx * fx + fy * fy) / d2
+      r2 = GP.fleet_halo * GP.fleet_halo / d2
+      s2 = r2 + p * p - q2
+      if s2 > 0.0:
+        s = math.sqrt(s2)
+        sm = -s - p
+        sp = s - p
+        x = GP.Xscale * xc
+        y = GP.Xscale * yc
+        if sm < 0.0:
+          if 0.0 < sp:
+            if sp < 1.0:
+              path.moveTo(x + sp * dx, y + sp * dy)
+            else:
+              path.moveTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
+              return
+        elif sm < 1.0:
+          path.lineTo(x + sm * dx, y + sm * dy)
+          if sp < 1.0:
+            path.moveTo(x + sp * dx, y + sp * dy)
+          else:
+            path.moveTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
+            return
+      path.lineTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
+
+
+  def UpdateCourse(self, wp, planets):
+    wp.planet = None
+    for p in planets:
+      d = (p.x - wp.xo) * (p.x - wp.xo) + (p.y - wp.yo) * (p.y - wp.yo)
+      if d < GP.p_snap:
+        wp.xo = p.x
+        wp.yo = p.y
+        wp.planet = p
+        return
+
+
+  def RepeatTasks(self, repeat):
     wp = self.FirstWaypoint
-    while wp and wp.segment:
-      wp.segment.setPen(pen)
+    while not wp.at(self.LastWaypoint):
+      wp.retain = False
       wp = wp.next
-    self.Course.setPen(pen)
+    while wp:
+      wp.retain = repeat
+      wp = wp.next
+    self.RepeatTasks = repeat
 
 
-  def GetOffset(self, wp):
-    dx = self.xc - wp.xo
-    dy = self.yc - wp.yo
-    dist = GP.Xscale * GP.c_dist * math.sqrt(dx * dx + dy * dy)
-    if dist > GP.max_dist:
-      dist = GP.max_dist
-    dx = dist * math.cos(self.Heading)
-    dy = dist * math.sin(self.Heading)
-    return dx, dy
+  def DeleteWaypoint(self, n0):
+    wp = None
+    wo = self.FirstWaypoint
+    wn = wo.next
+    n = 0
+    while wn and n < n0:
+      n += 1
+      wp = wo
+      wo = wn
+      wn = wn.next
+    if n > 0:
+      if wp:
+        wp.next = wn
+      else:
+        self.FirstWaypoint = wn
+      if wn:
+        wn.previous = wp
+      else:
+        self.LastWaypoint = wp
+      if wo == self.NextWaypoint:
+        self.NextWaypoint = wp.next
+      del(wo)
+    return self.NextWaypoint

@@ -49,6 +49,8 @@ def main():
     ship.Cloaking = 700
     ship.Fuel = 130
     ship.TotalFuel = 150
+    ship.MineLaying = 0
+    ship.MineSweeping = 1
     ship.Name = "Explorer"
 
     fleet_0 = Fleet([ship], 4)
@@ -95,6 +97,8 @@ def main():
     form.Map.Universe.addWaypoint(fleet_8, 280, 450)
     form.Map.Universe.addWaypoint(fleet_8, 280, 600)
     form.Map.Universe.addWaypoint(fleet_8, 600, 600)
+    form.Map.Universe.addWaypoint(fleet_8, 500, 550)
+    form.Map.Universe.addWaypoint(fleet_8, 140, -150)
 
     form.Map.Universe.planets[0].BuildStarbase()
     form.Map.Universe.planets[0].Relation = Stance.neutral
@@ -126,6 +130,8 @@ def main():
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 64000, M.Normal, -1))
 
     fleet_7.WarpSpeed = 4
+    fleet_8.RepeatSchedule = True
+#    fleet_8.NextWaypoint = fleet_8.FirstWaypoint.next.next
     form.Map.Universe.ComputeTurn()
 
     for p in form.Map.Universe.planets:

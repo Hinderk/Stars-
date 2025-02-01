@@ -67,7 +67,7 @@ class Minefield:
       self.area = scene.addEllipse(box, Pen.red_m, Brush.red_m)
       self.area.setZValue(-4)
       self.center = scene.addPolygon(self.caret, Pen.noshow, Brush.red)
-    self.center.setZValue(2)
+    self.center.setZValue(4)
     self.center.setPos(x, y)
     self.area.setVisible(False)
     self.center.setVisible(False)
