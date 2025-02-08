@@ -203,37 +203,38 @@ class Fleet:
 
     
   def ExtendPath(self, path, xc, yc, b):
-    dx = GP.Xscale * (b.xo - xc)
-    dy = GP.Xscale * (b.yo - yc)
-    d2 = float(dx * dx + dy * dy)
-    if d2 > 0.0:
-      fx = GP.Xscale * (xc - self.xc)
-      fy = GP.Xscale * (yc - self.yc)
-      p = (fx * dx + fy * dy) / d2
-      q2 = (fx * fx + fy * fy) / d2
-      r2 = GP.fleet_halo * GP.fleet_halo / d2
-      s2 = r2 + p * p - q2
-      if s2 > 0.0:
-        s = math.sqrt(s2)
-        sm = -s - p
-        sp = s - p
-        x = GP.Xscale * xc
-        y = GP.Xscale * yc
-        if sm < 0.0:
-          if 0.0 < sp:
+    if b:
+      dx = GP.Xscale * (b.xo - xc)
+      dy = GP.Xscale * (b.yo - yc)
+      d2 = float(dx * dx + dy * dy)
+      if d2 > 0.0:
+        fx = GP.Xscale * (xc - self.xc)
+        fy = GP.Xscale * (yc - self.yc)
+        p = (fx * dx + fy * dy) / d2
+        q2 = (fx * fx + fy * fy) / d2
+        r2 = GP.fleet_halo * GP.fleet_halo / d2
+        s2 = r2 + p * p - q2
+        if s2 > 0.0:
+          s = math.sqrt(s2)
+          sm = -s - p
+          sp = s - p
+          x = GP.Xscale * xc
+          y = GP.Xscale * yc
+          if sm < 0.0:
+            if 0.0 < sp:
+              if sp < 1.0:
+                path.moveTo(x + sp * dx, y + sp * dy)
+              else:
+                path.moveTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
+                return
+          elif sm < 1.0:
+            path.lineTo(x + sm * dx, y + sm * dy)
             if sp < 1.0:
               path.moveTo(x + sp * dx, y + sp * dy)
             else:
               path.moveTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
               return
-        elif sm < 1.0:
-          path.lineTo(x + sm * dx, y + sm * dy)
-          if sp < 1.0:
-            path.moveTo(x + sp * dx, y + sp * dy)
-          else:
-            path.moveTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
-            return
-      path.lineTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
+        path.lineTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
 
 
   def UpdateCourse(self, wp, planets):
@@ -247,37 +248,72 @@ class Fleet:
         return
 
 
-  def RepeatTasks(self, repeat):
+  def ClearWaypoints(self):
     wp = self.FirstWaypoint
-    while not wp.at(self.LastWaypoint):
-      wp.retain = False
-      wp = wp.next
     while wp:
-      wp.retain = repeat
+      wo = wp
       wp = wp.next
-    self.RepeatTasks = repeat
+      del(wo)
+    self.FirstWaypoint = None
+    self.NextWaypoint = None
+    self.LastWaypoint = None
+
+
+  def RepeatTasks(self, repeat):
+    state = False
+    wp = self.FirstWaypoint
+    while wp:
+      if wp.next and wp.at(self.LastWaypoint):
+        state = repeat
+      wp.retain = state
+      wp = wp.next
+    self.RepeatSchedule = state
+    return state
+
+
+  def UpdateSchedule(self):
+    return self.RepeatTasks(self.RepeatSchedule)
 
 
   def DeleteWaypoint(self, n0):
     wp = None
     wo = self.FirstWaypoint
     wn = wo.next
-    n = 0
+    n = 1
     while wn and n < n0:
       n += 1
       wp = wo
       wo = wn
       wn = wn.next
-    if n > 0:
-      if wp:
-        wp.next = wn
-      else:
-        self.FirstWaypoint = wn
-      if wn:
-        wn.previous = wp
-      else:
-        self.LastWaypoint = wp
-      if wo == self.NextWaypoint:
-        self.NextWaypoint = wp.next
-      del(wo)
+    if wp:
+      wp.next = wn
+    else:
+      self.FirstWaypoint = wn
+    if wn:
+      wn.previous = wp
+    else:
+      self.LastWaypoint = wp
+    if wo == self.NextWaypoint:
+      self.NextWaypoint = wn
+    del(wo)
+    return self.FindNextWaypoint()
+
+
+  def FindNextWaypoint(self):  # FIX ME!!  -- Check for planets?
+    wn = self.NextWaypoint
+    if wn and self.xc == wn.xo and self.yc == wn.yo:
+      self.WarpSpeed = wn.warp
+      self.Task = wn.task
+      self.NextWaypoint = wn.next
+    wp = self.FirstWaypoint
+    if wp and wp is not self.NextWaypoint:
+      if not wp.retain:
+        wo = wp
+        wp = wp.next
+        del(wo)
+    if wp:
+      wp.previous = None
+    else:
+      self.LastWaypoint = None
+    self.FirstWaypoint = wp
     return self.NextWaypoint

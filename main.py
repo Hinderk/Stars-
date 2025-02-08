@@ -99,6 +99,7 @@ def main():
     form.Map.Universe.addWaypoint(fleet_8, 600, 600)
     form.Map.Universe.addWaypoint(fleet_8, 500, 550)
     form.Map.Universe.addWaypoint(fleet_8, 140, -150)
+    form.Map.Universe.addWaypoint(fleet_8, -120, 600)
 
     form.Map.Universe.planets[0].BuildStarbase()
     form.Map.Universe.planets[0].Relation = Stance.neutral
@@ -130,8 +131,7 @@ def main():
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 64000, M.Normal, -1))
 
     fleet_7.WarpSpeed = 4
-    fleet_8.RepeatSchedule = True
-#    fleet_8.NextWaypoint = fleet_8.FirstWaypoint.next.next
+    fleet_8.RepeatTasks(True)
     form.Map.Universe.ComputeTurn()
 
     for p in form.Map.Universe.planets:
