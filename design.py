@@ -11,10 +11,11 @@ class Design:
     def getDesign(index):
         return Design.HullDesign.get(index)
 
+    # fID : foe identifier ...
 
     def __init__(self, fID, hull):
         self.fID = fID
-        self.Index = 32 * self.LatestIndex + fID
+        self.Index = (fID, self.LatestIndex)
         self.Hull = hull
         self.System = []
         name = hull.value[1]

@@ -30,7 +30,7 @@ def main():
 
     form = Gui(People, Rules)            # Create the main user interface
 
-    form.Buttons.UpdateMyDesigns(['Scout Mk 1', 'Freighter Mk 1', 'C'])
+    form.Buttons.UpdateMyDesigns(['Scout Mk 1', 'Small Freighter Mk 1', 'C'])
 
     s = System()
     s.itemCount = 1
@@ -57,14 +57,26 @@ def main():
     fleet_1 = Fleet([ship], 2)
     fleet_2 = Fleet([ship], 0)
 
-    ship.Name = "Hauler"
-    ship.Type = "Freighter"
+    freighter = Ship(Design(0, Hull.SFR))
+    freighter.EmptyWeight = 20
+    freighter.TotalWeight = 100
+    freighter.CargoSpace = 500
+    freighter.Settlers = 100
+    freighter.Boranium = 20
+    freighter.Germanium = 10
+    freighter.Ironium = 30
+    freighter.Cloaking = 0
+    freighter.Fuel = 300
+    freighter.TotalFuel = 1000
+    freighter.MineLaying = 10
+    freighter.MineSweeping = 0
+    freighter.Name = "Hauler"
 
     fleet_3 = Fleet([ship, ship, ship], 1)
     fleet_4 = Fleet([ship], 3)
     fleet_5 = Fleet([ship], 9)
-    fleet_6 = Fleet([ship, ship], 0)
-    fleet_7 = Fleet([ship, ship, ship], 0)
+    fleet_6 = Fleet([freighter, freighter], 0)
+    fleet_7 = Fleet([freighter, freighter, freighter], 9)
     fleet_8 = Fleet([ship, ship, ship, ship], 0)
 
     fleet_3.Idle = False
@@ -130,7 +142,7 @@ def main():
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 10, y + 50, 25000, M.Normal, 0))
     form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 64000, M.Normal, -1))
 
-    fleet_7.WarpSpeed = 4
+    fleet_7.WarpSpeed = 10
     fleet_8.RepeatTasks(True)
     form.Map.Universe.ComputeTurn()
 

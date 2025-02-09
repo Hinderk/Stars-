@@ -429,28 +429,28 @@ class Universe(QGraphicsScene):
         sval = [(0.0, -1), (1.0, 1)]
         r2 = GP.fleet_halo * GP.fleet_halo / d2
         for f in self.fleets:
-          fx = GP.Xscale * (xc - f.xc)
-          fy = GP.Xscale * (yc - f.yc)
-          p = (fx * dx + fy * dy) / d2
-          q2 = (fx * fx + fy * fy) / d2
-          s2 = r2 + p * p - q2
-          if s2 > 0.0:
-            s = math.sqrt(s2)
-            sm = -s - p
-            sp = s - p
-            if 0.0 < sp or sm < 1.0:
-              sval.append((sm, 1))
-              sval.append((sp, -1))
+          if f.Discovered and f.ShipCounter > 0 and not f.Orbiting:
+            fx = GP.Xscale * (xc - f.xc)
+            fy = GP.Xscale * (yc - f.yc)
+            p = (fx * dx + fy * dy) / d2
+            q2 = (fx * fx + fy * fy) / d2
+            s2 = r2 + p * p - q2
+            if s2 > 0.0:
+              s = math.sqrt(s2)
+              sm = -s - p
+              sp = s - p
+              if 0.0 < sp or sm < 1.0:
+                sval.append((sm, 1))
+                sval.append((sp, -1))
         sval.sort(key=lambda p: p[0])
         s = 1
         x = GP.Xscale * xc
         y = GP.Xscale * yc
-        for sp in sval:
-          s += sp[1]
-          so = sp[0]
+        for (so, ds) in sval:
+          s += ds
           if s < 1:
             path.moveTo(x + so * dx, y + so * dy)
-          elif s < 2 and sp[1] > 0:
+          elif s < 2 and ds > 0:
             path.lineTo(x + so * dx, y + so * dy)
 
 
