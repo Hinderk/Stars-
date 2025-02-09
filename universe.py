@@ -420,6 +420,40 @@ class Universe(QGraphicsScene):
     self.SelectFleet.emit(None, index, self.SelectedFleets, [])
 
 
+  def SegmentPath(self, path, xc, yc, b):
+    if b:
+      dx = GP.Xscale * (b.xo - xc)
+      dy = GP.Xscale * (b.yo - yc)
+      d2 = float(dx * dx + dy * dy)
+      if d2 > 0.0:
+        sval = [(0.0, -1), (1.0, 1)]
+        r2 = GP.fleet_halo * GP.fleet_halo / d2
+        for f in self.fleets:
+          fx = GP.Xscale * (xc - f.xc)
+          fy = GP.Xscale * (yc - f.yc)
+          p = (fx * dx + fy * dy) / d2
+          q2 = (fx * fx + fy * fy) / d2
+          s2 = r2 + p * p - q2
+          if s2 > 0.0:
+            s = math.sqrt(s2)
+            sm = -s - p
+            sp = s - p
+            if 0.0 < sp or sm < 1.0:
+              sval.append((sm, 1))
+              sval.append((sp, -1))
+        sval.sort(key=lambda p: p[0])
+        s = 1
+        x = GP.Xscale * xc
+        y = GP.Xscale * yc
+        for sp in sval:
+          s += sp[1]
+          so = sp[0]
+          if s < 1:
+            path.moveTo(x + so * dx, y + so * dy)
+          elif s < 2 and sp[1] > 0:
+            path.lineTo(x + so * dx, y + so * dy)
+
+
   def ShowMines(self, switch, fof):
     self.ShowField[fof] = switch
     if self.FieldsVisible:
@@ -638,7 +672,6 @@ class Universe(QGraphicsScene):
     else:
       xo = p.x
       yo = p.y
-#    self.addWaypoint(fleet, xo, yo)
     if fleet.FriendOrFoe == Stance.allied and fleet.MaxRange > 0:
       fleet.scanner = self.CreateScanner(xo, yo, fleet.MaxRange, fleet.PenRange)
     fleet.ShipCount = self.CreateOrbitLabel(0, 0)
@@ -936,9 +969,9 @@ class Universe(QGraphicsScene):
       while a:
         if a == f.NextWaypoint:
           render = True
-          f.ExtendPath(path, f.xc, f.yc, a)
+          self.SegmentPath(path, f.xc, f.yc, a)
         if render or a.retain:
-          f.ExtendPath(path, a.xo, a.yo, a.next)
+          self.SegmentPath(path, a.xo, a.yo, a.next)
         a = a.next
       if f.NextWaypoint:
         f.Course = self.addPath(path)

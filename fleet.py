@@ -201,41 +201,6 @@ class Fleet:
       self.Course.setZValue(z)
     self.RestingFleet.setZValue(z)
 
-    
-  def ExtendPath(self, path, xc, yc, b):
-    if b:
-      dx = GP.Xscale * (b.xo - xc)
-      dy = GP.Xscale * (b.yo - yc)
-      d2 = float(dx * dx + dy * dy)
-      if d2 > 0.0:
-        fx = GP.Xscale * (xc - self.xc)
-        fy = GP.Xscale * (yc - self.yc)
-        p = (fx * dx + fy * dy) / d2
-        q2 = (fx * fx + fy * fy) / d2
-        r2 = GP.fleet_halo * GP.fleet_halo / d2
-        s2 = r2 + p * p - q2
-        if s2 > 0.0:
-          s = math.sqrt(s2)
-          sm = -s - p
-          sp = s - p
-          x = GP.Xscale * xc
-          y = GP.Xscale * yc
-          if sm < 0.0:
-            if 0.0 < sp:
-              if sp < 1.0:
-                path.moveTo(x + sp * dx, y + sp * dy)
-              else:
-                path.moveTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
-                return
-          elif sm < 1.0:
-            path.lineTo(x + sm * dx, y + sm * dy)
-            if sp < 1.0:
-              path.moveTo(x + sp * dx, y + sp * dy)
-            else:
-              path.moveTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
-              return
-        path.lineTo(GP.Xscale * b.xo, GP.Xscale * b.yo)
-
 
   def UpdateCourse(self, wp, planets):
     wp.planet = None
