@@ -134,6 +134,69 @@ class GuiDesign:
 
          """
 
+    Style_2 = """
+
+             QPushButton {
+                 padding: 5px 10px 10px 10px;
+                 font-size: 16pt;
+                 font-style: oblique;
+                 font-weight: 400;
+                 border: 1.5px solid rgb(120,120,120);
+                 border-radius: 6px;
+                 background-color: white;
+             }
+
+             QLabel {
+                 padding: 5px 10px 5px 10px;
+                 font-size: 18pt;
+                 font-weight: 600;
+                 background-color: transparent;
+             }
+
+             QRadioButton {
+                 padding: 5px 10px 5px 10px;
+                 font-size: 16pt;
+                 font-style: oblique;
+                 font-weight: 400;
+             }
+
+             QGroupBox {
+                 background: rgb(243,243,243);
+                 color: black;
+                 font-style: oblique;
+                 font-size: 20pt;
+                 font-weight: 400;
+             }
+
+             QComboBox {
+                 padding: 5px 0px 10px 20px;
+                 font-size: 22px;
+                 font-style: oblique;
+                 font-weight: 400;
+                 border: 1.5px solid rgb(120,120,120);
+                 border-radius: 6px;
+                 background-color: white;
+             }
+
+             QComboBox::drop-down {
+                 subcontrol-origin: padding;
+                 subcontrol-position: top right;
+                 width: 25px;
+                 border-left-width: 1px;
+                 border-left-color: darkgray;
+                 border-left-style: solid;
+                 border-top-right-radius: 6px;
+                 border-bottom-right-radius: 6px;
+             }
+             
+             QComboBox::down-arrow {
+                 image: url(:/Icons/Select);
+                 width: 20px;
+                 height: 20px;
+             }
+
+         """
+
 
     def getGuiStyle(select=0):
         return GuiDesign.Style_0
@@ -141,6 +204,10 @@ class GuiDesign:
 
     def getMapStyle(select=0):
         return GuiDesign.Style_1
+
+
+    def getSetupStyle(select=0):
+        return GuiDesign.Style_2
 
 
     def getSize():

@@ -17,6 +17,7 @@ from fleetdata import Fleetdata
 from minedata import Minedata
 from starmap import Starmap
 from universe import Universe
+from newgame import NewGame
 
 
 
@@ -97,6 +98,7 @@ class Gui(QMainWindow):
         self.ShowFleets.clicked.connect(self.InspectFleets)
         self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
         self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFleets)
+        self.Menu.actionNewGame.triggered.connect(self.NewGame.Launch)
         self.Map.Universe.HighlightPlanet(self.Map.Universe.planets[-1])
 
     def SetupUI(self, people, rules):
@@ -110,6 +112,8 @@ class Gui(QMainWindow):
         self.CentralWidget = QWidget(self)
         self.setCentralWidget(self.CentralWidget)
         self.CentralWidget.setMinimumSize(sx, sy)
+
+        self.NewGame = NewGame(people, rules)
 
         LeftSide = QWidget()
         LeftSide.setMinimumWidth(875)        # Minimal feasible value ...
@@ -643,4 +647,3 @@ class Gui(QMainWindow):
     def AddWaypoints(self, event):
         self.WaypointMode = event
         self.Map.Universe.SetWaypointMode(event)
-

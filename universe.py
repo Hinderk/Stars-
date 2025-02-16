@@ -420,38 +420,37 @@ class Universe(QGraphicsScene):
     self.SelectFleet.emit(None, index, self.SelectedFleets, [])
 
 
-  def SegmentPath(self, path, xc, yc, b):
-    if b:
-      dx = GP.Xscale * (b.xo - xc)
-      dy = GP.Xscale * (b.yo - yc)
-      d2 = float(dx * dx + dy * dy)
-      if d2 > 0.0:
-        sval = [(0.0, -1), (1.0, 1)]
-        r2 = GP.fleet_halo * GP.fleet_halo / d2
-        for f in self.fleets:
-          if f.Discovered and f.ShipCounter > 0 and not f.Orbiting:
-            fx = GP.Xscale * (xc - f.xc)
-            fy = GP.Xscale * (yc - f.yc)
-            p = (fx * dx + fy * dy) / d2
-            q2 = (fx * fx + fy * fy) / d2
-            s2 = r2 + p * p - q2
-            if s2 > 0.0:
-              s = math.sqrt(s2)
-              sm = -s - p
-              sp = s - p
-              if 0.0 < sp or sm < 1.0:
-                sval.append((sm, 1))
-                sval.append((sp, -1))
-        sval.sort(key=lambda p: p[0])
-        s = 1
-        x = GP.Xscale * xc
-        y = GP.Xscale * yc
-        for (so, ds) in sval:
-          s += ds
-          if s < 1:
-            path.moveTo(x + so * dx, y + so * dy)
-          elif s < 2 and ds > 0:
-            path.lineTo(x + so * dx, y + so * dy)
+  def SegmentPath(self, path, xa, ya, xb, yb):
+    dx = GP.Xscale * (xb - xa)
+    dy = GP.Xscale * (yb - ya)
+    d2 = float(dx * dx + dy * dy)
+    if d2 > 0.0:
+      sval = [(0.0, -1), (1.0, 1)]
+      r2 = GP.fleet_halo * GP.fleet_halo / d2
+      for f in self.fleets:
+        if f.Discovered and f.ShipCounter > 0 and not f.Orbiting:
+          fx = GP.Xscale * (xa - f.xc)
+          fy = GP.Xscale * (ya - f.yc)
+          p = (fx * dx + fy * dy) / d2
+          q2 = (fx * fx + fy * fy) / d2
+          s2 = r2 + p * p - q2
+          if s2 > 0.0:
+            s = math.sqrt(s2)
+            sm = -s - p
+            sp = s - p
+            if 0.0 < sp or sm < 1.0:
+              sval.append((sm, 1))
+              sval.append((sp, -1))
+      sval.sort(key=lambda p: p[0])
+      s = 1
+      x = GP.Xscale * xa
+      y = GP.Xscale * ya
+      for (so, ds) in sval:
+        s += ds
+        if s < 1:
+          path.moveTo(x + so * dx, y + so * dy)
+        elif s < 2 and ds > 0:
+          path.lineTo(x + so * dx, y + so * dy)
 
 
   def ShowMines(self, switch, fof):
@@ -951,7 +950,6 @@ class Universe(QGraphicsScene):
     y0 = GP.Xscale * f.yc
     if f.Course:
       self.removeItem(f.Course)
-    f.Course = None
     if f.WarpSpeed > 0:
       if f.MovingFleet:
         self.removeItem(f.MovingFleet)
@@ -962,6 +960,7 @@ class Universe(QGraphicsScene):
     else:
       f.RestingFleet.setPos(x0, y0)
       f.RestingFleet.setVisible(True)
+    f.Course = None
     if f.FriendOrFoe == Stance.allied:
       path = QPainterPath()
       render = False
@@ -969,24 +968,19 @@ class Universe(QGraphicsScene):
       while a:
         if a == f.NextWaypoint:
           render = True
-          self.SegmentPath(path, f.xc, f.yc, a)
-        if render or a.retain:
-          self.SegmentPath(path, a.xo, a.yo, a.next)
+          self.SegmentPath(path, f.xc, f.yc, a.xo, a.yo)
+        if (render or a.retain) and a.next:
+          self.SegmentPath(path, a.xo, a.yo, a.next.xo, a.next.yo)
         a = a.next
       if f.NextWaypoint:
         f.Course = self.addPath(path)
     elif f.WarpSpeed > 0:
-      length = f.WarpSpeed * f.WarpSpeed * GP.Xscale
-      dist = GP.c_dist * length
-      if dist > GP.max_dist:
-        dist = GP.max_dist
+      path = QPainterPath()
+      length = f.WarpSpeed * f.WarpSpeed * GP.time_horizon
       dx = length * math.cos(f.Heading)
       dy = length * math.sin(f.Heading)
-      x1 = x0 + dx
-      y1 = y0 + dy
-      x0 += dx * dist / length
-      y0 += dy * dist / length
-      f.Course = self.addLine(x0, y0, x1, y1)
+      self.SegmentPath(path, f.xc, f.yc, f.xc + dx, f.yc + dy)
+      f.Course = self.addPath(path)
 
 
   def ComputeTurn(self):

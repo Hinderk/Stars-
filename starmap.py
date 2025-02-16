@@ -1,4 +1,5 @@
 
+from PyQt6.QtGui import QPainter
 from PyQt6.QtWidgets import QGraphicsView
 from PyQt6.QtWidgets import QSizePolicy
 
@@ -16,6 +17,8 @@ class Starmap(QGraphicsView):
     self.Universe = Universe(rules)
     self.setScene(self.Universe)
     self.setMouseTracking(True)
+#    self.setRenderHint(QPainter.RenderHint.Antialiasing)
+    self.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
     self.CurrentScaling = 100
     pol = QSizePolicy()
     pol.setHorizontalPolicy(pol.Policy.MinimumExpanding)

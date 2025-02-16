@@ -155,15 +155,17 @@ class Fleet:
 
 
   def GetColours(self, selected=False):
-    if self.FriendOrFoe == Stance.allied:
-      if selected:
+    if selected:
+      if self.FriendOrFoe == Stance.allied:
         return (QPen(Pen.blue_h), Brush.blue)
-      else:
-        return (QPen(Pen.blue_l), Brush.blue)
-    elif self.FriendOrFoe == Stance.hostile:
-      return (QPen(Pen.red_l), Brush.red)
-    else:
+      elif self.FriendOrFoe == Stance.hostile:
+        return (QPen(Pen.red_l), Brush.red_d)
       return (QPen(Pen.green), Brush.green)
+    elif self.FriendOrFoe == Stance.allied:
+      return (QPen(Pen.blue_l), Brush.blue)
+    elif self.FriendOrFoe == Stance.hostile:
+      return (QPen(Pen.red), Brush.red_d)
+    return (QPen(Pen.green), Brush.green)
 
 
   def UpdateShipCount(self):

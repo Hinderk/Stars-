@@ -48,6 +48,7 @@
   </qresource>
   <qresource prefix="Icons">
     <file alias="Stars">Images/Icons/stars.ico</file>
+    <file alias="Host">Images/Icons/host.ico</file>
     <file alias="Fleets">Images/Icons/fleets.svg</file>
     <file alias="Neutrals">Images/Icons/neutrals.svg</file>
     <file alias="Enemies">Images/Icons/enemies.svg</file>
@@ -61,5 +62,6 @@
     <file alias="Planet">Images/Icons/planet.svg</file>
     <file alias="Previous">Images/Icons/previous.svg</file>
     <file alias="Next">Images/Icons/next.svg</file>
+	<file alias="Select">Images/Icons/select.svg</file>
   </qresource>
 </RCC>

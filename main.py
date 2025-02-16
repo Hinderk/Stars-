@@ -77,7 +77,7 @@ def main():
     fleet_5 = Fleet([ship], 9)
     fleet_6 = Fleet([freighter, freighter], 0)
     fleet_7 = Fleet([freighter, freighter, freighter], 9)
-    fleet_8 = Fleet([ship, ship, ship, ship], 0)
+    fleet_8 = Fleet([ship, ship, ship, ship], 9)
 
     fleet_3.Idle = False
     fleet_7.Idle = False
