@@ -1,5 +1,6 @@
 
 from PyQt6.QtWidgets import QWidget
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt6.QtWidgets import QGroupBox, QComboBox
@@ -20,19 +21,11 @@ class NewGame(QWidget):
         Icon = QIcon()
         Icon.addPixmap(QPixmap(":/Icons/Host"))
         self.setWindowIcon(Icon)
-        self.setMaximumSize(800, 600)
-        self.setMinimumSize(800, 600)
+        self.setFixedSize(800, 600)
         self.hide()
-        Layout_HL = QHBoxLayout(self)
-        Layout_HL.setSpacing(0)
+
         LeftSide = QWidget()
-        Left_VL = QVBoxLayout(LeftSide)
-        Left_VL.setSpacing(0)
-        RightSide = QStackedLayout()
         SimpleSetup = QWidget()
-        RightSide.addWidget(SimpleSetup)
-        
-        Right_VL = QVBoxLayout(SimpleSetup)
         FactionBox = QGroupBox()
         FactionBox.setTitle('Player Faction')
         Faction_VL = QVBoxLayout(FactionBox)
@@ -45,14 +38,41 @@ class NewGame(QWidget):
         GameBox = QGroupBox()
         GameBox.setTitle('Advanced Game')
         Game_VL = QVBoxLayout(GameBox)
-        self.AdvancedGame = QPushButton()
-        self.AdvancedGame.setText('Advanced Game Configuration')
-        Game_VL.addWidget(self.AdvancedGame)
+        AdvancedGame = QPushButton()
+        AdvancedGame.setText('Advanced Game Configuration')
+        Explanation = QLabel('This button allows You to configure multi-player games '
+                             'and customize advanced game options. You do not need to '
+                             'press it to launch standard single player games.')
+        Explanation.setWordWrap(True)
+        Game_VL.addWidget(Explanation)
+        Game_VL.addWidget(AdvancedGame)
 
+        Buttons_HL = QHBoxLayout()
+        self.SoloStart = QPushButton()
+        self.SoloStart.setText("OK")
+        self.SoloStart.setToolTip(" Start a new game with default settings.")
+        self.SoloStart.setFixedSize(160, 50)
+        Buttons_HL.addWidget(self.SoloStart)
+        Cancel = QPushButton()
+        Cancel.setText("Cancel")
+        Cancel.setToolTip(" Close this dialog.")
+        Cancel.setFixedSize(160, 50)
+        Buttons_HL.addStretch()
+        Buttons_HL.addWidget(Cancel)
+        self.Help = QPushButton()
+        self.Help.setText("Help")
+        self.Help.setToolTip(" Read the game manual.")
+        self.Help.setFixedSize(160, 50)
+        Buttons_HL.addStretch()
+        Buttons_HL.addWidget(self.Help)
+
+        Right_VL = QVBoxLayout(SimpleSetup)
         Right_VL.addWidget(FactionBox)
-        Right_VL.addSpacing(10)
+        Right_VL.addSpacing(20)
         Right_VL.addWidget(GameBox)
         Right_VL.addStretch()
+        Right_VL.addLayout(Buttons_HL)
+        Right_VL.addSpacing(15)
 
         SizeBox = QGroupBox()
         SizeBox.setTitle('Universe Size')
@@ -69,7 +89,7 @@ class NewGame(QWidget):
         Size_VL.addWidget(self.LargeMap)
         Size_VL.addWidget(self.HugeMap)
         self.SmallMap.setChecked(True)
-        
+
         ModeBox = QGroupBox()
         ModeBox.setTitle('Difficulty Level')
         self.EasyMode = QRadioButton('Easy')
@@ -83,14 +103,25 @@ class NewGame(QWidget):
         Mode_VL.addWidget(self.HarderMode)
         Mode_VL.addWidget(self.ExpertMode)
         self.StandardMode.setChecked(True)
-        
+
+        Left_VL = QVBoxLayout(LeftSide)
+        Left_VL.setSpacing(0)
         Left_VL.addWidget(ModeBox)
         Left_VL.addSpacing(20)
         Left_VL.addWidget(SizeBox)
         Left_VL.addStretch()
 
+        AdvancedSetup = QWidget()
+
+
+        self.RightSide = QStackedLayout()
+        self.RightSide.addWidget(SimpleSetup)
+        self.RightSide.addWidget(AdvancedSetup)
+
+        Layout_HL = QHBoxLayout(self)
+        Layout_HL.setSpacing(0)
         Layout_HL.addWidget(LeftSide)
-        Layout_HL.addLayout(RightSide)
+        Layout_HL.addLayout(self.RightSide)
 
         FactionSelector.addItem('Humanoid')
         FactionSelector.addItem('Rabbitoid')
@@ -99,10 +130,23 @@ class NewGame(QWidget):
         FactionSelector.addItem('Silicanoid')
         FactionSelector.addItem('Antetheral')
         FactionSelector.addItem('Random')
-        
+
+        Cancel.clicked.connect(self.Hide)
+        AdvancedGame.clicked.connect(self.AdvancedSetup)
+
+
+
+    def AdvancedSetup(self):
+        self.RightSide.setCurrentIndex(1)
+        print('Setup advanced game ...')
 
 
     def Launch(self):
+        self.RightSide.setCurrentIndex(0)
         self.show()
         print('New Game pressed ...')
-        
+
+
+    def Hide(self):
+        self.hide()
+        print('New Game closed ...')

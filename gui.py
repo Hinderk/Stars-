@@ -114,6 +114,7 @@ class Gui(QMainWindow):
         self.CentralWidget.setMinimumSize(sx, sy)
 
         self.NewGame = NewGame(people, rules)
+        self.NewGame.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         LeftSide = QWidget()
         LeftSide.setMinimumWidth(875)        # Minimal feasible value ...

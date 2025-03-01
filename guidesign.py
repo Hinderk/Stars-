@@ -147,9 +147,10 @@ class GuiDesign:
              }
 
              QLabel {
-                 padding: 5px 10px 5px 10px;
-                 font-size: 18pt;
-                 font-weight: 600;
+                 padding: 0px 10px 10px 10px;
+                 font-size: 16pt;
+                 font-style: oblique;
+                 font-weight: 400;
                  background-color: transparent;
              }
 
