@@ -18,6 +18,7 @@ from minedata import Minedata
 from starmap import Starmap
 from universe import Universe
 from newgame import NewGame
+from gamesetup import GameSetup
 
 
 
@@ -98,7 +99,8 @@ class Gui(QMainWindow):
         self.ShowFleets.clicked.connect(self.InspectFleets)
         self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
         self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFleets)
-        self.Menu.actionNewGame.triggered.connect(self.NewGame.Launch)
+        self.Menu.actionNewGame.triggered.connect(self.NewGame.ConfigureGame)
+        self.NewGame.AdvancedGame.clicked.connect(self.ConfigureGame)
         self.Map.Universe.HighlightPlanet(self.Map.Universe.planets[-1])
 
     def SetupUI(self, people, rules):
@@ -113,8 +115,10 @@ class Gui(QMainWindow):
         self.setCentralWidget(self.CentralWidget)
         self.CentralWidget.setMinimumSize(sx, sy)
 
+        self.GameSetup = GameSetup(people, rules)
         self.NewGame = NewGame(people, rules)
         self.NewGame.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.GameSetup.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         LeftSide = QWidget()
         LeftSide.setMinimumWidth(875)        # Minimal feasible value ...
@@ -648,3 +652,8 @@ class Gui(QMainWindow):
     def AddWaypoints(self, event):
         self.WaypointMode = event
         self.Map.Universe.SetWaypointMode(event)
+
+
+    def ConfigureGame(self):
+        self.NewGame.hide()
+        self.GameSetup.ConfigureGame()

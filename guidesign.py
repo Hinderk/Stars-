@@ -136,6 +136,16 @@ class GuiDesign:
 
     Style_2 = """
 
+             QLineEdit {
+                 padding: 5px 10px 10px 10px;
+                 font-size: 18pt;
+                 font-style: oblique;
+                 font-weight: 400;
+                 border: 1.5px solid rgb(120,120,120);
+                 border-radius: 6px;
+                 background-color: white;
+             }
+
              QPushButton {
                  padding: 5px 10px 10px 10px;
                  font-size: 16pt;
@@ -145,6 +155,21 @@ class GuiDesign:
                  border-radius: 6px;
                  background-color: white;
              }
+
+             QPushButton:disabled {
+                 background-color: transparent;
+                 color: rgb(200,200,200);
+                 border: 1.5px solid rgb(200,200,200);
+             }
+
+             QPushButton:hover:!pressed {
+                 background-color:#5f94bc;
+             }
+
+             QPushButton:pressed {
+                 background-color:#4f84ac;
+             }
+
 
              QLabel {
                  padding: 0px 10px 10px 10px;

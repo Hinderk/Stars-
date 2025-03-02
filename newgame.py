@@ -1,10 +1,10 @@
 
 from PyQt6.QtWidgets import QWidget
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QSize
+from PyQt6.QtGui import QKeySequence
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt6.QtWidgets import QGroupBox, QComboBox
-from PyQt6.QtWidgets import QStackedLayout
 from PyQt6.QtWidgets import QRadioButton, QLabel
 from PyQt6.QtWidgets import QPushButton
 
@@ -16,57 +16,63 @@ class NewGame(QWidget):
 
     def __init__(self, people, rules):
         super(self.__class__, self).__init__()
-        self.setWindowTitle("New Game")
+        self.setWindowTitle('New Game')
         self.setStyleSheet(GuiDesign.getSetupStyle())
         Icon = QIcon()
-        Icon.addPixmap(QPixmap(":/Icons/Host"))
+        Icon.addPixmap(QPixmap(':/Icons/Host'))
         self.setWindowIcon(Icon)
         self.setFixedSize(800, 600)
         self.hide()
 
         LeftSide = QWidget()
-        SimpleSetup = QWidget()
+        RightSide = QWidget()
         FactionBox = QGroupBox()
         FactionBox.setTitle('Player Faction')
         Faction_VL = QVBoxLayout(FactionBox)
-        FactionSelector = QComboBox()
-        Faction_VL.addWidget(FactionSelector)
+        self.FactionSelector = QComboBox()
+        Faction_VL.addWidget(self.FactionSelector)
         self.FactionSetup = QPushButton()
-        self.FactionSetup.setText('Customize Faction')
+        self.FactionSetup.setText('Customize &Faction')
+        self.FactionSetup.setShortcut(QKeySequence('Ctrl+F'))
         Faction_VL.addWidget(self.FactionSetup)
 
         GameBox = QGroupBox()
         GameBox.setTitle('Advanced Game')
         Game_VL = QVBoxLayout(GameBox)
-        AdvancedGame = QPushButton()
-        AdvancedGame.setText('Advanced Game Configuration')
+        self.AdvancedGame = QPushButton()
+        self.AdvancedGame.setText('&Advanced Game Configuration')
+        self.AdvancedGame.setShortcut(QKeySequence('Ctrl+A'))
         Explanation = QLabel('This button allows You to configure multi-player games '
                              'and customize advanced game options. You do not need to '
                              'press it to launch standard single player games.')
         Explanation.setWordWrap(True)
         Game_VL.addWidget(Explanation)
-        Game_VL.addWidget(AdvancedGame)
+        Game_VL.addWidget(self.AdvancedGame)
 
+        ButtonSize = QSize(160, 50)
         Buttons_HL = QHBoxLayout()
         self.SoloStart = QPushButton()
-        self.SoloStart.setText("OK")
-        self.SoloStart.setToolTip(" Start a new game with default settings.")
-        self.SoloStart.setFixedSize(160, 50)
+        self.SoloStart.setText('&OK')
+        self.SoloStart.setToolTip(' Start a new game with default settings.')
+        self.SoloStart.setShortcut(QKeySequence('Ctrl+O'))
+        self.SoloStart.setFixedSize(ButtonSize)
         Buttons_HL.addWidget(self.SoloStart)
         Cancel = QPushButton()
-        Cancel.setText("Cancel")
-        Cancel.setToolTip(" Close this dialog.")
-        Cancel.setFixedSize(160, 50)
+        Cancel.setText('&Cancel')
+        Cancel.setToolTip(' Close this dialog.')
+        Cancel.setShortcut(QKeySequence('Ctrl+C'))
+        Cancel.setFixedSize(ButtonSize)
         Buttons_HL.addStretch()
         Buttons_HL.addWidget(Cancel)
         self.Help = QPushButton()
-        self.Help.setText("Help")
-        self.Help.setToolTip(" Read the game manual.")
-        self.Help.setFixedSize(160, 50)
+        self.Help.setText('&Help')
+        self.Help.setToolTip(' Read the game manual.')
+        self.Help.setShortcut(QKeySequence('Ctrl+H'))
+        self.Help.setFixedSize(ButtonSize)
         Buttons_HL.addStretch()
         Buttons_HL.addWidget(self.Help)
 
-        Right_VL = QVBoxLayout(SimpleSetup)
+        Right_VL = QVBoxLayout(RightSide)
         Right_VL.addWidget(FactionBox)
         Right_VL.addSpacing(20)
         Right_VL.addWidget(GameBox)
@@ -111,42 +117,24 @@ class NewGame(QWidget):
         Left_VL.addWidget(SizeBox)
         Left_VL.addStretch()
 
-        AdvancedSetup = QWidget()
-
-
-        self.RightSide = QStackedLayout()
-        self.RightSide.addWidget(SimpleSetup)
-        self.RightSide.addWidget(AdvancedSetup)
-
         Layout_HL = QHBoxLayout(self)
         Layout_HL.setSpacing(0)
         Layout_HL.addWidget(LeftSide)
-        Layout_HL.addLayout(self.RightSide)
+        Layout_HL.addWidget(RightSide)
 
-        FactionSelector.addItem('Humanoid')
-        FactionSelector.addItem('Rabbitoid')
-        FactionSelector.addItem('Insectoid')
-        FactionSelector.addItem('Nucletoid')
-        FactionSelector.addItem('Silicanoid')
-        FactionSelector.addItem('Antetheral')
-        FactionSelector.addItem('Random')
+        self.FactionSelector.addItem('Humanoid')    # Query the rules for these factions.
+        self.FactionSelector.addItem('Rabbitoid')
+        self.FactionSelector.addItem('Insectoid')
+        self.FactionSelector.addItem('Nucletoid')
+        self.FactionSelector.addItem('Silicanoid')
+        self.FactionSelector.addItem('Antetheral')
+        self.FactionSelector.addItem('Random')
 
-        Cancel.clicked.connect(self.Hide)
-        AdvancedGame.clicked.connect(self.AdvancedSetup)
-
+        Cancel.clicked.connect(self.hide)
 
 
-    def AdvancedSetup(self):
-        self.RightSide.setCurrentIndex(1)
-        print('Setup advanced game ...')
-
-
-    def Launch(self):
-        self.RightSide.setCurrentIndex(0)
+    def ConfigureGame(self):
+        self.FactionSelector.setCurrentIndex(0)
+        self.SmallMap.setChecked(True)
+        self.StandardMode.setChecked(True)
         self.show()
-        print('New Game pressed ...')
-
-
-    def Hide(self):
-        self.hide()
-        print('New Game closed ...')
