@@ -72,4 +72,11 @@ class Task(Enum):
     MOVE = 'Travel'
     HAUL = 'Transport'
     MINE = 'Mining'
+
+
+class PlayerType(Enum):
+    AIP = 'AI Antagonist'
+    EXP = 'Expansion Slot'
+    HUP = 'Human Player'
+    RNG = 'Random Choice'
         

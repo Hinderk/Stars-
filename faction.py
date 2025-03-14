@@ -22,5 +22,14 @@ class Faction:
         return 5 < fID
 
 
-    def __init__(self):
+    def __init__(self, FactionID=0):
+        self.fID = FactionID
         self.FactionLogo = None
+        self.Name = 'Homo Sapiens'
+        self.Species = 'Humans'
+        self.MinRadioactivity = 20
+        self.MaxRadioactivity = 70
+        self.MinGravity = 0.2
+        self.MaxGravity = 2.5
+        self.MinTemperatur = -40.0
+        self.MaxTemperatur = 50.0

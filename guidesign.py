@@ -1,4 +1,16 @@
 
+from enum import Enum
+
+
+
+class GuiStyle(Enum):
+    GeneralGui = 0
+    StarMap = 1
+    SimpleSetup = 2
+    AdvancedSetup_1 = 3
+    AdvancedSetup_2 = 4
+    PlayerMenu = 5
+
 
 class GuiDesign:
 
@@ -153,13 +165,16 @@ class GuiDesign:
                  font-weight: 400;
                  border: 1.5px solid rgb(120,120,120);
                  border-radius: 6px;
+             }
+
+             QPushButton:enabled {
                  background-color: white;
              }
 
              QPushButton:disabled {
-                 background-color: transparent;
-                 color: rgb(200,200,200);
-                 border: 1.5px solid rgb(200,200,200);
+                 background-color: #f3f3f3;
+                 color: #c8c8c8;
+                 border: 1.5px solid #c8c8c8;
              }
 
              QPushButton:hover:!pressed {
@@ -167,9 +182,8 @@ class GuiDesign:
              }
 
              QPushButton:pressed {
-                 background-color:#4f84ac;
+                 background-color: #4f84ac;
              }
-
 
              QLabel {
                  padding: 0px 10px 10px 10px;
@@ -214,7 +228,7 @@ class GuiDesign:
                  border-top-right-radius: 6px;
                  border-bottom-right-radius: 6px;
              }
-             
+
              QComboBox::down-arrow {
                  image: url(:/Icons/Select);
                  width: 20px;
@@ -223,17 +237,115 @@ class GuiDesign:
 
          """
 
+    Style_3 = """
 
-    def getGuiStyle(select=0):
-        return GuiDesign.Style_0
+             QWidget {
+                 background-color: #f3f3f3;
+             }
+
+             QTableView {
+                outline: none;
+             }
+
+             QTableView::item {
+                 padding: 0px 10px 0px 10px;
+                 background-color: white;
+                 border-bottom: 1px solid #a0a0a0;
+                 border-right: 1px solid #a0a0a0;
+             }
+
+             QTableView::item:selected {
+                 background-color: #5f94bc;
+                 selection-color: white;
+             }
+
+             QHeaderView::section {
+                 padding: 4px 10px 4px 10px;
+                 border-style: none;
+                 background-color: #f3f3f3;
+                 font-weight: 600;
+                 font-size: 16pt;
+                 font-style: oblique;
+                 border-bottom: 1px solid #a0a0a0;
+                 border-right: 1px solid #a0a0a0;
+             }
+
+             QHeaderView::section:horizontal {
+                 border-top: 1px solid #a0a0a0;
+             }
+
+             QHeaderView::section:vertical {
+                 border-left: 1px solid #a0a0a0;
+             }
+
+             QTableCornerButton::section {
+                 border: 1px solid #a0a0a0;
+                 background-color: #f3f3f3;
+             }
+
+             QTableWidget {
+                 padding: 20px 20px 20px 20px;
+                 font-weight: 400;
+                 font-size: 16pt;
+                 font-style: oblique;
+                 border-radius: 6px;
+                 border: 1.5px solid #787878;
+             }
+
+             QLineEdit {
+                 padding: 0px;
+                 border: none;
+                 font-size: 16pt;
+                 font-style: oblique;
+                 font-weight: 600;
+                 color: white;
+                 background-color: #5f94bc;
+             }
+
+         """
+
+    Style_4 = """
+
+             QMenu {
+                 border: 1.5px solid rgb(200,200,200) ;
+                 border-radius: 0px
+             }
+
+             QMenu::item {
+                 background-color: rgb(0,0,0);
+                 color: rgb(240,240,240);
+                 font-size: 18px;
+                 padding: 6px 12px 6px 12px;
+             }
+
+             QMenu::separator {
+                 width: 1.0px;
+                 height: 1.0px;
+                 background-color: rgb(200,200,200);
+             }
+
+             QMenu::item::selected {
+                 background-color: rgb(200,200,200);
+                 color: rgb(0,0,0);
+                 font-size: 18px;
+             }
+
+         """
 
 
-    def getMapStyle(select=0):
-        return GuiDesign.Style_1
-
-
-    def getSetupStyle(select=0):
-        return GuiDesign.Style_2
+    def getStyle(role, select=0):
+        if role == GuiStyle.GeneralGui:
+            return GuiDesign.Style_0
+        elif role == GuiStyle.StarMap:
+            return GuiDesign.Style_1
+        elif role == GuiStyle.SimpleSetup:
+            return GuiDesign.Style_2
+        elif role == GuiStyle.AdvancedSetup_1:
+            return GuiDesign.Style_2
+        elif role == GuiStyle.AdvancedSetup_2:
+            return GuiDesign.Style_3
+        elif role == GuiStyle.PlayerMenu:
+            return GuiDesign.Style_4
 
 
     def getSize():

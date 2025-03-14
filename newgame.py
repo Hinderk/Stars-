@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QGroupBox, QComboBox
 from PyQt6.QtWidgets import QRadioButton, QLabel
 from PyQt6.QtWidgets import QPushButton
 
-from guidesign import GuiDesign
+from guidesign import GuiDesign, GuiStyle
 
 
 
@@ -17,7 +17,7 @@ class NewGame(QWidget):
     def __init__(self, people, rules):
         super(self.__class__, self).__init__()
         self.setWindowTitle('New Game')
-        self.setStyleSheet(GuiDesign.getSetupStyle())
+        self.setStyleSheet(GuiDesign.getStyle(GuiStyle.SimpleSetup))
         Icon = QIcon()
         Icon.addPixmap(QPixmap(':/Icons/Host'))
         self.setWindowIcon(Icon)
@@ -122,12 +122,8 @@ class NewGame(QWidget):
         Layout_HL.addWidget(LeftSide)
         Layout_HL.addWidget(RightSide)
 
-        self.FactionSelector.addItem('Humanoid')    # Query the rules for these factions.
-        self.FactionSelector.addItem('Rabbitoid')
-        self.FactionSelector.addItem('Insectoid')
-        self.FactionSelector.addItem('Nucletoid')
-        self.FactionSelector.addItem('Silicanoid')
-        self.FactionSelector.addItem('Antetheral')
+        for ai in people.AIFaction:
+            self.FactionSelector.addItem(ai.Species)
         self.FactionSelector.addItem('Random')
 
         Cancel.clicked.connect(self.hide)

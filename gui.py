@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QMainWindow, QPushButton, QToolButton
 from PyQt6.QtWidgets import QStatusBar, QGroupBox, QCheckBox
 from PyQt6.QtWidgets import QPlainTextEdit
 
-from guidesign import GuiDesign
+from guidesign import GuiDesign, GuiStyle
 from defines import Stance
 from menubar import Menu
 from toolbar import ToolBar
@@ -60,7 +60,7 @@ class Gui(QMainWindow):
         self.HostileFleets = 0
         self.ShowFleetMovements = False
         self.WaypointMode = False
-        self.setStyleSheet(GuiDesign.getGuiStyle())
+        self.setStyleSheet(GuiDesign.getStyle(GuiStyle.GeneralGui))
         self.Action = dict()
         self.SetupUI(people, rules)
         self.Buttons.Zoom.setMenu(self.Menu.MenuZoom)
@@ -102,6 +102,7 @@ class Gui(QMainWindow):
         self.Menu.actionNewGame.triggered.connect(self.NewGame.ConfigureGame)
         self.NewGame.AdvancedGame.clicked.connect(self.ConfigureGame)
         self.Map.Universe.HighlightPlanet(self.Map.Universe.planets[-1])
+
 
     def SetupUI(self, people, rules):
 
@@ -157,7 +158,7 @@ class Gui(QMainWindow):
         Info_VL.setSpacing(0)
         Info_VL.addWidget(self.SetupInspectorTitle())
         self.ItemInfo = QStackedLayout()
-        self.PlanetInfo = Inspector(people)
+        self.PlanetInfo = Inspector(people.myFaction())
         self.ItemInfo.addWidget(self.PlanetInfo)
 
         self.FleetInfo = Fleetdata()

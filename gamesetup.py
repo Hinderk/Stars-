@@ -1,15 +1,18 @@
 
 from PyQt6.QtWidgets import QWidget
-from PyQt6.QtCore import QSize
+from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtGui import QKeySequence
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
-from PyQt6.QtWidgets import QGroupBox
+from PyQt6.QtWidgets import QGroupBox, QHeaderView
+from PyQt6.QtWidgets import QTableWidget, QMenu
 from PyQt6.QtWidgets import QStackedLayout
 from PyQt6.QtWidgets import QRadioButton, QLabel
 from PyQt6.QtWidgets import QPushButton, QLineEdit
 
-from guidesign import GuiDesign
+from defines import PlayerType as PT
+from guidesign import GuiDesign, GuiStyle
+
 
 
 
@@ -18,21 +21,25 @@ class GameSetup(QWidget):
     def __init__(self, people, rules):
         super(self.__class__, self).__init__()
         self.setWindowTitle("Advanced New Game Wizard - Step 1 of 3")
-        self.setStyleSheet(GuiDesign.getSetupStyle())
+        self.setStyleSheet(GuiDesign.getStyle(GuiStyle.AdvancedSetup_1))
         Icon = QIcon()
         Icon.addPixmap(QPixmap(":/Icons/Host"))
         self.setWindowIcon(Icon)
         self.setFixedSize(1000, 750)
         self.hide()
-        Layout_VL = QVBoxLayout(self)
-        Wizard = QWidget()
-        self.Pages = QStackedLayout(Wizard)
-        self.SetupUniverse()
-        self.SetupPlayers()
-        self.SetupVictoryConditions()
-        ButtonSize = QSize(140, 50)
+        self.Wizard = QWidget()
+        self.Pages = QStackedLayout(self.Wizard)
         self.CurrentPage = 0
+        self.NumberOfPlayers = 4              # Where to define these defaults?
+        self.SetupUniverse()
+        self.SetupPlayers(people)
+        self.SetupVictoryConditions()
+        self.SetupMenu(people)
+        self.SetupButtons()
 
+
+    def SetupButtons(self):
+        ButtonSize = QSize(140, 50)
         Buttons_HL = QHBoxLayout()
         self.Finish = QPushButton()
         self.Finish.setText('Finish')
@@ -60,7 +67,6 @@ class GameSetup(QWidget):
         self.Back.setFixedSize(ButtonSize)
         self.Back.setShortcut(QKeySequence('Ctrl+B'))
         self.Back.setEnabled(False)
-
         Buttons_HL.addSpacing(30)
         Buttons_HL.addWidget(self.Help)
         Buttons_HL.addStretch()
@@ -72,10 +78,9 @@ class GameSetup(QWidget):
         Buttons_HL.addStretch()
         Buttons_HL.addWidget(self.Finish)
         Buttons_HL.addSpacing(30)
-
-        Layout_VL.addWidget(Wizard)
+        Layout_VL = QVBoxLayout(self)
+        Layout_VL.addWidget(self.Wizard)
         Layout_VL.addLayout(Buttons_HL)
-
         self.Finish.clicked.connect(self.SaveGameData)
         self.Back.clicked.connect(self.Revert)
         self.Next.clicked.connect(self.Proceed)
@@ -86,6 +91,8 @@ class GameSetup(QWidget):
         print('Proceed ' + str(self.CurrentPage))
         if self.CurrentPage < 2:
             self.CurrentPage += 1
+            step = 'Step ' + str(1 + self.CurrentPage) + ' of 3'
+            self.setWindowTitle('Advanced New Game Wizard - ' + step)
             self.Pages.setCurrentIndex(self.CurrentPage)
             self.Back.setEnabled(True)
             self.Next.setEnabled(self.CurrentPage < 2)
@@ -95,6 +102,8 @@ class GameSetup(QWidget):
         print('Revert ' + str(self.CurrentPage))
         if 0 < self.CurrentPage:
             self.CurrentPage -= 1
+            step = 'Step ' + str(1 + self.CurrentPage) + ' of 3'
+            self.setWindowTitle('Advanced New Game Wizard - ' + step)
             self.Pages.setCurrentIndex(self.CurrentPage)
             self.Next.setEnabled(True)
             self.Back.setEnabled(self.CurrentPage > 0)
@@ -122,6 +131,51 @@ class GameSetup(QWidget):
     def SaveGameData(self):
         print('Game data saved to file ...')
 
+
+    def SetupMenu(self, people):
+        self.Select = QMenu()
+        self.Select.setStyleSheet(GuiDesign.getStyle(GuiStyle.PlayerMenu))
+        pf = self.Select.addMenu('Predefined Faction ')
+        n = 1
+        for ai in people.AIFaction:
+            a = pf.addAction(ai.Species)
+            a.setData((0, n, 0))
+            n += 1
+        a = pf.addAction('Random')
+        a.setData((0, 0, 0))
+        cf = self.Select.addMenu('Custom Faction')
+        a = cf.addAction('New Faction')
+        a.setData((1, 0, 0))
+        a = cf.addAction('Open File')
+        a.setData((1, 1, 0))
+        cf.addSeparator()
+        n = 0
+        for pc in people.PlayerFaction:
+            a = cf.addAction(pc.Name)
+            a.setData((1, 2, n))
+            n += 1
+        self.Select.addSeparator()
+        cp = self.Select.addMenu('Computer Player')
+        n = 1
+        for ai in people.AIFaction:
+            cpm = cp.addMenu(ai.Name + ' ')
+            m = 0
+            for mode in ['Easy', 'Standard', 'Tough', 'Expert', 'Random']:
+                a = cpm.addAction(mode)
+                a.setData((2, n, m))
+                m += 1
+            n += 1
+        cpm = cp.addMenu('Random')
+        m = 0
+        for mode in ['Easy', 'Standard', 'Tough', 'Expert', 'Random']:
+            a = cpm.addAction(mode)
+            a.setData((2, 0, m))
+            m += 1
+        self.Select.addSeparator()
+        a = self.Select.addAction('Expansion Slot')
+        a.setData((3, 0, 0))
+        a = self.Select.addAction('Unknown Faction')
+        a.setData((4, 0, 0))
 
 
     def SetupUniverse(self):
@@ -237,12 +291,64 @@ class GameSetup(QWidget):
         self.Pages.addWidget(GameWorld)
 
 
-    def SetupPlayers(self):
+    def SetupPlayers(self, people):
+        self.Players = QTableWidget(1, 3)
+        self.Players.setHorizontalHeaderLabels(['Slot', 'Faction', 'Player Name'])
+        self.Players.setShowGrid(False)
+        self.Players.verticalScrollBar().hide()
+        align = Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
+        Header_V = self.Players.horizontalHeader()
+        Header_V.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        Header_V.setStretchLastSection(True)
+        Header_V.resizeSection(0, 200)
+        Header_V.resizeSection(1, 200)
+        Header_V.setDefaultAlignment(align)
+        Header_H = self.Players.verticalHeader()
+        Header_H.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        Header_H.resizeSection(0, 48)
+        Header_H.setDefaultAlignment(align)
+        self.AddPlayer(0, PT.HUP, people.myFaction())
+        n = 1
+        while n < self.NumberOfPlayers:
+            self.Players.insertRow(n)
+            Header_H.resizeSection(n, 48)
+            n += 1
+            self.AddPlayer(n, PT.AIP, people.getAIFaction(n))
+        Layout_HL = QHBoxLayout()
+        Layout_HL.addSpacing(20)
+        Layout_HL.addWidget(self.Players)
+        Layout_HL.addSpacing(20)
         PlayerSetup = QWidget()
+        PlayerSetup.setStyleSheet(GuiDesign.getStyle(GuiStyle.AdvancedSetup_2))
+        Layout_VL = QVBoxLayout(PlayerSetup)
+        Layout_VL.addLayout(Layout_HL)
+        Layout_VL.addSpacing(10)
         self.Pages.addWidget(PlayerSetup)
+        self.Players.cellDoubleClicked.connect(self.SelectPlayer)
+
+
+    def AddPlayer(self, row, playertype, playerfaction):
+        print('>-------------')
+        print(playertype)
+        print(playerfaction.Species)
+        print('-------------<')
+
+
+
+    def SelectPlayer(self, row, column):
+        if column < 2:
+            here = self.cursor().pos()
+            print(self.Players.cellWidget(row, column))
+            selected = self.Select.exec(here)
+            if selected:
+                itemtype, item, toughness = selected.data()
+                print('>>>>>>>>>')
+                print(itemtype)
+                print(item)
+                print(toughness)
+                print('<<<<<<<<<')
 
 
     def SetupVictoryConditions(self):
         VictorySettings = QWidget()
         self.Pages.addWidget(VictorySettings)
-

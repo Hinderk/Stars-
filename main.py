@@ -8,15 +8,15 @@ from gui import Gui
 from hull import Hull
 from design import Design
 from defines import Stance
-from planet import Planet
+# from planet import Planet
 from ruleset import Ruleset
-from race import Race
+from people import People
 from fleet import Fleet
 from ship import Ship
 from system import System
 from system import SystemType as ST
 from scanner import Model
-from waypoint import Waypoint
+# from waypoint import Waypoint
 from minefield import Minefield
 from minefield import Model as M
 
@@ -25,10 +25,10 @@ from minefield import Model as M
 def main():
     app = QApplication(sys.argv)
 
-    Rules = Ruleset()
-    People = Race()
+    rules = Ruleset()
+    people = People()
 
-    form = Gui(People, Rules)            # Create the main user interface
+    form = Gui(people, rules)            # Create the main user interface
 
     form.Buttons.UpdateMyDesigns(['Scout Mk 1', 'Small Freighter Mk 1', 'C'])
 
