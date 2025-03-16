@@ -5,18 +5,22 @@ from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtGui import QKeySequence
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt6.QtWidgets import QGroupBox, QHeaderView
-from PyQt6.QtWidgets import QTableWidget, QMenu
+from PyQt6.QtWidgets import QTableView, QMenu
 from PyQt6.QtWidgets import QStackedLayout
 from PyQt6.QtWidgets import QRadioButton, QLabel
 from PyQt6.QtWidgets import QPushButton, QLineEdit
 
 from defines import PlayerType as PT
+from defines import AIMode as AI
 from guidesign import GuiDesign, GuiStyle
+from playerdata import PlayerData
 
 
 
 
 class GameSetup(QWidget):
+
+    AIModes = [AI.AI0, AI.AI1, AI.AI2, AI.AI3, AI.AIR]
 
     def __init__(self, people, rules):
         super(self.__class__, self).__init__()
@@ -30,7 +34,8 @@ class GameSetup(QWidget):
         self.Wizard = QWidget()
         self.Pages = QStackedLayout(self.Wizard)
         self.CurrentPage = 0
-        self.NumberOfPlayers = 4              # Where to define these defaults?
+        self.NumberOfPlayers = 6              # Where to define these defaults?
+        self.Factions = people
         self.SetupUniverse()
         self.SetupPlayers(people)
         self.SetupVictoryConditions()
@@ -88,7 +93,6 @@ class GameSetup(QWidget):
 
 
     def Proceed(self):
-        print('Proceed ' + str(self.CurrentPage))
         if self.CurrentPage < 2:
             self.CurrentPage += 1
             step = 'Step ' + str(1 + self.CurrentPage) + ' of 3'
@@ -99,7 +103,6 @@ class GameSetup(QWidget):
 
 
     def Revert(self):
-        print('Revert ' + str(self.CurrentPage))
         if 0 < self.CurrentPage:
             self.CurrentPage -= 1
             step = 'Step ' + str(1 + self.CurrentPage) + ' of 3'
@@ -160,21 +163,22 @@ class GameSetup(QWidget):
         for ai in people.AIFaction:
             cpm = cp.addMenu(ai.Name + ' ')
             m = 0
-            for mode in ['Easy', 'Standard', 'Tough', 'Expert', 'Random']:
-                a = cpm.addAction(mode)
+            for mode in AI:
+                a = cpm.addAction(mode.value)
                 a.setData((2, n, m))
                 m += 1
             n += 1
         cpm = cp.addMenu('Random')
         m = 0
-        for mode in ['Easy', 'Standard', 'Tough', 'Expert', 'Random']:
-            a = cpm.addAction(mode)
+        for mode in AI:
+            a = cpm.addAction(mode.value)
             a.setData((2, 0, m))
             m += 1
         self.Select.addSeparator()
         a = self.Select.addAction('Expansion Slot')
         a.setData((3, 0, 0))
-        a = self.Select.addAction('Unknown Faction')
+        self.Select.addSeparator()
+        a = self.Select.addAction('Remove Player')
         a.setData((4, 0, 0))
 
 
@@ -292,28 +296,27 @@ class GameSetup(QWidget):
 
 
     def SetupPlayers(self, people):
-        self.Players = QTableWidget(1, 3)
-        self.Players.setHorizontalHeaderLabels(['Slot', 'Faction', 'Player Name'])
+        self.Model = PlayerData()
+        self.Players = QTableView()
         self.Players.setShowGrid(False)
-        self.Players.verticalScrollBar().hide()
+        self.Players.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.Players.setModel(self.Model)
         align = Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
-        Header_V = self.Players.horizontalHeader()
-        Header_V.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        Header_V.setStretchLastSection(True)
-        Header_V.resizeSection(0, 200)
-        Header_V.resizeSection(1, 200)
-        Header_V.setDefaultAlignment(align)
-        Header_H = self.Players.verticalHeader()
+        Header_H = self.Players.horizontalHeader()
         Header_H.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        Header_H.resizeSection(0, 48)
+        Header_H.setStretchLastSection(True)
+        Header_H.resizeSection(0, 200)
+        Header_H.resizeSection(1, 200)
         Header_H.setDefaultAlignment(align)
-        self.AddPlayer(0, PT.HUP, people.myFaction())
+        Header_V = self.Players.verticalHeader()
+        Header_V.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        Header_V.setDefaultSectionSize(48)
+        Header_V.setDefaultAlignment(align)
+        self.Model.AddPlayer(0, PT.HUP, None, people.myFaction())
         n = 1
         while n < self.NumberOfPlayers:
-            self.Players.insertRow(n)
-            Header_H.resizeSection(n, 48)
+            self.Model.AddPlayer(n, PT.AIP, AI.AI1, people.getAIFaction(n))
             n += 1
-            self.AddPlayer(n, PT.AIP, people.getAIFaction(n))
         Layout_HL = QHBoxLayout()
         Layout_HL.addSpacing(20)
         Layout_HL.addWidget(self.Players)
@@ -324,29 +327,46 @@ class GameSetup(QWidget):
         Layout_VL.addLayout(Layout_HL)
         Layout_VL.addSpacing(10)
         self.Pages.addWidget(PlayerSetup)
-        self.Players.cellDoubleClicked.connect(self.SelectPlayer)
+        self.Players.clicked.connect(self.SelectPlayer)
 
 
-    def AddPlayer(self, row, playertype, playerfaction):
-        print('>-------------')
-        print(playertype)
-        print(playerfaction.Species)
-        print('-------------<')
-
-
-
-    def SelectPlayer(self, row, column):
-        if column < 2:
+    def SelectPlayer(self, select):
+        if select.column() < 2:
             here = self.cursor().pos()
-            print(self.Players.cellWidget(row, column))
             selected = self.Select.exec(here)
             if selected:
-                itemtype, item, toughness = selected.data()
-                print('>>>>>>>>>')
-                print(itemtype)
-                print(item)
-                print(toughness)
-                print('<<<<<<<<<')
+                pType = PT.HUP
+                pMode = None
+                ID, fID, mID = selected.data()
+                if ID == 0:
+                    if fID > 0:
+                        fnew = self.Factions.getAIFaction(fID - 1)
+                    else:
+                        pType = PT.RNG
+                        fnew = self.Factions.randomFaction()
+                if ID == 1:
+                    fnew = self.Factions.myFaction()   # FIX ME
+                    if fID == 0:
+                        print('Design New Faction')
+                    if fID == 1:
+                        print('Load a design file')
+                    if fID == 2:
+                        fnew = self.Factions.getFaction(mID)
+                if ID == 2:
+                    if fID > 0:
+                        fnew = self.Factions.getAIFaction(fID - 1)
+                        pType = PT.AIP
+                    else:
+                        pType = PT.RNG
+                        fnew = self.Factions.randomFaction()
+                    pMode = self.AIModes[mID]
+                if ID == 3:
+                    fnew = self.Factions.myFaction()   # FIX ME
+                    pType = PT.EXP
+                if ID == 4:
+                    self.Model.RemovePlayer(select.row())
+                    return
+                self.Model.AddPlayer(select.row(), pType, pMode, fnew)
 
 
     def SetupVictoryConditions(self):

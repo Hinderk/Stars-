@@ -1,4 +1,6 @@
 
+import random
+
 from faction import Faction
 
 
@@ -7,7 +9,6 @@ class People:
     Species = ['Humanoid', 'Rabbitoid', 'Insectoid', 'Nucletoid', 'Silicanoid', 'Antetheral']
     Names = ['Robotoids', 'Turindrones', 'Automitrons', 'Rototills', 'Cybertrons', 'Macinti']
     AIFaction = []
-    PlayerFaction = [Faction()]
 
     MaxAI = 0
     for name in Names:
@@ -20,12 +21,24 @@ class People:
 
     def __init__(self):
         self.PlayerID = 0
+        self.PlayerCount = 1
+        self.PlayerFaction = [Faction()]
 
 
     def myFaction(self):
-        return People.PlayerFaction[self.PlayerID]
+        return self.PlayerFaction[self.PlayerID]
+
+
+    def getFaction(self, fID):
+        return self.PlayerFaction[fID % self.PlayerCount]
 
 
     def getAIFaction(self, fID):
         return People.AIFaction[fID % People.MaxAI]
+
+
+    def randomFaction(self):
+        print(random.randint(0, People.MaxAI))
+        return People.AIFaction[random.randint(0, People.MaxAI - 1)]
+
 

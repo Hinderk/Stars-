@@ -244,7 +244,13 @@ class GuiDesign:
              }
 
              QTableView {
-                outline: none;
+                 padding: 20px 20px 20px 20px;
+                 font-weight: 400;
+                 font-size: 16pt;
+                 font-style: oblique;
+                 border-radius: 6px;
+                 border: 1.5px solid #787878;
+                 outline: none;
              }
 
              QTableView::item {
@@ -283,23 +289,14 @@ class GuiDesign:
                  background-color: #f3f3f3;
              }
 
-             QTableWidget {
-                 padding: 20px 20px 20px 20px;
-                 font-weight: 400;
-                 font-size: 16pt;
-                 font-style: oblique;
-                 border-radius: 6px;
-                 border: 1.5px solid #787878;
-             }
-
              QLineEdit {
                  padding: 0px;
                  border: none;
                  font-size: 16pt;
                  font-style: oblique;
                  font-weight: 600;
-                 color: white;
-                 background-color: #5f94bc;
+                 color: black;
+                 background-color: white;
              }
 
          """

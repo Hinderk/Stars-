@@ -78,5 +78,12 @@ class PlayerType(Enum):
     AIP = 'AI Antagonist'
     EXP = 'Expansion Slot'
     HUP = 'Human Player'
-    RNG = 'Random Choice'
-        
+    RNG = 'Random Player'
+
+
+class AIMode(Enum):
+    AI0 = 'Easy'
+    AI1 = 'Standard'
+    AI2 = 'Tough'
+    AI3 = 'Expert'
+    AIR = 'Random'
