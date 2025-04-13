@@ -38,7 +38,6 @@ class People:
 
 
     def randomFaction(self):
-        print(random.randint(0, People.MaxAI))
         return People.AIFaction[random.randint(0, People.MaxAI - 1)]
 
 

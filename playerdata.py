@@ -11,11 +11,19 @@ from defines import AIMode as AI
 
 class PlayerData(QAbstractTableModel):
 
-
-    def __init__(self):
+    def __init__(self, people, pcount):
         super(self.__class__, self).__init__()
-        self.NumberOfPlayers = 0
+        self.ufCount = 0
+        self.exCount = 0
+        self.aiCount = 0
+        self.cpCount = dict()
+        self.NumberOfPlayers = pcount
         self.Players = dict()
+        self.AddPlayer(0, PT.HUP, None, people.myFaction())
+        n = 1
+        while n < self.NumberOfPlayers:
+            self.AddPlayer(n, PT.AIP, AI.AI1, people.randomFaction())
+            n += 1
 
 
     def AddPlayer(self, row, ptype, pmode, pfaction):
@@ -27,14 +35,22 @@ class PlayerData(QAbstractTableModel):
         if row in self.Players:
             _, _, _, pname = self.Players[row]
         elif ptype == PT.EXP:
-            pname = 'AI Stewart for Human Absentee'
+            self.exCount += 1
+            pname = 'AI Stewarts ' + str(self.exCount).zfill(2)
         elif ptype == PT.RNG:
             if pmode:
-                pname = 'Undisclosed AI Antagonist'
+                self.aiCount += 1
+                pname = 'AI Antagonists ' + str(self.aiCount).zfill(2)
             else:
-                pname = 'Unknown Faction'
+                self.ufCount += 1
+                pname = 'Unknown Actors ' + str(self.ufCount).zfill(2)
         else:
             pname = pfaction.Name
+            if pname in self.cpCount:
+                self.cpCount[pname] += 1
+            else:
+                self.cpCount[pname] = 1
+            pname += ' ' + str(self.cpCount[pname]).zfill(2)
         self.Players[row] = (ptype, pmode, pfaction, pname)
 
 
@@ -52,8 +68,25 @@ class PlayerData(QAbstractTableModel):
         self.Players = Target
 
 
+    def ResetModel(self, people, pcount):
+        self.ufCount = 0
+        self.exCount = 0
+        self.aiCount = 0
+        self.cpCount.clear()
+        self.beginResetModel()
+        self.NumberOfPlayers = pcount
+        self.Players.clear()
+        self.AddPlayer(0, PT.HUP, None, people.myFaction())
+        n = 1
+        while n < pcount:
+            self.AddPlayer(n, PT.AIP, AI.AI1, people.randomFaction())
+            n += 1
+        self.endResetModel()
+
+
     def rowCount(self, index):
         return self.NumberOfPlayers + 1
+
 
     def columnCount(self, index):
         return 3

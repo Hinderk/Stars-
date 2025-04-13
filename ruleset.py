@@ -213,3 +213,7 @@ class Ruleset(random.Random):
 
   def Rmin(self):
     return 20.0
+
+
+  def GetNumberOfPlayers(self):  # This must depend on the size of the star map
+    return 4

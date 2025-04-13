@@ -9,7 +9,9 @@ class GuiStyle(Enum):
     SimpleSetup = 2
     AdvancedSetup_1 = 3
     AdvancedSetup_2 = 4
-    PlayerMenu = 5
+    AdvancedSetup_3 = 5
+    PlayerMenu = 6
+    FileBrowser = 7
 
 
 class GuiDesign:
@@ -304,31 +306,140 @@ class GuiDesign:
     Style_4 = """
 
              QMenu {
-                 border: 1.5px solid rgb(200,200,200) ;
-                 border-radius: 0px
+                 border: 1px solid #787878;
+                 padding: 5px;
+                 border-radius: 6px
              }
 
              QMenu::item {
-                 background-color: rgb(0,0,0);
-                 color: rgb(240,240,240);
-                 font-size: 18px;
+                 background-color: #f3f3f3;
+                 color: black;
+                 font-size: 16pt;
+                 font-style: oblique;
+                 font-weight: 400;
                  padding: 6px 12px 6px 12px;
              }
 
              QMenu::separator {
                  width: 1.0px;
                  height: 1.0px;
-                 background-color: rgb(200,200,200);
+                 background-color: black;
              }
 
              QMenu::item::selected {
-                 background-color: rgb(200,200,200);
-                 color: rgb(0,0,0);
-                 font-size: 18px;
+                 background-color: #5f94bc;
+                 color: white;
+                 font-size: 16pt;
+                 font-style: oblique;
+                 font-weight: 600;
              }
 
          """
 
+    Style_5 = """
+
+             QLabel {
+                 font-size: 20pt;
+                 font-style: oblique;
+                 font-weight: 600;
+                 padding: 6px 0px 6px 0px;
+             }
+
+             QRadioButton {
+                 font-size: 20pt;
+                 font-style: oblique;
+                 font-weight: 400;
+                 padding: 6px 0px 6px 32px;
+             }
+
+             QSpinBox {
+                 font-size: 20pt;
+                 font-style: oblique;
+                 font-weight: 400;
+                 background-color: #f3f3f3;
+             }
+
+             QSpinBox::down-button {
+                 width: 20
+             }
+
+             QSpinBox::up-button {
+                 width: 20
+             }
+
+         """
+
+    Style_6 = """
+
+             QLineEdit {
+                 padding: 5px 10px 10px 10px;
+                 font-size: 18pt;
+                 font-weight: 500;
+             }
+
+             QPushButton {
+                 padding: 5px 10px 10px 10px;
+                 font-size: 18pt;
+                 font-style: oblique;
+                 font-weight: 500;
+             }
+
+             QLabel {
+                 padding: 5px 10px 10px 10px;
+                 font-weight: 500;
+                 font-size: 18pt;
+                 font-style: oblique;
+             }
+
+             QComboBox {
+                 padding: 5px 0px 10px 20px;
+                 font-size: 20px;
+                 font-style: oblique;
+                 font-weight: 600;
+             }
+
+             QTreeView {
+                 font-size: 18px;
+                 font-style: oblique;
+                 font-weight: 400;
+             }
+
+             QTreeView::item:selected:active {
+                 background: #4f84ac;
+             }
+
+             QTreeView::item:hover {
+                 background: #5f94bc;
+             }
+
+             QHeaderView::section {
+                 font-size: 16px;
+                 font-style: oblique;
+                 font-weight: 600;
+                 padding: 6px 0px 0px 20px;
+             }
+
+             QTreeView::header {
+                 font-size: 18px;
+                 font-style: oblique;
+                 font-weight: 400;
+             }
+
+             QListView {
+                 font-size: 18px;
+                 font-style: oblique;
+                 font-weight: 400;
+             }
+
+             QListView::item:selected:active {
+                 background: #4f84ac;
+             }
+
+             QListView::item:hover {
+                 background: #5f94bc;
+             }
+
+         """
 
     def getStyle(role, select=0):
         if role == GuiStyle.GeneralGui:
@@ -343,6 +454,10 @@ class GuiDesign:
             return GuiDesign.Style_3
         elif role == GuiStyle.PlayerMenu:
             return GuiDesign.Style_4
+        elif role == GuiStyle.AdvancedSetup_3:
+            return GuiDesign.Style_5
+        elif role == GuiStyle.FileBrowser:
+            return GuiDesign.Style_6
 
 
     def getSize():

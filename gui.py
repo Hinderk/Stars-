@@ -116,9 +116,9 @@ class Gui(QMainWindow):
         self.setCentralWidget(self.CentralWidget)
         self.CentralWidget.setMinimumSize(sx, sy)
 
-        self.GameSetup = GameSetup(people, rules)
         self.NewGame = NewGame(people, rules)
         self.NewGame.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.GameSetup = GameSetup(people, rules)
         self.GameSetup.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         LeftSide = QWidget()
@@ -657,4 +657,4 @@ class Gui(QMainWindow):
 
     def ConfigureGame(self):
         self.NewGame.hide()
-        self.GameSetup.ConfigureGame()
+        self.GameSetup.ConfigureGame(self.NewGame.MapSize)
