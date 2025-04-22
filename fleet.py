@@ -1,12 +1,12 @@
 
-from PyQt6.QtGui import QPen
+from PyQt6.QtGui import QPen, QPolygonF
+# from PyQt6.QtCore import QPointF
 
 import math
 
 from universe import Universe
 from design import Design
-from faction import Faction
-from defines import Stance
+from defines import Stance, Task
 from colours import Pen, Brush
 from system import SystemType
 from defines import Perks
@@ -27,7 +27,8 @@ class Fleet:
     return 0, 0
 
 
-  def __init__(self, ships, fID):
+  def __init__(self, ships, fID, people):
+    faction = people.getFaction(fID)
     self.xc = 0
     self.yc = 0
     self.ShipList = []
@@ -41,6 +42,7 @@ class Fleet:
     self.MineFields = []
     self.RepeatSchedule = False
     self.Idle = True
+    self.Task = Task.IDLE
     self.Discovered = True           # TODO: Depends on scanners!
     self.Orbiting = None
     self.TotalWeight = 0
@@ -55,15 +57,15 @@ class Fleet:
     self.MineSweeping = 0
     self.MaxRange = 0
     self.PenRange = 0
-    self.StealCargo = False
+    self.StealCargo = faction.CargoRobber
     self.Name = None
     self.Index = None
     self.Picture = None
-    self.FriendOrFoe = Faction.Stance(Ruleset.fID0, fID)
+    self.FriendOrFoe = people.getStance(Ruleset.fID0, fID)  # TODO : just a test
     self.ShipCounter = len(ships)
     for s in ships:
       self.AddShip(s)
-    self.Faction = fID
+    self.BannerIndex = faction.BannerIndex
     self.scanner = None
     self.MovingFleet = None
     self.RestingFleet = None
@@ -153,15 +155,17 @@ class Fleet:
 
 
   def GetColours(self, selected=False):
-    if self.FriendOrFoe == Stance.allied:
-      if selected:
+    if selected:
+      if self.FriendOrFoe == Stance.allied:
         return (QPen(Pen.blue_h), Brush.blue)
-      else:
-        return (QPen(Pen.blue_l), Brush.blue)
-    elif self.FriendOrFoe == Stance.hostile:
-      return (QPen(Pen.red_l), Brush.red)
-    else:
+      elif self.FriendOrFoe == Stance.hostile:
+        return (QPen(Pen.red_l), Brush.red_d)
       return (QPen(Pen.green), Brush.green)
+    elif self.FriendOrFoe == Stance.allied:
+      return (QPen(Pen.blue_l), Brush.blue)
+    elif self.FriendOrFoe == Stance.hostile:
+      return (QPen(Pen.red), Brush.red_d)
+    return (QPen(Pen.green), Brush.green)
 
 
   def UpdateShipCount(self):
@@ -178,41 +182,105 @@ class Fleet:
 
 
   def ShowCourse(self, show):
-    if self.Orbiting:
-      visible = False
-    else:
-      visible = show
-    wp = self.FirstWaypoint
-    while wp.segment and wp != self.NextWaypoint:
-      wp.segment.setVisible(False)
-      wp = wp.next
-    while wp and wp.segment:
-      wp.segment.setVisible(visible)
-      wp = wp.next
-    self.Course.setVisible(visible)
+    if self.Course:
+      self.Course.setVisible(show)
 
 
   def ColourCourse(self, selected=False):
     pen, brush = self.GetColours(selected)
+    z = 1
+    if selected:
+      z = 2
     if self.MovingFleet:
       self.MovingFleet.setPen(pen)
       self.MovingFleet.setBrush(brush)
+      self.MovingFleet.setZValue(z)
     self.RestingFleet.setPen(pen)
     self.RestingFleet.setBrush(brush)
-    pen.setWidthF(Universe.CurrentPathWidth)
+    if self.Course:
+      pen.setWidthF(Universe.CurrentPathWidth)
+      self.Course.setPen(pen)
+      self.Course.setZValue(z)
+    self.RestingFleet.setZValue(z)
+
+
+  def UpdateCourse(self, wp, planets):
+    wp.planet = None
+    for p in planets:
+      d = (p.x - wp.xo) * (p.x - wp.xo) + (p.y - wp.yo) * (p.y - wp.yo)
+      if d < GP.p_snap:
+        wp.xo = p.x
+        wp.yo = p.y
+        wp.planet = p
+        return
+
+
+  def ClearWaypoints(self):
     wp = self.FirstWaypoint
-    while wp and wp.segment:
-      wp.segment.setPen(pen)
+    while wp:
+      wo = wp
       wp = wp.next
-    self.Course.setPen(pen)
+      del(wo)
+    self.FirstWaypoint = None
+    self.NextWaypoint = None
+    self.LastWaypoint = None
 
 
-  def GetOffset(self, wp):
-    dx = self.xc - wp.xo
-    dy = self.yc - wp.yo
-    dist = GP.Xscale * GP.c_dist * math.sqrt(dx * dx + dy * dy)
-    if dist > GP.max_dist:
-      dist = GP.max_dist
-    dx = dist * math.cos(self.Heading)
-    dy = dist * math.sin(self.Heading)
-    return dx, dy
+  def RepeatTasks(self, repeat):
+    state = False
+    wp = self.FirstWaypoint
+    while wp:
+      if wp.next and wp.at(self.LastWaypoint):
+        state = repeat
+      wp.retain = state
+      wp = wp.next
+    self.RepeatSchedule = state
+    return state
+
+
+  def UpdateSchedule(self):
+    return self.RepeatTasks(self.RepeatSchedule)
+
+
+  def DeleteWaypoint(self, n0):
+    wp = None
+    wo = self.FirstWaypoint
+    wn = wo.next
+    n = 1
+    while wn and n < n0:
+      n += 1
+      wp = wo
+      wo = wn
+      wn = wn.next
+    if wp:
+      wp.next = wn
+    else:
+      self.FirstWaypoint = wn
+    if wn:
+      wn.previous = wp
+    else:
+      self.LastWaypoint = wp
+    if wo == self.NextWaypoint:
+      self.NextWaypoint = wn
+    del(wo)
+    return self.FindNextWaypoint()
+
+
+  def FindNextWaypoint(self):  # FIX ME!!  -- Check for planets?
+    wn = self.NextWaypoint
+    if wn and self.xc == wn.xo and self.yc == wn.yo:
+      self.WarpSpeed = wn.warp
+      self.Task = wn.task
+      self.NextWaypoint = wn.next
+    wp = self.FirstWaypoint
+    if wp and wp is not self.NextWaypoint:
+      if not wp.retain:
+        wo = wp
+        wp = wp.next
+        del(wo)
+    if wp:
+      wp.previous = None
+    else:
+      self.LastWaypoint = None
+    self.FirstWaypoint = wp
+    return self.NextWaypoint

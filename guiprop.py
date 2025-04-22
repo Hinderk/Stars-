@@ -37,7 +37,9 @@ class GuiProps:
 
     map_frame = 200
     planet_distance = 100
-    c_dist = 0.40
-    max_dist = 15.0
+    fleet_halo = 15.0
+    time_horizon = 5    # Applies to enemy fleets only ...
+    
+    p_snap = 16
 
     fp_width = {25: 2.8, 50: 2.0, 75: 1.8, 100: 1.8, 125: 1.4, 150: 1.4, 200: 1.2, 400: 1.0}

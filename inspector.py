@@ -23,7 +23,7 @@ class Inspector(QGraphicsView):
   TopOffset = 5
 
 
-  def __init__(self, people):
+  def __init__(self, faction):
     super(self.__class__, self).__init__()
 
     self.mConc = []
@@ -36,7 +36,7 @@ class Inspector(QGraphicsView):
 
     self.AddStaticText()
     self.SetupColors()
-    self.PaintBackdrop(people)
+    self.PaintBackdrop(faction)
     self.InitBiome()
     self.InitMinerals()
     self.setScene(self.Scene)
@@ -247,7 +247,7 @@ class Inspector(QGraphicsView):
     self.pen.append(WidePen)
 
 
-  def PaintBackdrop(self, people):
+  def PaintBackdrop(self, faction):
     black = QColor(0, 0, 0)
     white = QColor(255, 255, 255, 150)
     whitePen = QPen(white)
@@ -272,12 +272,12 @@ class Inspector(QGraphicsView):
       self.Scene.addLine(xp, self.yMinerals, xp, yp, whitePen)
     MinVal = []
     MaxVal = []
-    MinVal.append(0.5 + math.log2(people.MinGravity) / 6.0)
-    MinVal.append(0.5 + people.MinTemperatur / 400.0)
-    MinVal.append(people.MinRadioactivity / 100.0)
-    MaxVal.append(0.5 + math.log2(people.MaxGravity) / 6.0)
-    MaxVal.append(0.5 + people.MaxTemperatur / 400.0)
-    MaxVal.append(people.MaxRadioactivity / 100.0)
+    MinVal.append(0.5 + math.log2(faction.MinGravity) / 6.0)
+    MinVal.append(0.5 + faction.MinTemperatur / 400.0)
+    MinVal.append(faction.MinRadioactivity / 100.0)
+    MaxVal.append(0.5 + math.log2(faction.MaxGravity) / 6.0)
+    MaxVal.append(0.5 + faction.MaxTemperatur / 400.0)
+    MaxVal.append(faction.MaxRadioactivity / 100.0)
     deltaY = self.yWidth / 12
     yp = self.yInfo + deltaY
     for n in (0, 1, 2):

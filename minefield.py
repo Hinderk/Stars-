@@ -31,7 +31,7 @@ class Minefield:
   for m in Model:
     Counter[m] = 0
 
-  def __init__(self, scene, x, y, m, model, fID):
+  def __init__(self, scene, x, y, m, model, fID, people):
 
     r = sqrt(m) * GuiProps.Xscale
     Minefield.Counter[model] += 1
@@ -43,7 +43,7 @@ class Minefield:
     self.TotalOthers = 0
     self.Detected = True # False    -- FIXME: Test feature
     self.ShipTracking = False
-    self.fof = Faction.Stance(Ruleset.fID0, fID)
+    self.fof = people.getStance(Ruleset.fID0, fID)
     self.faction = fID
     self.x = x
     self.y = y
@@ -67,7 +67,7 @@ class Minefield:
       self.area = scene.addEllipse(box, Pen.red_m, Brush.red_m)
       self.area.setZValue(-4)
       self.center = scene.addPolygon(self.caret, Pen.noshow, Brush.red)
-    self.center.setZValue(2)
+    self.center.setZValue(4)
     self.center.setPos(x, y)
     self.area.setVisible(False)
     self.center.setVisible(False)

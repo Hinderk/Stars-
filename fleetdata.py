@@ -36,7 +36,7 @@ class Fleetdata(QGraphicsView):
     self.setScene(self.Scene)
     self.setMaximumHeight(325)
     self.FleetPicture = 0
-    self.CurrentFaction = 0
+    self.CurrentBanner = 0
 
 
   def AddStaticText(self):
@@ -62,11 +62,9 @@ class Fleetdata(QGraphicsView):
     Speed = self.Scene.addSimpleText("Warp Speed:", GP.infoFont)
     ypos += self.yDelta
     Speed.moveBy(xpos, ypos)
-#    text = "This fleet can lay up to 100 mines per year."
-    self.Mines = self.Scene.addSimpleText("", GP.infoFont)
-    ypos += self.yDelta
-    self.Mines.moveBy(xpos, ypos)
-#    text = "This fleet can destroy up to 100 mines per year."
+#    self.Mines = self.Scene.addSimpleText("", GP.infoFont)
+#    ypos += self.yDelta
+#    self.Mines.moveBy(xpos, ypos)
     self.Sweeps = self.Scene.addSimpleText("", GP.infoFont)
     ypos += self.yDelta
     self.Sweeps.moveBy(xpos, ypos)
@@ -111,11 +109,11 @@ class Fleetdata(QGraphicsView):
 
 
   def UpdateCargo(self, fleet):
-    self.FactionBanner[self.CurrentFaction].setVisible(False)
+    self.FactionBanner[self.CurrentBanner].setVisible(False)
     self.HullLogo[self.FleetPicture].setVisible(False)
-    self.CurrentFaction = fleet.Faction
+    self.CurrentBanner = fleet.BannerIndex
     self.FleetPicture = fleet.Picture
-    self.FactionBanner[self.CurrentFaction].setVisible(True)
+    self.FactionBanner[self.CurrentBanner].setVisible(True)
     self.HullLogo[self.FleetPicture].setVisible(True)
     fraction = []
     fuel = self.xWidth * fleet.Fuel / fleet.TotalFuel
@@ -148,9 +146,44 @@ class Fleetdata(QGraphicsView):
       self.backdrop.setBrush(Brush.yellow_p)
     else:
       self.backdrop.setBrush(Brush.red_p)
+#    if fleet.MineLaying > 0:
+#      text = 'This fleet can lay up to ' + str(fleet.MineLaying)
+#      self.Mines.setText(text + ' mines per year.')
+#    else:
+#      self.Mines.setText('')
+    if fleet.MineSweeping > 0:
+      text = 'This fleet can destroy up to ' + str(fleet.MineSweeping)
+      self.Sweeps.setText(text + ' mines per year.')
+    else:
+      self.Sweeps.setText('')
+    if fleet.NextWaypoint:
+      if fleet.NextWaypoint.planet:
+        self.Waypoint.setText(fleet.NextWaypoint.planet.Name)
+      else:
+        x = str(fleet.NextWaypoint.xo)
+        y = str(fleet.NextWaypoint.yo)
+        self.Waypoint.setText('(' + x + ',' + y + ')')
+      self.Task.setText(fleet.NextWaypoint.task.value)
+    else:
+      self.Waypoint.setText('None')
+    if fleet.WarpSpeed > 0:
+      self.Speed.setText(str(fleet.WarpSpeed))
+    else:
+      self.Speed.setText('Stopped')
+      self.Task.setText(fleet.Task.value)
     self.ShipCount.setText(str(len(fleet.ShipList)))
-#    text = "This fleet can lay up to 100 mines per year."
-#    text = "This fleet can destroy up to 100 mines per year."
+
+
+  def UpdateInfo(self, speed, wp):
+    if wp:
+      if wp.planet:
+        self.Waypoint.setText(wp.planet.Name)
+      else:
+        self.Waypoint.setText('(' + str(wp.xo) + ',' + str(wp.yo) + ')')
+    if speed > 0:
+      self.Speed.setText(str(speed))
+    else:
+      self.Speed.setText('Stopped')
 
 
   def AddLogos(self):

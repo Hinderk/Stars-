@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QMainWindow, QPushButton, QToolButton
 from PyQt6.QtWidgets import QStatusBar, QGroupBox, QCheckBox
 from PyQt6.QtWidgets import QPlainTextEdit
 
-from guidesign import GuiDesign
+from guidesign import GuiDesign, GuiStyle
 from defines import Stance
 from menubar import Menu
 from toolbar import ToolBar
@@ -17,6 +17,9 @@ from fleetdata import Fleetdata
 from minedata import Minedata
 from starmap import Starmap
 from universe import Universe
+from newgame import NewGame
+from gamesetup import GameSetup
+from factionwizard import FactionWizard
 
 
 
@@ -58,7 +61,7 @@ class Gui(QMainWindow):
         self.HostileFleets = 0
         self.ShowFleetMovements = False
         self.WaypointMode = False
-        self.setStyleSheet(GuiDesign.getGuiStyle())
+        self.setStyleSheet(GuiDesign.getStyle(GuiStyle.GeneralGui))
         self.Action = dict()
         self.SetupUI(people, rules)
         self.Buttons.Zoom.setMenu(self.Menu.MenuZoom)
@@ -88,6 +91,7 @@ class Gui(QMainWindow):
         self.Map.Universe.SelectPlanet.connect(self.InspectPlanet)
         self.Map.Universe.UpdatePlanet.connect(self.UpdatePlanetView)
         self.Map.Universe.UpdateFilter.connect(self.UpdateFields)
+        self.Map.Universe.UpdateRoute.connect(self.FleetInfo.UpdateInfo)
         self.ShowPlanet.clicked.connect(self.InspectPlanets)
         self.SelectNextEnemy.clicked.connect(self.InspectHostileFleet)
         self.SelectNextNeutral.clicked.connect(self.InspectNeutralFleet)
@@ -96,6 +100,12 @@ class Gui(QMainWindow):
         self.ShowFleets.clicked.connect(self.InspectFleets)
         self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
         self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFleets)
+        self.Menu.actionNewGame.triggered.connect(self.NewGame.ConfigureGame)
+        self.Menu.actionWizard.triggered.connect(self.NewFaction.ConfigureWizard)
+        self.NewGame.FactionSetup.clicked.connect(self.ConfigureFaction)
+        self.NewGame.AdvancedGame.clicked.connect(self.ConfigureGame)
+        self.GameSetup.ConfigureFaction.connect(self.ConfigureFaction)
+        self.NewFaction.Cancel.clicked.connect(self.AbortFaction)
         self.Map.Universe.HighlightPlanet(self.Map.Universe.planets[-1])
 
 
@@ -110,6 +120,13 @@ class Gui(QMainWindow):
         self.CentralWidget = QWidget(self)
         self.setCentralWidget(self.CentralWidget)
         self.CentralWidget.setMinimumSize(sx, sy)
+
+        self.NewGame = NewGame(people, rules)
+        self.NewGame.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.GameSetup = GameSetup(people, rules)
+        self.GameSetup.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.NewFaction = FactionWizard(people, rules)
+        self.NewFaction.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         LeftSide = QWidget()
         LeftSide.setMinimumWidth(875)        # Minimal feasible value ...
@@ -148,7 +165,7 @@ class Gui(QMainWindow):
         Info_VL.setSpacing(0)
         Info_VL.addWidget(self.SetupInspectorTitle())
         self.ItemInfo = QStackedLayout()
-        self.PlanetInfo = Inspector(people)
+        self.PlanetInfo = Inspector(people.myFaction())
         self.ItemInfo.addWidget(self.PlanetInfo)
 
         self.FleetInfo = Fleetdata()
@@ -643,4 +660,24 @@ class Gui(QMainWindow):
     def AddWaypoints(self, event):
         self.WaypointMode = event
         self.Map.Universe.SetWaypointMode(event)
+
+
+    def ConfigureGame(self):
+        self.NewGame.hide()
+        self.GameSetup.ConfigureGame(self.NewGame.MapSize)
+
+
+    def ConfigureFaction(self):
+        advanced = self.GameSetup.isVisible()
+        simple = self.NewGame.isVisible()
+        self.GameSetup.hide()
+        self.NewGame.hide()
+        self.NewFaction.ConfigureWizard(simple, advanced)
+
+
+    def AbortFaction(self):
+        self.NewFaction.hide()
+        self.GameSetup.setVisible(self.NewFaction.RestartGameWizard)
+        self.NewGame.setVisible(self.NewFaction.RestartNewGame)
+
 

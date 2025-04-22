@@ -68,6 +68,22 @@ class ShipClass(Enum):
 
 
 class Task(Enum):
-    IDLE = 0
-    MOVE = 1
-        
+    IDLE = 'None'
+    MOVE = 'Travel'
+    HAUL = 'Transport'
+    MINE = 'Mining'
+
+
+class PlayerType(Enum):
+    AIP = 'AI Antagonist'
+    EXP = 'Expansion Slot'
+    HUP = 'Human Player'
+    RNG = 'Random Player'
+
+
+class AIMode(Enum):
+    AI0 = 'Easy'
+    AI1 = 'Standard'
+    AI2 = 'Tough'
+    AI3 = 'Expert'
+    AIR = 'Random'
