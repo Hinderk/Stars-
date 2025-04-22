@@ -1,7 +1,9 @@
 
 import random
 
+from defines import Stance
 from faction import Faction
+
 
 
 class People:
@@ -18,19 +20,30 @@ class People:
         MaxAI += 1
         AIFaction.append(fi)
 
-
+        
     def __init__(self):
         self.PlayerID = 0
         self.PlayerCount = 1
-        self.PlayerFaction = [Faction()]
+        self.Player = [Faction()]
+
+
+    def getStance(self, fIDA, fIDB):  # TODO: For testing purposes only ...
+        if fIDA == fIDB:
+            return Stance.allied
+        elif fIDB < 4:
+            return Stance.friendly
+        elif fIDB < 8:
+            return Stance.neutral
+        else:
+            return Stance.hostile
 
 
     def myFaction(self):
-        return self.PlayerFaction[self.PlayerID]
+        return self.Player[self.PlayerID]
 
 
     def getFaction(self, fID):
-        return self.PlayerFaction[fID % self.PlayerCount]
+        return self.Player[fID % self.PlayerCount]
 
 
     def getAIFaction(self, fID):

@@ -12,6 +12,7 @@ class GuiStyle(Enum):
     AdvancedSetup_3 = 5
     PlayerMenu = 6
     FileBrowser = 7
+    FactionSetup_1 = 8
 
 
 class GuiDesign:
@@ -458,6 +459,8 @@ class GuiDesign:
             return GuiDesign.Style_5
         elif role == GuiStyle.FileBrowser:
             return GuiDesign.Style_6
+        elif role == GuiStyle.FactionSetup_1:
+            return GuiDesign.Style_2  # FIX ME !!
 
 
     def getSize():

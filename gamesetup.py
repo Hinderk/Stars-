@@ -1,8 +1,12 @@
 
+import random
+import json
+
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtGui import QKeySequence
+from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt6.QtWidgets import QGroupBox, QHeaderView
@@ -11,15 +15,21 @@ from PyQt6.QtWidgets import QStackedLayout, QSpinBox
 from PyQt6.QtWidgets import QRadioButton, QLabel
 from PyQt6.QtWidgets import QPushButton, QLineEdit
 
+from PyQt6.QtCore import pyqtSignal as QSignal
+
 from defines import PlayerType as PT
 from defines import AIMode as AI
 from guidesign import GuiDesign, GuiStyle
+from faction import Faction
 from victory import Victory
 from playerdata import PlayerData
 
 
 
+
 class GameSetup(QWidget):
+    
+    ConfigureFaction = QSignal(bool, bool)
 
     AIModes = [AI.AI0, AI.AI1, AI.AI2, AI.AI3, AI.AIR]
 
@@ -38,11 +48,21 @@ class GameSetup(QWidget):
         self.GameFeature = []
         self.NumberOfPlayers = rules.GetNumberOfPlayers()
         self.Factions = people
+        self.SetupErrorMessages()
         self.SetupUniverse()
         self.SetupPlayers(people)
         self.SetupVictoryConditions()
         self.SetupMenu(people)
         self.SetupButtons()
+
+
+    def SetupErrorMessages(self):
+        self.Error = QMessageBox(self)
+        self.Error.setIcon(self.Error.Icon.Warning)
+        self.Error.setWindowTitle('Advanced New Game Wizard')
+        Icon = QIcon()
+        Icon.addPixmap(QPixmap(":/Icons/Stars"))
+        self.Error.setWindowIcon(Icon)
 
 
     def SetupButtons(self):
@@ -135,9 +155,38 @@ class GameSetup(QWidget):
         self.show()
 
 
+    def LoadFaction(self):
+        ReadFaction = QFileDialog(self)
+        ReadFaction.setOption(ReadFaction.Option.DontUseNativeDialog)
+        ReadFaction.setStyleSheet(GuiDesign.getStyle(GuiStyle.FileBrowser))
+        ReadFaction.setMinimumSize(1000, 750)
+        ReadFaction.setFileMode(ReadFaction.FileMode.AnyFile)
+        ReadFaction.setViewMode(ReadFaction.ViewMode.List)
+        ReadFaction.setAcceptMode(ReadFaction.AcceptMode.AcceptOpen)
+        ReadFaction.setNameFilters(['Game Files (*.f1)', 'All Files (*.*)'])
+        ReadFaction.setDefaultSuffix('f1')
+        fnew = None
+        if ReadFaction.exec():
+            Files = ReadFaction.selectedFiles()
+            try:
+                f = open(Files[0], 'rt')
+                try:
+                    fnew = Faction()
+                    fnew.deserialize(json.load(f))
+                except:
+                    fnew = None
+                    self.Error.setText('Invalid faction file!')
+                    self.Error.exec()
+                f.close()
+            except OSError:
+                self.Error.setText('Failed to open file!')
+                self.Error.exec()
+        return fnew
+
+
     def SaveGameData(self):
         SaveGame = QFileDialog(self)
-        SaveGame.setOption( SaveGame.Option.DontUseNativeDialog)
+        SaveGame.setOption(SaveGame.Option.DontUseNativeDialog)
         SaveGame.setStyleSheet(GuiDesign.getStyle(GuiStyle.FileBrowser))
         SaveGame.setMinimumSize(1000, 750)
         SaveGame.setFileMode(SaveGame.FileMode.AnyFile)
@@ -152,41 +201,51 @@ class GameSetup(QWidget):
                 name = self.GameName.text()
                 if not name:
                     name = 'Silent Running'
-                f.write('setup.advanced.name: ' + name)
                 GameData = [name]
                 for rb in self.MapSize:
                     if rb.isChecked():
                         GameData.append(self.MapSize.index(rb))
-                        f.write('\nsetup.advanced.size: ' + rb.text())
+                    else:
+                        GameData.append(-1)
                 for rb in self.StarDensity:
                     if rb.isChecked():
                         GameData.append(self.StarDensity.index(rb))
-                        f.write('\nsetup.advanced.density: ' + rb.text())
+                    else:
+                        GameData.append(-1)
                 for rb in self.PlayerDistance:
                     if rb.isChecked():
                         GameData.append(self.PlayerDistance.index(rb))
-                        f.write('\nsetup.advanced.distance: ' + rb.text())
-                f.write('\nsetup.advanced.featureset:')
+                    else:
+                        GameData.append(-1)
                 for rb in self.GameFeature:
                     if rb.isChecked():
-                        f.write(' 1')
                         GameData.append(1)
                     else:
-                        f.write(' 0')
                         GameData.append(0)
-
                 for vc in Victory:
                     radio, spinner = self.VictoryCondition[vc]
-                    f.write('\nsetup.advanced.distance: ' + radio.text())
                     if radio.isChecked():
                         GameData.append(spinner.value())
                     else:
-                        GameData.append(0)
+                        GameData.append(-1)
+                GameData.append(self.ActiveConditions.value())
+                GameData.append(self.GameDuration.value())
+                players = dict()
+                for p in self.Model.Players:
+                    ptype, pmode, pf, pname = self.Model.Players[p]
+                    if pmode:
+                        if pmode == AI.AIR:
+                            pmode = self.AIModes[random.randint(0, 3)]
+                        players[p] = [pname, ptype.name, pmode.name]
+                    else:
+                        players[p] = [pname, ptype.name, '']
+                    players[p] += pf.serialize()
+                GameData.append(players)
+                json.dump(GameData, f)
                 f.close()
-            except OSError:
-                print('Couldn\'t open file!')
-
-        print(GameData)
+            except:
+                self.Error.setText('Failed to save game data!')
+                self.Error.exec()
 
 
     def SetupMenu(self, people):
@@ -207,7 +266,7 @@ class GameSetup(QWidget):
         a.setData((1, 1, 0))
         cf.addSeparator()
         n = 0
-        for pc in people.PlayerFaction:
+        for pc in people.Player:
             a = cf.addAction(pc.Name)
             a.setData((1, 2, n))
             n += 1
@@ -383,11 +442,11 @@ class GameSetup(QWidget):
                         pType = PT.RNG
                         fnew = self.Factions.randomFaction()
                 if ID == 1:
-                    fnew = self.Factions.myFaction()   # FIX ME
                     if fID == 0:
-                        print('Design New Faction')
+                        self.ConfigureFaction.emit(False, True)
+                        fnew = None
                     if fID == 1:
-                        print('Load a design file')
+                        fnew = self.LoadFaction()
                     if fID == 2:
                         fnew = self.Factions.getFaction(mID)
                 if ID == 2:
@@ -404,7 +463,8 @@ class GameSetup(QWidget):
                 if ID == 4:
                     self.Model.RemovePlayer(select.row())
                     return
-                self.Model.AddPlayer(select.row(), pType, pMode, fnew)
+                if fnew:
+                    self.Model.AddPlayer(select.row(), pType, pMode, fnew)
 
 
     def AddVictoryCondition(self, vlayout, vc):

@@ -33,6 +33,11 @@ class Menu(QMenuBar):
         self.actionNewGame.setShortcut("Ctrl+N")
         self.actionNewGame.setAutoRepeat(False)
 
+        self.actionWizard = QAction(self)
+        self.actionWizard.setAutoRepeat(False)
+        self.actionWizard.setText("Custom Faction Wizard ...")
+        self.actionWizard.setStatusTip("Launch the custom faction wizard ...")
+
         self.actionOpenGame = QAction(self)
         self.actionOpenGame.setAutoRepeat(False)
         self.actionOpenGame.setText("Open")
@@ -106,10 +111,10 @@ class Menu(QMenuBar):
         self.actionDefault.setCheckable(True)
         self.actionDefault.setChecked(True)
 
-        self.actionRace = QAction(self)
-        self.actionRace.setText("Race ...")
-        self.actionRace.setShortcut("F8")
-        self.actionRace.setAutoRepeat(False)
+        self.actionFaction = QAction(self)
+        self.actionFaction.setText("Faction ...")
+        self.actionFaction.setShortcut("F8")
+        self.actionFaction.setAutoRepeat(False)
 
         self.actionSaveSubmit = QAction(self)
         self.actionSaveSubmit.setText("Save and Submit")
@@ -179,6 +184,7 @@ class Menu(QMenuBar):
         MenuDumpTextFile.addAction(self.actionUniverseDefinition)
 
         MenuFile.addAction(self.actionNewGame)
+        MenuFile.addAction(self.actionWizard)
         MenuFile.addAction(self.actionOpenGame)
         MenuFile.addAction(self.actionCloseGame)
         MenuFile.addAction(self.actionSaveGameAs)
@@ -199,7 +205,7 @@ class Menu(QMenuBar):
         MenuView.addAction(self.MenuZoom.menuAction())
         MenuView.addAction(MenuLayout.menuAction())
         MenuView.addSeparator()
-        MenuView.addAction(self.actionRace)
+        MenuView.addAction(self.actionFaction)
         MenuView.addAction(self.actionGameParameters)
         MenuView.setTitle("View")
         MenuTurn.addAction(self.actionGenerate)

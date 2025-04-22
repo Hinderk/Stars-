@@ -1,12 +1,11 @@
 
 from PyQt6.QtGui import QPen, QPolygonF
-from PyQt6.QtCore import QPointF
+# from PyQt6.QtCore import QPointF
 
 import math
 
 from universe import Universe
 from design import Design
-from faction import Faction
 from defines import Stance, Task
 from colours import Pen, Brush
 from system import SystemType
@@ -28,7 +27,8 @@ class Fleet:
     return 0, 0
 
 
-  def __init__(self, ships, fID):
+  def __init__(self, ships, fID, people):
+    faction = people.getFaction(fID)
     self.xc = 0
     self.yc = 0
     self.ShipList = []
@@ -57,15 +57,15 @@ class Fleet:
     self.MineSweeping = 0
     self.MaxRange = 0
     self.PenRange = 0
-    self.StealCargo = False
+    self.StealCargo = faction.CargoRobber
     self.Name = None
     self.Index = None
     self.Picture = None
-    self.FriendOrFoe = Faction.Stance(Ruleset.fID0, fID)
+    self.FriendOrFoe = people.getStance(Ruleset.fID0, fID)  # TODO : just a test
     self.ShipCounter = len(ships)
     for s in ships:
       self.AddShip(s)
-    self.Faction = fID
+    self.BannerIndex = faction.BannerIndex
     self.scanner = None
     self.MovingFleet = None
     self.RestingFleet = None

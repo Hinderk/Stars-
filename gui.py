@@ -19,6 +19,7 @@ from starmap import Starmap
 from universe import Universe
 from newgame import NewGame
 from gamesetup import GameSetup
+from factionwizard import FactionWizard
 
 
 
@@ -100,7 +101,11 @@ class Gui(QMainWindow):
         self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
         self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFleets)
         self.Menu.actionNewGame.triggered.connect(self.NewGame.ConfigureGame)
+        self.Menu.actionWizard.triggered.connect(self.NewFaction.ConfigureWizard)
+        self.NewGame.FactionSetup.clicked.connect(self.ConfigureFaction)
         self.NewGame.AdvancedGame.clicked.connect(self.ConfigureGame)
+        self.GameSetup.ConfigureFaction.connect(self.ConfigureFaction)
+        self.NewFaction.Cancel.clicked.connect(self.AbortFaction)
         self.Map.Universe.HighlightPlanet(self.Map.Universe.planets[-1])
 
 
@@ -120,6 +125,8 @@ class Gui(QMainWindow):
         self.NewGame.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.GameSetup = GameSetup(people, rules)
         self.GameSetup.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.NewFaction = FactionWizard(people, rules)
+        self.NewFaction.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         LeftSide = QWidget()
         LeftSide.setMinimumWidth(875)        # Minimal feasible value ...
@@ -658,3 +665,19 @@ class Gui(QMainWindow):
     def ConfigureGame(self):
         self.NewGame.hide()
         self.GameSetup.ConfigureGame(self.NewGame.MapSize)
+
+
+    def ConfigureFaction(self):
+        advanced = self.GameSetup.isVisible()
+        simple = self.NewGame.isVisible()
+        self.GameSetup.hide()
+        self.NewGame.hide()
+        self.NewFaction.ConfigureWizard(simple, advanced)
+
+
+    def AbortFaction(self):
+        self.NewFaction.hide()
+        self.GameSetup.setVisible(self.NewFaction.RestartGameWizard)
+        self.NewGame.setVisible(self.NewFaction.RestartNewGame)
+
+

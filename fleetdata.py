@@ -36,7 +36,7 @@ class Fleetdata(QGraphicsView):
     self.setScene(self.Scene)
     self.setMaximumHeight(325)
     self.FleetPicture = 0
-    self.CurrentFaction = 0
+    self.CurrentBanner = 0
 
 
   def AddStaticText(self):
@@ -109,11 +109,11 @@ class Fleetdata(QGraphicsView):
 
 
   def UpdateCargo(self, fleet):
-    self.FactionBanner[self.CurrentFaction].setVisible(False)
+    self.FactionBanner[self.CurrentBanner].setVisible(False)
     self.HullLogo[self.FleetPicture].setVisible(False)
-    self.CurrentFaction = fleet.Faction
+    self.CurrentBanner = fleet.BannerIndex
     self.FleetPicture = fleet.Picture
-    self.FactionBanner[self.CurrentFaction].setVisible(True)
+    self.FactionBanner[self.CurrentBanner].setVisible(True)
     self.HullLogo[self.FleetPicture].setVisible(True)
     fraction = []
     fuel = self.xWidth * fleet.Fuel / fleet.TotalFuel

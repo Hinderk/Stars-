@@ -53,9 +53,9 @@ def main():
     ship.MineSweeping = 1
     ship.Name = "Explorer"
 
-    fleet_0 = Fleet([ship], 4)
-    fleet_1 = Fleet([ship], 2)
-    fleet_2 = Fleet([ship], 0)
+    fleet_0 = Fleet([ship], 4, people)
+    fleet_1 = Fleet([ship], 2, people)
+    fleet_2 = Fleet([ship], 0, people)
 
     freighter = Ship(Design(0, Hull.SFR))
     freighter.EmptyWeight = 20
@@ -72,12 +72,12 @@ def main():
     freighter.MineSweeping = 0
     freighter.Name = "Hauler"
 
-    fleet_3 = Fleet([ship, ship, ship], 1)
-    fleet_4 = Fleet([ship], 3)
-    fleet_5 = Fleet([ship], 9)
-    fleet_6 = Fleet([freighter, freighter], 0)
-    fleet_7 = Fleet([freighter, freighter, freighter], 9)
-    fleet_8 = Fleet([ship, ship, ship, ship], 9)
+    fleet_3 = Fleet([ship, ship, ship], 1, people)
+    fleet_4 = Fleet([ship], 3, people)
+    fleet_5 = Fleet([ship], 9, people)
+    fleet_6 = Fleet([freighter, freighter], 0, people)
+    fleet_7 = Fleet([freighter, freighter, freighter], 9, people)
+    fleet_8 = Fleet([ship, ship, ship, ship], 9, people)
 
     fleet_3.Idle = False
     fleet_7.Idle = False
@@ -130,17 +130,17 @@ def main():
     x = -30
     y = -30
 
-    M0 = Minefield(form.Map.Universe, p.x, p.y, 2500, M.Normal, 0)
+    M0 = Minefield(form.Map.Universe, p.x, p.y, 2500, M.Normal, 0, people)
     M0.Detected = True
     form.Map.Universe.minefields.append(M0)
-    M0 = Minefield(form.Map.Universe, p.x, p.y, 25000, M.SpeedTrap, 11)
+    M0 = Minefield(form.Map.Universe, p.x, p.y, 25000, M.SpeedTrap, 11, people)
     M0.Detected = True
     form.Map.Universe.minefields.append(M0)
 
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 400, M.Normal, 4))
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 1400, M.SpeedTrap, 4))
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 10, y + 50, 25000, M.Normal, 0))
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 64000, M.Normal, -1))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 400, M.Normal, 4, people))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 1400, M.SpeedTrap, 4, people))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 10, y + 50, 25000, M.Normal, 0, people))
+    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 64000, M.Normal, -1, people))
 
     fleet_7.WarpSpeed = 10
     fleet_8.RepeatTasks(True)
