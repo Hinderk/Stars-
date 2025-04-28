@@ -1,7 +1,8 @@
 
+""" Collection of pens & brushes to create a consistent color scheme """
+
 from PyQt6.QtGui import QColor, QPen, QBrush
 from PyQt6.QtCore import Qt
-
 
 
 _black = QColor(0, 0, 0)
@@ -13,6 +14,16 @@ _white = QColor(255, 255, 255)
 _brown = QColor(181, 101, 29)
 _neutral = QColor(40, 220, 40)
 _grey = QColor(200, 200, 200)
+_off_white = QColor(255, 255, 255, 150)
+
+_inspector_blue = QColor(0, 0, 255, 120)
+_inspector_green = QColor(0, 255, 0, 140)
+_inspector_yellow = QColor(255, 255, 0, 160)
+_inspector_red = QColor(255, 0, 0, 180)
+
+_inspector_light_blue = QColor(80, 80, 255)
+_inspector_light_red = QColor(255, 80, 80)
+_inspector_light_green = QColor(80, 200, 80)
 
 _scanner_yellow = QColor(236, 175, 0)     # QColor(255, 255, 0, 120)
 _scanner_red = QColor(220, 104, 0)        # QColor(255, 120, 0, 220)
@@ -37,15 +48,27 @@ _background_green = QColor(200, 255, 200)
 _background_yellow = QColor(255, 255, 200)
 
 
-
 class Pen:
 
+    """ This class provides a collection of pens to draw GUI elements """
+
     noshow = QPen(Qt.PenStyle.NoPen)
+    blue_25 = QPen(_inspector_light_blue)
+    green_25 = QPen(_inspector_light_green)
+    red_25 = QPen(_inspector_light_red)
+    blue_25.setWidthF(2.5)
+    red_25.setWidthF(2.5)
+    green_25.setWidthF(2.5)
+    blue_i = QPen(_inspector_blue)
+    green_i = QPen(_inspector_green)
+    yellow_i = QPen(_inspector_yellow)
+    red_i = QPen(_inspector_red)
     blue_p = QPen(_background_blue)
     red_p = QPen(_background_red)
     yellow_p = QPen(_background_yellow)
     green_p = QPen(_background_green)
     white_l = QPen(_label_white)
+    white_o = QPen(_off_white)
     red_m = QPen(_minefield_red)
     red_s = QPen(_scanner_red)
     red_d = QPen(_dark_red)
@@ -69,6 +92,7 @@ class Pen:
     white_08 = QPen(_white)
     brown.setWidthF(2.0)
     white_2.setWidthF(2.0)
+    white_o.setWidth(2)
     white_08.setWidthF(0.8)
     red_m.setWidthF(0.4)
     blue_m.setWidthF(0.4)
@@ -77,9 +101,14 @@ class Pen:
     black_2.setWidthF(2.0)
 
 
-
 class Brush:
 
+    """ This class provides a collection of brushes to draw GUI elements """
+
+    blue_i = QBrush(_inspector_blue)
+    green_i = QBrush(_inspector_green)
+    yellow_i = QBrush(_inspector_yellow)
+    red_i = QBrush(_inspector_red)
     white_l = QBrush(_label_white)
     white = QBrush(_white)
     black = QBrush(_black)
@@ -87,7 +116,6 @@ class Brush:
     grey = QBrush(_grey)
     blue_m = QBrush(_minefield_blue, Qt.BrushStyle.BDiagPattern)
     blue_l = QBrush(_light_blue)
-#  red_l = QBrush(_light_red)
     red_d = QBrush(_dark_red)
     green = QBrush(_green)
     yellow = QBrush(_yellow)

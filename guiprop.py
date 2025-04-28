@@ -6,11 +6,11 @@ from PyQt6.QtGui import QFont
 class GuiProps:
 
     fontsize = 14
-    mapFont = QFont('Courier', pointSize=fontsize, weight=50)
-    infoFont = QFont('Segoe', pointSize=16, weight=400)
-    cargoFont = QFont('Segoe', pointSize=14, weight=800)
+    map_font = QFont('Courier', pointSize=fontsize, weight=50)
+    info_font = QFont('Segoe', pointSize=16, weight=400)
+    cargo_font = QFont('Segoe', pointSize=14, weight=800)
 
-    Xscale = 0.75       # Change to resize the star map ...
+    xscale = 0.75       # Change to resize the star map ...
 
     # The following numbers denote screen coordinates.
 

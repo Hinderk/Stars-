@@ -15,92 +15,92 @@ from defines import Stance
 
 class Minedata(QGraphicsView):
 
-    xOffset = 150
-    yOffset = 110
-    yDelta = 35
-    ySize = 27
-    xWidth = 550
-    xText = 100
-    IconWidth = 120
-    DataOffset = 150
-    FlagOffset = 20
-    TopOffset = 10
+    x_offset = 150
+    y_offset = 110
+    y_delta = 35
+    y_size = 27
+    x_width = 550
+    x_text = 100
+    icon_width = 120
+    data_offset = 150
+    flag_offset = 20
+    top_offset = 10
 
 
     def __init__(self):
         super(self.__class__, self).__init__()
-        self.Scene = QGraphicsScene(self)
-        self.AddStaticText()
-        self.AddInfoText()
-        self.AddLogos()
-        self.setScene(self.Scene)
+        self.scene = QGraphicsScene(self)
+        self.add_static_text()
+        self.add_info_text()
+        self.add_logos()
+        self.setScene(self.scene)
         self.setMaximumHeight(325)
-        self.CurrentFaction = 0
+        self.current_faction = 0
 
 
-    def AddStaticText(self):
-        Location = self.Scene.addSimpleText("Location:", GP.infoFont)
-        xpos = self.xOffset
+    def add_static_text(self):
+        location = self.scene.addSimpleText("Location:", GP.info_font)
+        xpos = self.x_offset
         ypos = 0
-        Location.moveBy(xpos, ypos)
-        FieldType = self.Scene.addSimpleText("Field Type:", GP.infoFont)
-        ypos += self.yDelta
-        FieldType.moveBy(xpos, ypos)
-        FieldRadius = self.Scene.addSimpleText("Field Radius:", GP.infoFont)
-        ypos += self.yDelta
-        FieldRadius.moveBy(xpos, ypos)
-        MineCount = self.Scene.addSimpleText("Live Mines:", GP.infoFont)
-        ypos += self.yDelta
-        MineCount.moveBy(xpos, ypos)
-        DecayRate = self.Scene.addSimpleText("Decay Rate:", GP.infoFont)
-        ypos += self.yDelta
-        DecayRate.moveBy(xpos, ypos)
-        self.IndexLabel = self.Scene.addSimpleText("Field:", GP.infoFont)
-        ypos += 2 * self.yDelta
-        self.IndexLabel.moveBy(xpos, ypos)
+        location.moveBy(xpos, ypos)
+        field_type = self.scene.addSimpleText("Field Type:", GP.info_font)
+        ypos += self.y_delta
+        field_type.moveBy(xpos, ypos)
+        field_radius = self.scene.addSimpleText("Field Radius:", GP.info_font)
+        ypos += self.y_delta
+        field_radius.moveBy(xpos, ypos)
+        mine_count = self.scene.addSimpleText("Live Mines:", GP.info_font)
+        ypos += self.y_delta
+        mine_count.moveBy(xpos, ypos)
+        decay_rate = self.scene.addSimpleText("Decay Rate:", GP.info_font)
+        ypos += self.y_delta
+        decay_rate.moveBy(xpos, ypos)
+        self.index_label = self.scene.addSimpleText("Field:", GP.info_font)
+        ypos += 2 * self.y_delta
+        self.index_label.moveBy(xpos, ypos)
 
 
-    def AddInfoText(self):
-        self.Location = self.Scene.addSimpleText("", GP.infoFont)
-        xpos = self.xOffset + self.DataOffset
+    def add_info_text(self):
+        self.location = self.scene.addSimpleText("", GP.info_font)
+        xpos = self.x_offset + self.data_offset
         ypos = 0
-        self.Location.moveBy(xpos, ypos)
-        self.FieldType = self.Scene.addSimpleText("", GP.infoFont)
-        ypos += self.yDelta
-        self.FieldType.moveBy(xpos, ypos)
-        self.FieldRadius = self.Scene.addSimpleText("", GP.infoFont)
-        ypos += self.yDelta
-        self.FieldRadius.moveBy(xpos, ypos)
-        self.MineCount = self.Scene.addSimpleText("", GP.infoFont)
-        ypos += self.yDelta
-        self.MineCount.moveBy(xpos, ypos)
-        self.DecayRate = self.Scene.addSimpleText("", GP.infoFont)
-        ypos += self.yDelta
-        self.DecayRate.moveBy(xpos, ypos)
-        self.FieldIndex = self.Scene.addSimpleText("", GP.infoFont)
-        ypos += 2 * self.yDelta
-        self.FieldIndex.moveBy(xpos, ypos)
+        self.location.moveBy(xpos, ypos)
+        self.field_type = self.scene.addSimpleText("", GP.info_font)
+        ypos += self.y_delta
+        self.field_type.moveBy(xpos, ypos)
+        self.field_radius = self.scene.addSimpleText("", GP.info_font)
+        ypos += self.y_delta
+        self.field_radius.moveBy(xpos, ypos)
+        self.mine_count = self.scene.addSimpleText("", GP.info_font)
+        ypos += self.y_delta
+        self.mine_count.moveBy(xpos, ypos)
+        self.decay_rate = self.scene.addSimpleText("", GP.info_font)
+        ypos += self.y_delta
+        self.decay_rate.moveBy(xpos, ypos)
+        self.field_index = self.scene.addSimpleText("", GP.info_font)
+        ypos += 2 * self.y_delta
+        self.field_index.moveBy(xpos, ypos)
 
 
-    def UpdateData(self, field: Minefield, index, maxindex):
-        self.FactionBanner[self.CurrentFaction].setVisible(False)
-        self.CurrentFaction = field.faction
-        self.FactionBanner[field.faction].setVisible(True)
+    def update_data(self, field: Minefield, index, maxindex):
+        self.faction_banner[self.current_faction].setVisible(False)
+        self.current_faction = field.faction
+        self.faction_banner[field.faction].setVisible(True)
         text = '(' + str(field.x) + ',' + str(field.y) + ')'
-        self.Location.setText(text)
-        self.FieldType.setText(field.model.value)
+        self.location.setText(text)
+        self.field_type.setText(field.model.value)
         radius = round(10 * math.sqrt(field.mines) + 0.5) / 10
-        self.FieldRadius.setText(str(radius))
-        self.MineCount.setText(str(field.mines))
+        self.field_radius.setText(str(radius))
+        self.mine_count.setText(str(field.mines))
         rate = round(field.mines * field.rate_of_decay + 0.5)
-        self.DecayRate.setText(str(rate) + ' / year')
+        self.decay_rate.setText(str(rate) + ' / year')
         if maxindex > 1:
-            self.FieldIndex.setText(str(index) + ' of ' + str(maxindex))
-            self.FieldIndex.setVisible(True)
-            self.IndexLabel.setVisible(True)
+            self.field_index.setText(str(index) + ' of ' + str(maxindex))
+            self.field_index.setVisible(True)
+            self.index_label.setVisible(True)
         else:
-            self.IndexLabel.setVisible(False)
-            self.FieldIndex.setVisible(False)
+            self.index_label.setVisible(False)
+            self.field_index.setVisible(False)
         if field.fof == Stance.allied:
             self.backdrop.setBrush(Brush.blue_p)
         elif field.fof == Stance.friendly:
@@ -109,24 +109,24 @@ class Minedata(QGraphicsView):
             self.backdrop.setBrush(Brush.red_p)
 
 
-    def AddLogos(self):
-        yp = self.TopOffset
-        rectangle = QRectF(1, yp + 1, self.IconWidth - 2, self.IconWidth - 2)
-        self.backdrop = self.Scene.addRect(rectangle)
+    def add_logos(self):
+        yp = self.top_offset
+        rectangle = QRectF(1, yp + 1, self.icon_width - 2, self.icon_width - 2)
+        self.backdrop = self.scene.addRect(rectangle)
         image = QGraphicsSvgItem(":/Graphics/Mines")
         width = image.boundingRect().width()
-        image.setScale(self.IconWidth / width)
+        image.setScale(self.icon_width / width)
         image.setPos(0, yp)
-        self.Scene.addItem(image)
-        yp += self.FlagOffset + self.IconWidth
-        self.FactionBanner = []
+        self.scene.addItem(image)
+        yp += self.flag_offset + self.icon_width
+        self.faction_banner = []
         for faction in "ABCDEFGHIJKLMNOPQRST":
             resource = ":/Factions/Faction-" + faction
             banner = QGraphicsSvgItem(resource)
             width = banner.boundingRect().width()
-            banner.setScale(0.5 * self.IconWidth / width)
-            banner.setPos(0.25 * self.IconWidth, yp)
+            banner.setScale(0.5 * self.icon_width / width)
+            banner.setPos(0.25 * self.icon_width, yp)
             banner.setVisible(False)
-            self.Scene.addItem(banner)
-            self.FactionBanner.append(banner)
-        self.Scene.addRect(QRectF(800, 315, 5, 5), Pen.noshow)
+            self.scene.addItem(banner)
+            self.faction_banner.append(banner)
+        self.scene.addRect(QRectF(800, 315, 5, 5), Pen.noshow)

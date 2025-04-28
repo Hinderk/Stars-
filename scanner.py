@@ -51,21 +51,21 @@ class Scanner:
         self.penetration = None
 
 
-    def ShowRanges(self, toggle):
+    def show_ranges(self, toggle):
         if self.penetration:
             self.penetration.setVisible(toggle)
         if self.detection:
             self.detection.setVisible(toggle)
 
 
-    def ScaleRanges(self, factor):
-        x = GuiProps.Xscale * self.xo
-        y = GuiProps.Xscale * self.yo
+    def scale_ranges(self, factor):
+        x = GuiProps.xscale * self.xo
+        y = GuiProps.xscale * self.yo
         if self.detection:
-            r = factor * self.maxrange * GuiProps.Xscale
+            r = factor * self.maxrange * GuiProps.xscale
             box = QRectF(x - r, y - r, r + r, r + r)
             self.detection.setRect(box)
         if self.penetration:
-            r = factor * self.penrange * GuiProps.Xscale
+            r = factor * self.penrange * GuiProps.xscale
             box = QRectF(x - r, y - r, r + r, r + r)
             self.penetration.setRect(box)

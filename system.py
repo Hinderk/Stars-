@@ -21,6 +21,6 @@ class System:
     def __init__(self):
 
         self.domain = SystemType.EMPTY
-        self.itemType = None
-        self.itemCount = 0
+        self.item_type = None
+        self.item_count = 0
 

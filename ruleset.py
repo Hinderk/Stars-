@@ -10,15 +10,15 @@ from scanner import Model
 
 class Ruleset(random.Random):
 
-    fID0 = 0   # Define the index of the faction controlled by the player ...
+    f_id0 = 0   # Define the index of the faction controlled by the player ...
 
 
-    def MinefieldDecay(fID):
+    def minefield_decay(f_id):
         return 0.02
 
 
-    def CloakingRatio(Cloaking, Weight):
-        cloak = Cloaking / Weight
+    def cloaking_ratio(cloaking, weight):
+        cloak = cloaking / weight
         if cloak <= 100:
             c = cloak / 2
         else:
@@ -42,7 +42,7 @@ class Ruleset(random.Random):
         return c / 100
 
 
-    NameList = ["Aarhus", "Abderhalden", "Aberdonia", "Abilunon", "Abkhazia",
+    name_list = ["Aarhus", "Abderhalden", "Aberdonia", "Abilunon", "Abkhazia",
               "Achaemenides", "Adachi", "Adelheid", "Admetos", "Adonis",
                "Aegina", "Agamemnon", "Agasthenes", "Aharon", "Akhmatova",
                "Albellus", "Algoa", "Anhui", "Antenor", "Anteros", "Apollo",
@@ -140,81 +140,81 @@ class Ruleset(random.Random):
 
     def __init__(self, seed=128):
         super(self.__class__, self).__init__(seed)
-        self.Seed = seed
-        self.Location = []
-        self.PlanetNames = list(Ruleset.NameList)
+        self.seed = seed
+        self.location = []
+        self.planet_names = list(Ruleset.name_list)
 
 
     def _FindClosest(self, x0, y0):
         dist = 1e20
-        for [x, y] in self.Location:
+        for [x, y] in self.location:
             d = (x - x0) * (x - x0) + (y - y0) * (y - y0)
             if d < dist:
                 dist = d
         return math.sqrt(dist)
 
 
-    def Random(self, MinVal, MaxVal, Optimum):
-        return self.triangular(MinVal, MaxVal, Optimum)
+    def Random(self, min_val, max_val, optimum):
+        return self.triangular(min_val, max_val, optimum)
 
 
-    def FindName(self):
+    def find_name(self):
         try:
-            name = self.choice(self.PlanetNames)
-            self.PlanetNames.remove(name)
+            name = self.choice(self.planet_names)
+            self.planet_names.remove(name)
             return name
         except:
             return None
 
 
-    def FindPosition(self):
-        rmin = GuiProps.planet_distance / GuiProps.Xscale
-        xlim = self.Xmax()
-        ylim = self.Ymax()
-        Retries = 0
-        while Retries < 128:
+    def find_position(self):
+        rmin = GuiProps.planet_distance / GuiProps.xscale
+        xlim = self.xmax()
+        ylim = self.ymax()
+        retries = 0
+        while retries < 128:
             x = self.randrange(-xlim, xlim)
             y = self.randrange(-ylim, ylim)
             r = self._FindClosest(x, y)
-            if r > self.Rmin() and r > rmin:
-                self.Location.append([x, y])
+            if r > self.rmin() and r > rmin:
+                self.location.append([x, y])
                 return [x, y]
         return None
 
 
-    def FirstYear(self):
+    def first_year(self):
         return 2400
 
 
-    def GetPopulationCeiling():
+    def get_population_ceiling():
         return 400000                    # TODO: Species dependent model
 
 
-    def FirstScanner(self):
+    def first_scanner(self):
 #    return Model.Scoper150
         return Model.Snooper500X
 
-    def GetMaxResources(self):
+    def get_max_resources(self):
         return 100.0
 
-    def GetMinResources(self):
+    def get_min_resources(self):
         return 5.0
 
-    def GetResources(self):
+    def get_resources(self):
         return 70.0
 
-    def PlanetCount():
+    def planet_count():
         return 15
 
-    def Xmax(self):
-        return 1000.0
+    def xmax(self):
+        return 1000
 
-    def Ymax(self):
-        return 1000.0
+    def ymax(self):
+        return 1000
 
-    def Rmin(self):
-        return 20.0
+    def rmin(self):
+        return 20
 
 
-    def GetNumberOfPlayers(self):  # This must depend on the size of the star map
+    def get_number_of_players(self):  # This must depend on the size of the star map
         return 4

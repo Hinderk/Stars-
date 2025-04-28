@@ -27,33 +27,33 @@ class Minefield:
     caret << QPointF(0, GuiProps.center_size)
     caret << QPointF(-GuiProps.center_size, 0)
 
-    Counter = dict()
+    counter = dict()
     for m in Model:
-        Counter[m] = 0
+        counter[m] = 0
 
-    def __init__(self, scene, x, y, m, model, fID, people):
+    def __init__(self, scene, x, y, m, model, f_id, people):
 
-        r = math.sqrt(m) * GuiProps.Xscale
-        Minefield.Counter[model] += 1
+        r = math.sqrt(m) * GuiProps.xscale
+        Minefield.counter[model] += 1
 
-        self.id = Minefield.Counter[model]
+        self.id = Minefield.counter[model]
         self.fleets_en_route = []
-        self.TotalFriends = 0
-        self.TotalFoes = 0
-        self.TotalOthers = 0
-        self.Detected = True # False    -- FIXME: Test feature
-        self.ShipTracking = False
-        self.fof = people.getStance(Ruleset.fID0, fID)
-        self.faction = fID
+        self.total_friends = 0
+        self.total_foes = 0
+        self.total_others = 0
+        self.detected = True # False    -- FIXME: Test feature
+        self.ship_tracking = False
+        self.fof = people.get_stance(Ruleset.f_id0, f_id)
+        self.faction = f_id
         self.x = x
         self.y = y
         self.mines = m
         self.model = model
-        self.rate_of_decay = Ruleset.MinefieldDecay(fID)
+        self.rate_of_decay = Ruleset.minefield_decay(f_id)
         self.countdown = 0
 
-        x *= GuiProps.Xscale
-        y *= GuiProps.Xscale
+        x *= GuiProps.xscale
+        y *= GuiProps.xscale
         box = QRectF(x - r, y - r, r + r, r + r)
         if self.fof == Stance.allied:
             self.area = scene.addEllipse(box, Pen.blue_m, Brush.blue_m)

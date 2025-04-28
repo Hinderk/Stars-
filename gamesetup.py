@@ -29,252 +29,252 @@ from playerdata import PlayerData
 
 class GameSetup(QWidget):
     
-    ConfigureFaction = QSignal(bool, bool)
+    configure_faction = QSignal(bool, bool)
 
-    AIModes = [AI.AI0, AI.AI1, AI.AI2, AI.AI3, AI.AIR]
+    ai_modes = [AI.AI0, AI.AI1, AI.AI2, AI.AI3, AI.AIR]
 
     def __init__(self, people, rules):
         super(self.__class__, self).__init__()
         self.setWindowTitle("Advanced New Game Wizard - Step 1 of 3")
-        self.setStyleSheet(GuiDesign.getStyle(GuiStyle.AdvancedSetup_1))
-        Icon = QIcon()
-        Icon.addPixmap(QPixmap(":/Icons/Host"))
-        self.setWindowIcon(Icon)
+        self.setStyleSheet(GuiDesign.get_style(GuiStyle.ADVANCEDSETUP_1))
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/Icons/Host"))
+        self.setWindowIcon(icon)
         self.setFixedSize(1000, 750)
         self.hide()
-        self.Wizard = QWidget()
-        self.Pages = QStackedLayout(self.Wizard)
-        self.CurrentPage = 0
-        self.GameFeature = []
-        self.NumberOfPlayers = rules.GetNumberOfPlayers()
-        self.Factions = people
-        self.SetupErrorMessages()
-        self.SetupUniverse()
-        self.SetupPlayers(people)
-        self.SetupVictoryConditions()
-        self.SetupMenu(people)
-        self.SetupButtons()
+        self.wizard = QWidget()
+        self.pages = QStackedLayout(self.wizard)
+        self.current_page = 0
+        self.game_feature = []
+        self.number_of_players = rules.get_number_of_players()
+        self.factions = people
+        self.setup_error_messages()
+        self.setup_universe()
+        self.setup_players(people)
+        self.setup_victory_conditions()
+        self.setup_menu(people)
+        self.setup_buttons()
 
 
-    def SetupErrorMessages(self):
-        self.Error = QMessageBox(self)
-        self.Error.setIcon(self.Error.Icon.Warning)
-        self.Error.setWindowTitle('Advanced New Game Wizard')
-        Icon = QIcon()
-        Icon.addPixmap(QPixmap(":/Icons/Stars"))
-        self.Error.setWindowIcon(Icon)
+    def setup_error_messages(self):
+        self.error = QMessageBox(self)
+        self.error.setIcon(self.error.Icon.Warning)
+        self.error.setWindowTitle('Advanced New Game Wizard')
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/Icons/Stars"))
+        self.error.setWindowIcon(icon)
 
 
-    def SetupButtons(self):
-        ButtonSize = QSize(140, 50)
-        Buttons_HL = QHBoxLayout()
-        self.Finish = QPushButton()
-        self.Finish.setText('Finish')
-        self.Finish.setToolTip(' Save the game settings.')
-        self.Finish.setFixedSize(ButtonSize)
-        self.Finish.setShortcut(QKeySequence('Ctrl+F'))
-        Cancel = QPushButton()
-        Cancel.setText("Cancel")
-        Cancel.setToolTip(" Close this dialog.")
-        Cancel.setFixedSize(ButtonSize)
-        Cancel.setShortcut(QKeySequence('Ctrl+C'))
-        self.Help = QPushButton()
-        self.Help.setText("Help")
-        self.Help.setToolTip(" Read the game manual.")
-        self.Help.setFixedSize(ButtonSize)
-        self.Help.setShortcut(QKeySequence('Ctrl+H'))
-        self.Next = QPushButton()
-        self.Next.setText("Next")
-        self.Next.setToolTip(" Proceed to the next page.")
-        self.Next.setFixedSize(ButtonSize)
-        self.Next.setShortcut(QKeySequence('Ctrl+N'))
-        self.Back = QPushButton()
-        self.Back.setText("Back")
-        self.Back.setToolTip(" Return to the previous page.")
-        self.Back.setFixedSize(ButtonSize)
-        self.Back.setShortcut(QKeySequence('Ctrl+B'))
-        self.Back.setEnabled(False)
-        Buttons_HL.addSpacing(30)
-        Buttons_HL.addWidget(self.Help)
-        Buttons_HL.addStretch()
-        Buttons_HL.addWidget(Cancel)
-        Buttons_HL.addStretch()
-        Buttons_HL.addWidget(self.Back)
-        Buttons_HL.addStretch()
-        Buttons_HL.addWidget(self.Next)
-        Buttons_HL.addStretch()
-        Buttons_HL.addWidget(self.Finish)
-        Buttons_HL.addSpacing(30)
-        Layout_VL = QVBoxLayout(self)
-        Layout_VL.addWidget(self.Wizard)
-        Layout_VL.addLayout(Buttons_HL)
-        self.Finish.clicked.connect(self.SaveGameData)
-        self.Back.clicked.connect(self.Revert)
-        self.Next.clicked.connect(self.Proceed)
-        Cancel.clicked.connect(self.hide)
+    def setup_buttons(self):
+        button_size = QSize(140, 50)
+        buttons_hl = QHBoxLayout()
+        self.finish = QPushButton()
+        self.finish.setText('Finish')
+        self.finish.setToolTip(' Save the game settings.')
+        self.finish.setFixedSize(button_size)
+        self.finish.setShortcut(QKeySequence('Ctrl+F'))
+        cancel = QPushButton()
+        cancel.setText("Cancel")
+        cancel.setToolTip(" Close this dialog.")
+        cancel.setFixedSize(button_size)
+        cancel.setShortcut(QKeySequence('Ctrl+C'))
+        self.help = QPushButton()
+        self.help.setText("Help")
+        self.help.setToolTip(" Read the game manual.")
+        self.help.setFixedSize(button_size)
+        self.help.setShortcut(QKeySequence('Ctrl+H'))
+        self.next = QPushButton()
+        self.next.setText("Next")
+        self.next.setToolTip(" Proceed to the next page.")
+        self.next.setFixedSize(button_size)
+        self.next.setShortcut(QKeySequence('Ctrl+N'))
+        self.back = QPushButton()
+        self.back.setText("Back")
+        self.back.setToolTip(" Return to the previous page.")
+        self.back.setFixedSize(button_size)
+        self.back.setShortcut(QKeySequence('Ctrl+B'))
+        self.back.setEnabled(False)
+        buttons_hl.addSpacing(30)
+        buttons_hl.addWidget(self.help)
+        buttons_hl.addStretch()
+        buttons_hl.addWidget(cancel)
+        buttons_hl.addStretch()
+        buttons_hl.addWidget(self.back)
+        buttons_hl.addStretch()
+        buttons_hl.addWidget(self.next)
+        buttons_hl.addStretch()
+        buttons_hl.addWidget(self.finish)
+        buttons_hl.addSpacing(30)
+        layout_vl = QVBoxLayout(self)
+        layout_vl.addWidget(self.wizard)
+        layout_vl.addLayout(buttons_hl)
+        self.finish.clicked.connect(self.save_game_data)
+        self.back.clicked.connect(self.revert)
+        self.next.clicked.connect(self.proceed)
+        cancel.clicked.connect(self.hide)
 
 
-    def Proceed(self):
-        if self.CurrentPage < 2:
-            self.CurrentPage += 1
-            step = 'Step ' + str(1 + self.CurrentPage) + ' of 3'
+    def proceed(self):
+        if self.current_page < 2:
+            self.current_page += 1
+            step = 'Step ' + str(1 + self.current_page) + ' of 3'
             self.setWindowTitle('Advanced New Game Wizard - ' + step)
-            self.Pages.setCurrentIndex(self.CurrentPage)
-            self.Back.setEnabled(True)
-            self.Next.setEnabled(self.CurrentPage < 2)
+            self.pages.setCurrentIndex(self.current_page)
+            self.back.setEnabled(True)
+            self.next.setEnabled(self.current_page < 2)
 
 
-    def Revert(self):
-        if 0 < self.CurrentPage:
-            self.CurrentPage -= 1
-            step = 'Step ' + str(1 + self.CurrentPage) + ' of 3'
+    def revert(self):
+        if 0 < self.current_page:
+            self.current_page -= 1
+            step = 'Step ' + str(1 + self.current_page) + ' of 3'
             self.setWindowTitle('Advanced New Game Wizard - ' + step)
-            self.Pages.setCurrentIndex(self.CurrentPage)
-            self.Next.setEnabled(True)
-            self.Back.setEnabled(self.CurrentPage > 0)
+            self.pages.setCurrentIndex(self.current_page)
+            self.next.setEnabled(True)
+            self.back.setEnabled(self.current_page > 0)
 
 
-    def ConfigureGame(self, MapSize):
-        self.CurrentPage = 0
-        self.Pages.setCurrentIndex(0)
-        self.PlayerDistance[1].setChecked(True)
-        self.StarDensity[1].setChecked(True)
+    def configure_game(self, map_size):
+        self.current_page = 0
+        self.pages.setCurrentIndex(0)
+        self.player_distance[1].setChecked(True)
+        self.star_density[1].setChecked(True)
         index = 0
-        for m in MapSize:
+        for m in map_size:
             if m.isChecked():
                 break
             index += 1
-        self.MapSize[index].setChecked(True)
-        self.Next.setEnabled(True)
-        self.Back.setEnabled(False)
-        for rb in self.GameFeature:
+        self.map_size[index].setChecked(True)
+        self.next.setEnabled(True)
+        self.back.setEnabled(False)
+        for rb in self.game_feature:
             rb.setChecked(False)
-        self.GameName.setText('')
-        self.RestoreVictoryConditions()
-        self.Model.ResetModel(self.Factions, self.NumberOfPlayers)
+        self.game_name.setText('')
+        self.restore_victory_conditions()
+        self.model.reset_model(self.factions, self.number_of_players)
         self.show()
 
 
-    def LoadFaction(self):
-        ReadFaction = QFileDialog(self)
-        ReadFaction.setOption(ReadFaction.Option.DontUseNativeDialog)
-        ReadFaction.setStyleSheet(GuiDesign.getStyle(GuiStyle.FileBrowser))
-        ReadFaction.setMinimumSize(1000, 750)
-        ReadFaction.setFileMode(ReadFaction.FileMode.AnyFile)
-        ReadFaction.setViewMode(ReadFaction.ViewMode.List)
-        ReadFaction.setAcceptMode(ReadFaction.AcceptMode.AcceptOpen)
-        ReadFaction.setNameFilters(['Game Files (*.f1)', 'All Files (*.*)'])
-        ReadFaction.setDefaultSuffix('f1')
+    def load_faction(self):
+        read_faction = QFileDialog(self)
+        read_faction.setOption(read_faction.Option.DontUseNativeDialog)
+        read_faction.setStyleSheet(GuiDesign.get_style(GuiStyle.FILEBROWSER))
+        read_faction.setMinimumSize(1000, 750)
+        read_faction.setFileMode(read_faction.FileMode.AnyFile)
+        read_faction.setViewMode(read_faction.ViewMode.List)
+        read_faction.setAcceptMode(read_faction.AcceptMode.AcceptOpen)
+        read_faction.setNameFilters(['Game Files (*.f1)', 'All Files (*.*)'])
+        read_faction.setDefaultSuffix('f1')
         fnew = None
-        if ReadFaction.exec():
-            Files = ReadFaction.selectedFiles()
+        if read_faction.exec():
+            files = read_faction.selectedFiles()
             try:
-                f = open(Files[0], 'rt')
+                f = open(files[0], 'rt')
                 try:
                     fnew = Faction()
                     fnew.deserialize(json.load(f))
                 except:
                     fnew = None
-                    self.Error.setText('Invalid faction file!')
-                    self.Error.exec()
+                    self.error.setText('Invalid faction file!')
+                    self.error.exec()
                 f.close()
             except OSError:
-                self.Error.setText('Failed to open file!')
-                self.Error.exec()
+                self.error.setText('Failed to open file!')
+                self.error.exec()
         return fnew
 
 
-    def SaveGameData(self):
-        SaveGame = QFileDialog(self)
-        SaveGame.setOption(SaveGame.Option.DontUseNativeDialog)
-        SaveGame.setStyleSheet(GuiDesign.getStyle(GuiStyle.FileBrowser))
-        SaveGame.setMinimumSize(1000, 750)
-        SaveGame.setFileMode(SaveGame.FileMode.AnyFile)
-        SaveGame.setViewMode(SaveGame.ViewMode.List)
-        SaveGame.setAcceptMode(SaveGame.AcceptMode.AcceptSave)
-        SaveGame.setNameFilters(['Game Files (*.xy)', 'All Files (*.*)'])
-        SaveGame.setDefaultSuffix('xy')
-        if SaveGame.exec():
-            Files = SaveGame.selectedFiles()
+    def save_game_data(self):
+        save_game = QFileDialog(self)
+        save_game.setOption(save_game.Option.DontUseNativeDialog)
+        save_game.setStyleSheet(GuiDesign.get_style(GuiStyle.FILEBROWSER))
+        save_game.setMinimumSize(1000, 750)
+        save_game.setFileMode(save_game.FileMode.AnyFile)
+        save_game.setViewMode(save_game.ViewMode.List)
+        save_game.setAcceptMode(save_game.AcceptMode.AcceptSave)
+        save_game.setNameFilters(['Game Files (*.xy)', 'All Files (*.*)'])
+        save_game.setDefaultSuffix('xy')
+        if save_game.exec():
+            files = save_game.selectedFiles()
             try:
-                f = open(Files[0], 'wt')
-                name = self.GameName.text()
+                f = open(files[0], 'wt')
+                name = self.game_name.text()
                 if not name:
                     name = 'Silent Running'
-                GameData = [name]
-                for rb in self.MapSize:
+                game_data = [name]
+                for rb in self.map_size:
                     if rb.isChecked():
-                        GameData.append(self.MapSize.index(rb))
+                        game_data.append(self.map_size.index(rb))
                     else:
-                        GameData.append(-1)
-                for rb in self.StarDensity:
+                        game_data.append(-1)
+                for rb in self.star_density:
                     if rb.isChecked():
-                        GameData.append(self.StarDensity.index(rb))
+                        game_data.append(self.star_density.index(rb))
                     else:
-                        GameData.append(-1)
-                for rb in self.PlayerDistance:
+                        game_data.append(-1)
+                for rb in self.player_distance:
                     if rb.isChecked():
-                        GameData.append(self.PlayerDistance.index(rb))
+                        game_data.append(self.player_distance.index(rb))
                     else:
-                        GameData.append(-1)
-                for rb in self.GameFeature:
+                        game_data.append(-1)
+                for rb in self.game_feature:
                     if rb.isChecked():
-                        GameData.append(1)
+                        game_data.append(1)
                     else:
-                        GameData.append(0)
+                        game_data.append(0)
                 for vc in Victory:
-                    radio, spinner = self.VictoryCondition[vc]
+                    radio, spinner = self.victory_condition[vc]
                     if radio.isChecked():
-                        GameData.append(spinner.value())
+                        game_data.append(spinner.value())
                     else:
-                        GameData.append(-1)
-                GameData.append(self.ActiveConditions.value())
-                GameData.append(self.GameDuration.value())
+                        game_data.append(-1)
+                game_data.append(self.active_conditions.value())
+                game_data.append(self.game_duration.value())
                 players = dict()
-                for p in self.Model.Players:
-                    ptype, pmode, pf, pname = self.Model.Players[p]
+                for p in self.model.players:
+                    ptype, pmode, pf, pname = self.model.players[p]
                     if pmode:
                         if pmode == AI.AIR:
-                            pmode = self.AIModes[random.randint(0, 3)]
+                            pmode = self.ai_modes[random.randint(0, 3)]
                         players[p] = [pname, ptype.name, pmode.name]
                     else:
                         players[p] = [pname, ptype.name, '']
                     players[p] += pf.serialize()
-                GameData.append(players)
-                json.dump(GameData, f)
+                game_data.append(players)
+                json.dump(game_data, f)
                 f.close()
             except:
-                self.Error.setText('Failed to save game data!')
-                self.Error.exec()
+                self.error.setText('Failed to save game data!')
+                self.error.exec()
 
 
-    def SetupMenu(self, people):
-        self.Select = QMenu()
-        self.Select.setStyleSheet(GuiDesign.getStyle(GuiStyle.PlayerMenu))
-        pf = self.Select.addMenu('Predefined Faction  ')
+    def setup_menu(self, people):
+        self.select = QMenu()
+        self.select.setStyleSheet(GuiDesign.get_style(GuiStyle.PLAYERMENU))
+        pf = self.select.addMenu('Predefined Faction  ')
         n = 1
-        for ai in people.AIFaction:
-            a = pf.addAction(ai.Species)
+        for ai in people.ai_faction:
+            a = pf.addAction(ai.species)
             a.setData((0, n, 0))
             n += 1
         a = pf.addAction('Random')
         a.setData((0, 0, 0))
-        cf = self.Select.addMenu('Custom Faction')
+        cf = self.select.addMenu('Custom Faction')
         a = cf.addAction('New Faction')
         a.setData((1, 0, 0))
         a = cf.addAction('Open File')
         a.setData((1, 1, 0))
         cf.addSeparator()
         n = 0
-        for pc in people.Player:
-            a = cf.addAction(pc.Name)
+        for pc in people.player:
+            a = cf.addAction(pc.name)
             a.setData((1, 2, n))
             n += 1
-        self.Select.addSeparator()
-        cp = self.Select.addMenu('Computer Player')
+        self.select.addSeparator()
+        cp = self.select.addMenu('Computer Player')
         n = 1
-        for ai in people.AIFaction:
-            cpm = cp.addMenu(ai.Name + '  ')
+        for ai in people.ai_faction:
+            cpm = cp.addMenu(ai.name + '  ')
             m = 0
             for mode in AI:
                 a = cpm.addAction(mode.value)
@@ -287,187 +287,187 @@ class GameSetup(QWidget):
             a = cpm.addAction(mode.value)
             a.setData((2, 0, m))
             m += 1
-        self.Select.addSeparator()
-        a = self.Select.addAction('Expansion Slot')
+        self.select.addSeparator()
+        a = self.select.addAction('Expansion Slot')
         a.setData((3, 0, 0))
-        self.Select.addSeparator()
-        a = self.Select.addAction('Remove Player')
+        self.select.addSeparator()
+        a = self.select.addAction('Remove Player')
         a.setData((4, 0, 0))
 
 
-    def AddGameFeature(self, layout, text, hotkey):
+    def add_game_feature(self, layout, text, hotkey):
         rb = QRadioButton(text)
         rb.setStyleSheet('font-size: 20pt;font-style: oblique;font-weight: 400;')
         rb.setShortcut(QKeySequence(hotkey))
         layout.addWidget(rb)
-        self.GameFeature.append(rb)
+        self.game_feature.append(rb)
 
 
-    def SetupUniverse(self):
-        SizeBox = QGroupBox()
-        SizeBox.setTitle('Universe Size')
-        Tiny = QRadioButton('Tiny')
-        Small = QRadioButton('Small')
-        Medium = QRadioButton('Medium')
-        Large = QRadioButton('Large')
-        Huge = QRadioButton('Huge')
-        self.MapSize = [Tiny, Small, Medium, Large, Huge]
-        Size_VL = QVBoxLayout(SizeBox)
-        Size_VL.setSpacing(0)
-        Size_VL.addWidget(Tiny)
-        Size_VL.addWidget(Small)
-        Size_VL.addWidget(Medium)
-        Size_VL.addWidget(Large)
-        Size_VL.addWidget(Huge)
-        Small.setChecked(True)
-        DensityBox = QGroupBox()
-        DensityBox.setTitle('Density')
-        Sparse = QRadioButton('Sparse')
-        Normal = QRadioButton('Normal')
-        Dense = QRadioButton('Dense')
-        Packed = QRadioButton('Packed')
-        self.StarDensity = [Sparse, Normal, Dense, Packed]
-        Density_VL = QVBoxLayout(DensityBox)
-        Density_VL.setSpacing(0)
-        Density_VL.addWidget(Sparse)
-        Density_VL.addWidget(Normal)
-        Density_VL.addWidget(Dense)
-        Density_VL.addWidget(Packed)
-        Normal.setChecked(True)
-        PlayerBox = QGroupBox()
-        PlayerBox.setTitle('Player Positions')
-        PlayerBox.setMinimumWidth(300)
-        Close = QRadioButton('Close')
-        Moderate = QRadioButton('Moderate')
-        Farther = QRadioButton('Farther')
-        Large = QRadioButton('Distant')
-        self.PlayerDistance = [Close, Moderate, Farther, Large]
-        Player_VL = QVBoxLayout(PlayerBox)
-        Player_VL.setSpacing(0)
-        Player_VL.addWidget(Close)
-        Player_VL.addWidget(Moderate)
-        Player_VL.addWidget(Farther)
-        Player_VL.addWidget(Large)
-        Moderate.setChecked(True)
-        LeftSide = QWidget()
-        LeftSide.setMinimumWidth(240)
-        Left_VL = QVBoxLayout(LeftSide)
-        Left_VL.setSpacing(0)
-        Left_VL.addWidget(SizeBox)
-        Left_VL.addSpacing(20)
-        Left_VL.addWidget(DensityBox)
-        Left_VL.addStretch()
-        RightSide = QWidget()
-        Right_VL = QVBoxLayout(RightSide)
-        Right_VL.setSpacing(0)
-        Right_VL.addWidget(PlayerBox)
-        Right_VL.addSpacing(20)
-        self.AddGameFeature(Right_VL, ' &Beginner: Abundance of Minerals', 'Ctrl+B')
-        self.AddGameFeature(Right_VL, ' &Slower Advances in Technology', 'Ctrl+S')
-        self.AddGameFeature(Right_VL, ' Acclererated &Multi-player Game', 'Ctrl+M')
-        self.AddGameFeature(Right_VL, ' No &Random Events', 'Ctrl+R')
-        self.AddGameFeature(Right_VL, ' Computer Players form &Alliances', 'Ctrl+A')
-        self.AddGameFeature(Right_VL, ' &Public Player Scores', 'Ctrl+P')
-        self.AddGameFeature(Right_VL, ' &Galaxy features Star Clusters', 'Ctrl+G')
-        Right_VL.addStretch()
-        Layout_HL=QHBoxLayout()
-        Layout_HL.setSpacing(0)
-        Layout_HL.addWidget(LeftSide)
-        Layout_HL.addSpacing(20)
-        Layout_HL.addWidget(RightSide)
-        Layout_HL.addStretch()
-        self.GameName=QLineEdit()
-        self.GameName.setPlaceholderText('Silent Running')
-        self.GameName.setMaxLength(56)
-        self.GameName.setMinimumWidth(670)
-        NameLabel=QLabel('Game Name:')
-        NameLabel.setStyleSheet('font-size: 20pt;font-style: oblique;font-weight: 600;')
-        Game_HL=QHBoxLayout()
-        Game_HL.addStretch()
-        Game_HL.addWidget(NameLabel)
-        Game_HL.addSpacing(20)
-        Game_HL.addWidget(self.GameName)
-        Game_HL.addSpacing(20)
-        GameWorld=QWidget()
-        Layout_VL=QVBoxLayout(GameWorld)
-        Layout_VL.addLayout(Game_HL)
-        Layout_VL.addSpacing(10)
-        Layout_VL.addLayout(Layout_HL)
-        Layout_VL.addStretch()
-        self.Pages.addWidget(GameWorld)
+    def setup_universe(self):
+        size_box = QGroupBox()
+        size_box.setTitle('Universe Size')
+        tiny = QRadioButton('Tiny')
+        small = QRadioButton('Small')
+        medium = QRadioButton('Medium')
+        large = QRadioButton('Large')
+        huge = QRadioButton('Huge')
+        self.map_size = [tiny, small, medium, large, huge]
+        size_vl = QVBoxLayout(size_box)
+        size_vl.setSpacing(0)
+        size_vl.addWidget(tiny)
+        size_vl.addWidget(small)
+        size_vl.addWidget(medium)
+        size_vl.addWidget(large)
+        size_vl.addWidget(huge)
+        small.setChecked(True)
+        density_box = QGroupBox()
+        density_box.setTitle('Density')
+        sparse = QRadioButton('Sparse')
+        normal = QRadioButton('Normal')
+        dense = QRadioButton('Dense')
+        packed = QRadioButton('Packed')
+        self.star_density = [sparse, normal, dense, packed]
+        density_vl = QVBoxLayout(density_box)
+        density_vl.setSpacing(0)
+        density_vl.addWidget(sparse)
+        density_vl.addWidget(normal)
+        density_vl.addWidget(dense)
+        density_vl.addWidget(packed)
+        normal.setChecked(True)
+        player_box = QGroupBox()
+        player_box.setTitle('Player Positions')
+        player_box.setMinimumWidth(300)
+        close = QRadioButton('Close')
+        moderate = QRadioButton('Moderate')
+        farther = QRadioButton('Farther')
+        large = QRadioButton('Distant')
+        self.player_distance = [close, moderate, farther, large]
+        player_vl = QVBoxLayout(player_box)
+        player_vl.setSpacing(0)
+        player_vl.addWidget(close)
+        player_vl.addWidget(moderate)
+        player_vl.addWidget(farther)
+        player_vl.addWidget(large)
+        moderate.setChecked(True)
+        left_side = QWidget()
+        left_side.setMinimumWidth(240)
+        left_vl = QVBoxLayout(left_side)
+        left_vl.setSpacing(0)
+        left_vl.addWidget(size_box)
+        left_vl.addSpacing(20)
+        left_vl.addWidget(density_box)
+        left_vl.addStretch()
+        right_side = QWidget()
+        right_vl = QVBoxLayout(right_side)
+        right_vl.setSpacing(0)
+        right_vl.addWidget(player_box)
+        right_vl.addSpacing(20)
+        self.add_game_feature(right_vl, ' &Beginner: Abundance of Minerals', 'Ctrl+B')
+        self.add_game_feature(right_vl, ' &Slower Advances in Technology', 'Ctrl+S')
+        self.add_game_feature(right_vl, ' Acclererated &Multi-player Game', 'Ctrl+M')
+        self.add_game_feature(right_vl, ' No &Random Events', 'Ctrl+R')
+        self.add_game_feature(right_vl, ' Computer Players form &Alliances', 'Ctrl+A')
+        self.add_game_feature(right_vl, ' &Public Player Scores', 'Ctrl+P')
+        self.add_game_feature(right_vl, ' &Galaxy features Star Clusters', 'Ctrl+G')
+        right_vl.addStretch()
+        layout_hl=QHBoxLayout()
+        layout_hl.setSpacing(0)
+        layout_hl.addWidget(left_side)
+        layout_hl.addSpacing(20)
+        layout_hl.addWidget(right_side)
+        layout_hl.addStretch()
+        self.game_name=QLineEdit()
+        self.game_name.setPlaceholderText('Silent Running')
+        self.game_name.setMaxLength(56)
+        self.game_name.setMinimumWidth(670)
+        name_label=QLabel('Game Name:')
+        name_label.setStyleSheet('font-size: 20pt;font-style: oblique;font-weight: 600;')
+        game_hl=QHBoxLayout()
+        game_hl.addStretch()
+        game_hl.addWidget(name_label)
+        game_hl.addSpacing(20)
+        game_hl.addWidget(self.game_name)
+        game_hl.addSpacing(20)
+        game_world=QWidget()
+        layout_vl=QVBoxLayout(game_world)
+        layout_vl.addLayout(game_hl)
+        layout_vl.addSpacing(10)
+        layout_vl.addLayout(layout_hl)
+        layout_vl.addStretch()
+        self.pages.addWidget(game_world)
 
 
-    def SetupPlayers(self, people):
-        self.Model = PlayerData(people, self.NumberOfPlayers)
-        self.Players = QTableView()
-        self.Players.setShowGrid(False)
-        self.Players.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.Players.setModel(self.Model)
+    def setup_players(self, people):
+        self.model = PlayerData(people, self.number_of_players)
+        self.players = QTableView()
+        self.players.setShowGrid(False)
+        self.players.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.players.setModel(self.model)
         align = Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
-        Header_H = self.Players.horizontalHeader()
-        Header_H.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        Header_H.setStretchLastSection(True)
-        Header_H.resizeSection(0, 200)
-        Header_H.resizeSection(1, 200)
-        Header_H.setDefaultAlignment(align)
-        Header_V = self.Players.verticalHeader()
-        Header_V.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        Header_V.setDefaultSectionSize(48)
-        Header_V.setDefaultAlignment(align)
-        Layout_HL = QHBoxLayout()
-        Layout_HL.addSpacing(20)
-        Layout_HL.addWidget(self.Players)
-        Layout_HL.addSpacing(20)
-        PlayerSetup = QWidget()
-        PlayerSetup.setStyleSheet(GuiDesign.getStyle(GuiStyle.AdvancedSetup_2))
-        Layout_VL = QVBoxLayout(PlayerSetup)
-        Layout_VL.addLayout(Layout_HL)
-        Layout_VL.addSpacing(10)
-        self.Pages.addWidget(PlayerSetup)
-        self.Players.clicked.connect(self.SelectPlayer)
+        header_h = self.players.horizontalHeader()
+        header_h.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        header_h.setStretchLastSection(True)
+        header_h.resizeSection(0, 200)
+        header_h.resizeSection(1, 200)
+        header_h.setDefaultAlignment(align)
+        header_v = self.players.verticalHeader()
+        header_v.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        header_v.setDefaultSectionSize(48)
+        header_v.setDefaultAlignment(align)
+        layout_hl = QHBoxLayout()
+        layout_hl.addSpacing(20)
+        layout_hl.addWidget(self.players)
+        layout_hl.addSpacing(20)
+        player_setup = QWidget()
+        player_setup.setStyleSheet(GuiDesign.get_style(GuiStyle.ADVANCEDSETUP_2))
+        layout_vl = QVBoxLayout(player_setup)
+        layout_vl.addLayout(layout_hl)
+        layout_vl.addSpacing(10)
+        self.pages.addWidget(player_setup)
+        self.players.clicked.connect(self.select_player)
 
 
-    def SelectPlayer(self, select):
+    def select_player(self, select):
         if select.column() < 2:
             here = self.cursor().pos()
-            selected = self.Select.exec(here)
+            selected = self.select.exec(here)
             if selected:
-                pType = PT.HUP
-                pMode = None
-                ID, fID, mID = selected.data()
+                p_type = PT.HUP
+                p_mode = None
+                ID, f_id, m_id = selected.data()
                 if ID == 0:
-                    if fID > 0:
-                        fnew = self.Factions.getAIFaction(fID - 1)
+                    if f_id > 0:
+                        fnew = self.factions.get_ai_faction(f_id - 1)
                     else:
-                        pType = PT.RNG
-                        fnew = self.Factions.randomFaction()
+                        p_type = PT.RNG
+                        fnew = self.factions.random_faction()
                 if ID == 1:
-                    if fID == 0:
-                        self.ConfigureFaction.emit(False, True)
+                    if f_id == 0:
+                        self.configure_faction.emit(False, True)
                         fnew = None
-                    if fID == 1:
-                        fnew = self.LoadFaction()
-                    if fID == 2:
-                        fnew = self.Factions.getFaction(mID)
+                    if f_id == 1:
+                        fnew = self.load_faction()
+                    if f_id == 2:
+                        fnew = self.factions.get_faction(m_id)
                 if ID == 2:
-                    if fID > 0:
-                        fnew = self.Factions.getAIFaction(fID - 1)
-                        pType = PT.AIP
+                    if f_id > 0:
+                        fnew = self.factions.get_ai_faction(f_id - 1)
+                        p_type = PT.AIP
                     else:
-                        pType = PT.RNG
-                        fnew = self.Factions.randomFaction()
-                    pMode = self.AIModes[mID]
+                        p_type = PT.RNG
+                        fnew = self.factions.random_faction()
+                    p_mode = self.ai_modes[m_id]
                 if ID == 3:
-                    fnew = self.Factions.myFaction()   # FIX ME
-                    pType = PT.EXP
+                    fnew = self.factions.my_faction()   # FIX ME
+                    p_type = PT.EXP
                 if ID == 4:
-                    self.Model.RemovePlayer(select.row())
+                    self.model.remove_player(select.row())
                     return
                 if fnew:
-                    self.Model.AddPlayer(select.row(), pType, pMode, fnew)
+                    self.model.add_player(select.row(), p_type, p_mode, fnew)
 
 
-    def AddVictoryCondition(self, vlayout, vc):
+    def add_victory_condition(self, vlayout, vc):
         msg, suffix, default, low, high, step, width, select = vc.value
         data = QSpinBox()
         if suffix:
@@ -485,67 +485,67 @@ class GameSetup(QWidget):
         hlayout.addWidget(data)
         hlayout.addStretch()
         vlayout.addLayout(hlayout)
-        self.VictoryCondition[vc] = (radio, data)
-        radio.toggled.connect(self.AdjustConditionCount)
+        self.victory_condition[vc] = (radio, data)
+        radio.toggled.connect(self.adjust_condition_count)
 
 
-    def AdjustConditionCount(self, enabled):
+    def adjust_condition_count(self, enabled):
         if enabled:
-            self.ConditionCounter += 1
+            self.condition_counter += 1
         else:
-            self.ConditionCounter -= 1
-        self.ActiveConditions.setRange(0, self.ConditionCounter)
+            self.condition_counter -= 1
+        self.active_conditions.setRange(0, self.condition_counter)
 
 
-    def SetupVictoryConditions(self):
-        Title = QLabel('Victory is declared if some of these conditions are met:')
-        VictorySettings = QWidget()
-        VictorySettings.setStyleSheet(GuiDesign.getStyle(GuiStyle.AdvancedSetup_3))
-        Layout_VL = QVBoxLayout(VictorySettings)
-        Layout_VL.setSpacing(0)
-        Layout_VL.addWidget(Title)
-        Layout_VL.addSpacing(20)
-        self.VictoryCondition = dict()
-        self.ConditionCounter = 4
+    def setup_victory_conditions(self):
+        title = QLabel('Victory is declared if some of these conditions are met:')
+        victory_settings = QWidget()
+        victory_settings.setStyleSheet(GuiDesign.get_style(GuiStyle.ADVANCEDSETUP_3))
+        layout_vl = QVBoxLayout(victory_settings)
+        layout_vl.setSpacing(0)
+        layout_vl.addWidget(title)
+        layout_vl.addSpacing(20)
+        self.victory_condition = dict()
+        self.condition_counter = 4
         for vc in Victory:
-            self.AddVictoryCondition(Layout_VL, vc)
-        Layout_VL.addSpacing(40)
+            self.add_victory_condition(layout_vl, vc)
+        layout_vl.addSpacing(40)
         label = QLabel('The following number of selected conditions must be met:')
-        self.ActiveConditions = QSpinBox()
-        self.ActiveConditions.setRange(0, 4)
-        self.ActiveConditions.setValue(1)
-        self.ActiveConditions.setMinimumSize(QSize(60, 40))
-        self.ActiveConditions.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.ActiveConditions.setStyleSheet('font-weight: 600;')
+        self.active_conditions = QSpinBox()
+        self.active_conditions.setRange(0, 4)
+        self.active_conditions.setValue(1)
+        self.active_conditions.setMinimumSize(QSize(60, 40))
+        self.active_conditions.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.active_conditions.setStyleSheet('font-weight: 600;')
         layout = QHBoxLayout()
         layout.addWidget(label)
-        layout.addWidget(self.ActiveConditions)
+        layout.addWidget(self.active_conditions)
         layout.addStretch()
-        Layout_VL.addLayout(layout)
-        Layout_VL.addSpacing(10)
+        layout_vl.addLayout(layout)
+        layout_vl.addSpacing(10)
         label = QLabel('These many years must pass before a winner is declared:')
-        self.GameDuration = QSpinBox()
-        self.GameDuration.setRange(30, 500)
-        self.GameDuration.setSingleStep(10)
-        self.GameDuration.setValue(50)
-        self.GameDuration.setMinimumSize(QSize(85, 40))
-        self.GameDuration.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.GameDuration.setStyleSheet('font-weight: 600;')
+        self.game_duration = QSpinBox()
+        self.game_duration.setRange(30, 500)
+        self.game_duration.setSingleStep(10)
+        self.game_duration.setValue(50)
+        self.game_duration.setMinimumSize(QSize(85, 40))
+        self.game_duration.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.game_duration.setStyleSheet('font-weight: 600;')
         layout = QHBoxLayout()
         layout.addWidget(label)
-        layout.addWidget(self.GameDuration)
+        layout.addWidget(self.game_duration)
         layout.addStretch()
-        Layout_VL.addLayout(layout)
-        Layout_VL.addStretch()
-        self.Pages.addWidget(VictorySettings)
+        layout_vl.addLayout(layout)
+        layout_vl.addStretch()
+        self.pages.addWidget(victory_settings)
 
 
-    def RestoreVictoryConditions(self):
+    def restore_victory_conditions(self):
         for vc in Victory:
-            radio, spinner = self.VictoryCondition[vc]
+            radio, spinner = self.victory_condition[vc]
             spinner.setValue(vc.value[2])
             radio.setChecked(vc.value[7])
-        self.ConditionCounter = 4
-        self.ActiveConditions.setRange(0, 4)
-        self.ActiveConditions.setValue(1)
-        self.GameDuration.setValue(50)
+        self.condition_counter = 4
+        self.active_conditions.setRange(0, 4)
+        self.active_conditions.setValue(1)
+        self.game_duration.setValue(50)

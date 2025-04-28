@@ -4,38 +4,38 @@ from hull import Hull
 
 class Design:
 
-    HullDesign = dict()
-    DesignCounter = dict()
-    LatestIndex = 0
+    hull_design = dict()
+    design_counter = dict()
+    latest_index = 0
 
-    def getDesign(index):
-        return Design.HullDesign.get(index)
+    def get_design(index):
+        return Design.hull_design.get(index)
 
     # fID : foe identifier ...
 
-    def __init__(self, fID, hull):
-        self.fID = fID
-        self.Index = (fID, self.LatestIndex)
-        self.Hull = hull
-        self.System = []
+    def __init__(self, f_id, hull):
+        self.f_id = f_id
+        self.index = (f_id, self.latest_index)
+        self.hull = hull
+        self.system = []
         name = hull.value[1]
-        if (name,fID) in self.DesignCounter:
-            nr = self.DesignCounter[(name, fID)]
-            self.Name = name + ' Mk ' + str(nr)
-            self.DesignCounter[(name, fID)] = nr + 1
+        if (name,f_id) in self.design_counter:
+            nr = self.design_counter[(name, f_id)]
+            self.name = name + ' Mk ' + str(nr)
+            self.design_counter[(name, f_id)] = nr + 1
         else:
-            self.Name = name + ' Mk 1'
-            self.DesignCounter[(name, fID)] = 1
-        self.PictureIndex = hull.value[0]
-        self.LatestIndex += 1
-        Design.HullDesign[self.Index] = self
+            self.name = name + ' Mk 1'
+            self.design_counter[(name, f_id)] = 1
+        self.picture_index = hull.value[0]
+        self.latest_index += 1
+        Design.hull_design[self.index] = self
 
 
-    def getDesignName(self):
-        return self.Hull.value[1]
+    def get_design_name(self):
+        return self.hull.value[1]
 
-    def getPictureIndex(self):
-        return self.PictureIndex
+    def get_picture_index(self):
+        return self.picture_index
 
-    def ComputeBattleRating(self):
+    def compute_battle_rating(self):
         return 1

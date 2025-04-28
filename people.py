@@ -8,49 +8,49 @@ from faction import Faction
 
 class People:
 
-    Species = ['Humanoid', 'Rabbitoid', 'Insectoid', 'Nucletoid', 'Silicanoid', 'Antetheral']
-    Names = ['Robotoids', 'Turindrones', 'Automitrons', 'Rototills', 'Cybertrons', 'Macinti']
-    AIFaction = []
+    species = ['Humanoid', 'Rabbitoid', 'Insectoid', 'Nucletoid', 'Silicanoid', 'Antetheral']
+    names = ['Robotoids', 'Turindrones', 'Automitrons', 'Rototills', 'Cybertrons', 'Macinti']
+    ai_faction = []
 
-    MaxAI = 0
-    for name in Names:
-        fi = Faction(MaxAI)
-        fi.Name = Names[MaxAI]
-        fi.Species = Species[MaxAI]
-        MaxAI += 1
-        AIFaction.append(fi)
+    max_ai = 0
+    for name in names:
+        fi = Faction(max_ai)
+        fi.name = names[max_ai]
+        fi.species = species[max_ai]
+        max_ai += 1
+        ai_faction.append(fi)
 
         
     def __init__(self):
-        self.PlayerID = 0
-        self.PlayerCount = 1
-        self.Player = [Faction()]
+        self.player_id = 0
+        self.player_count = 1
+        self.player = [Faction()]
 
 
-    def getStance(self, fIDA, fIDB):  # TODO: For testing purposes only ...
-        if fIDA == fIDB:
+    def get_stance(self, f_ida, f_idb):  # TODO: For testing purposes only ...
+        if f_ida == f_idb:
             return Stance.allied
-        elif fIDB < 4:
+        elif f_idb < 4:
             return Stance.friendly
-        elif fIDB < 8:
+        elif f_idb < 8:
             return Stance.neutral
         else:
             return Stance.hostile
 
 
-    def myFaction(self):
-        return self.Player[self.PlayerID]
+    def my_faction(self):
+        return self.player[self.player_id]
 
 
-    def getFaction(self, fID):
-        return self.Player[fID % self.PlayerCount]
+    def get_faction(self, f_id):
+        return self.player[f_id % self.player_count]
 
 
-    def getAIFaction(self, fID):
-        return People.AIFaction[fID % People.MaxAI]
+    def get_ai_faction(self, f_id):
+        return People.ai_faction[f_id % People.max_ai]
 
 
-    def randomFaction(self):
-        return People.AIFaction[random.randint(0, People.MaxAI - 1)]
+    def random_faction(self):
+        return People.ai_faction[random.randint(0, People.max_ai - 1)]
 
 

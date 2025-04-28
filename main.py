@@ -30,47 +30,47 @@ def main():
 
     form = Gui(people, rules)            # Create the main user interface
 
-    form.Buttons.UpdateMyDesigns(['Scout Mk 1', 'Small Freighter Mk 1', 'C'])
+    form.buttons.update_my_designs(['Scout Mk 1', 'Small Freighter Mk 1', 'C'])
 
     s = System()
-    s.itemCount = 1
-    s.itemType = Model.Rhino
+    s.item_count = 1
+    s.item_type = Model.Rhino
     s.domain = ST.SCANNER
 
     ship = Ship(Design(0, Hull.SCT))
-    ship.EmptyWeight = 25
-    ship.TotalWeight = 120
-    ship.CargoSpace = 200
-    ship.Design.System.append(s)
-    ship.Settlers = 60
-    ship.Boranium = 10
-    ship.Germanium = 30
-    ship.Ironium = 20
-    ship.Cloaking = 700
-    ship.Fuel = 130
-    ship.TotalFuel = 150
-    ship.MineLaying = 0
-    ship.MineSweeping = 1
-    ship.Name = "Explorer"
+    ship.empty_weight = 25
+    ship.total_weight = 120
+    ship.cargo_space = 200
+    ship.design.system.append(s)
+    ship.settlers = 60
+    ship.boranium = 10
+    ship.germanium = 30
+    ship.ironium = 20
+    ship.cloaking = 700
+    ship.fuel = 130
+    ship.total_fuel = 150
+    ship.mine_laying = 0
+    ship.mine_sweeping = 1
+    ship.name = "Explorer"
 
     fleet_0 = Fleet([ship], 4, people)
     fleet_1 = Fleet([ship], 2, people)
     fleet_2 = Fleet([ship], 0, people)
 
     freighter = Ship(Design(0, Hull.SFR))
-    freighter.EmptyWeight = 20
-    freighter.TotalWeight = 100
-    freighter.CargoSpace = 500
-    freighter.Settlers = 100
-    freighter.Boranium = 20
-    freighter.Germanium = 10
-    freighter.Ironium = 30
-    freighter.Cloaking = 0
-    freighter.Fuel = 300
-    freighter.TotalFuel = 1000
-    freighter.MineLaying = 10
-    freighter.MineSweeping = 0
-    freighter.Name = "Hauler"
+    freighter.empty_weight = 20
+    freighter.total_weight = 100
+    freighter.cargo_space = 500
+    freighter.settlers = 100
+    freighter.boranium = 20
+    freighter.germanium = 10
+    freighter.ironium = 30
+    freighter.cloaking = 0
+    freighter.fuel = 300
+    freighter.total_fuel = 1000
+    freighter.mine_laying = 10
+    freighter.mine_sweeping = 0
+    freighter.name = "Hauler"
 
     fleet_3 = Fleet([ship, ship, ship], 1, people)
     fleet_4 = Fleet([ship], 3, people)
@@ -79,77 +79,77 @@ def main():
     fleet_7 = Fleet([freighter, freighter, freighter], 9, people)
     fleet_8 = Fleet([ship, ship, ship, ship], 9, people)
 
-    fleet_3.Idle = False
-    fleet_7.Idle = False
-    fleet_8.WarpSpeed = 10
+    fleet_3.idle = False
+    fleet_7.idle = False
+    fleet_8.warp_speed = 10
 
-    p = form.Map.Universe.planets[2]
+    p = form.map.universe.planets[2]
 
-    form.Map.Universe.RegisterFleet(fleet_0, p)
-    form.Map.Universe.RegisterFleet(fleet_1, p)
-    form.Map.Universe.RegisterFleet(fleet_2, p)
-    form.Map.Universe.RegisterFleet(fleet_3, p)
-    form.Map.Universe.RegisterFleet(fleet_4, p)
-    form.Map.Universe.RegisterFleet(fleet_5, p)
+    form.map.universe.register_fleet(fleet_0, p)
+    form.map.universe.register_fleet(fleet_1, p)
+    form.map.universe.register_fleet(fleet_2, p)
+    form.map.universe.register_fleet(fleet_3, p)
+    form.map.universe.register_fleet(fleet_4, p)
+    form.map.universe.register_fleet(fleet_5, p)
 
-    form.Map.Universe.RegisterFleet(fleet_6, 40, -50)
-    form.Map.Universe.addWaypoint(fleet_6, 240, 420)
-    form.Map.Universe.addWaypoint(fleet_6, 120, 550)
-    form.Map.Universe.addWaypoint(fleet_6, 480, 500)
-    form.Map.Universe.addWaypoint(fleet_6, 550, 300)
+    form.map.universe.register_fleet(fleet_6, 40, -50)
+    form.map.universe.add_waypoint(fleet_6, 240, 420)
+    form.map.universe.add_waypoint(fleet_6, 120, 550)
+    form.map.universe.add_waypoint(fleet_6, 480, 500)
+    form.map.universe.add_waypoint(fleet_6, 550, 300)
 
-    form.Map.Universe.RegisterFleet(fleet_7, 40, -50)
-    form.Map.Universe.addWaypoint(fleet_7, -20, 500)
-    form.Map.Universe.addWaypoint(fleet_7, 180, 350)
-    form.Map.Universe.addWaypoint(fleet_7, 280, 600)
-    form.Map.Universe.addWaypoint(fleet_7, 500, 400)
+    form.map.universe.register_fleet(fleet_7, 40, -50)
+    form.map.universe.add_waypoint(fleet_7, -20, 500)
+    form.map.universe.add_waypoint(fleet_7, 180, 350)
+    form.map.universe.add_waypoint(fleet_7, 280, 600)
+    form.map.universe.add_waypoint(fleet_7, 500, 400)
 
-    form.Map.Universe.RegisterFleet(fleet_8, 140, -150)
-    form.Map.Universe.addWaypoint(fleet_8, -120, 600)
-    form.Map.Universe.addWaypoint(fleet_8, 280, 450)
-    form.Map.Universe.addWaypoint(fleet_8, 280, 600)
-    form.Map.Universe.addWaypoint(fleet_8, 600, 600)
-    form.Map.Universe.addWaypoint(fleet_8, 500, 550)
-    form.Map.Universe.addWaypoint(fleet_8, 140, -150)
-    form.Map.Universe.addWaypoint(fleet_8, -120, 600)
+    form.map.universe.register_fleet(fleet_8, 140, -150)
+    form.map.universe.add_waypoint(fleet_8, -120, 600)
+    form.map.universe.add_waypoint(fleet_8, 280, 450)
+    form.map.universe.add_waypoint(fleet_8, 280, 600)
+    form.map.universe.add_waypoint(fleet_8, 600, 600)
+    form.map.universe.add_waypoint(fleet_8, 500, 550)
+    form.map.universe.add_waypoint(fleet_8, 140, -150)
+    form.map.universe.add_waypoint(fleet_8, -120, 600)
 
-    form.Map.Universe.planets[0].BuildStarbase()
-    form.Map.Universe.planets[0].Relation = Stance.neutral
-    form.Map.Universe.planets[0].Colonists = 24000
+    form.map.universe.planets[0].build_starbase()
+    form.map.universe.planets[0].relation = Stance.neutral
+    form.map.universe.planets[0].colonists = 24000
 
-    form.Map.Universe.planets[5].Surface.Ironium = 20.0
-    form.Map.Universe.planets[5].Surface.Boranium = 130.0
-    form.Map.Universe.planets[5].Surface.Germanium = 100.0
-    form.Map.Universe.planets[5].Crust.Ironium = 70.0
-    form.Map.Universe.planets[5].Crust.Boranium = 30.0
-    form.Map.Universe.planets[5].Crust.Germanium = 90.0
-    form.Map.Universe.planets[5].Explore(2400)
-    form.Map.Universe.planets[5].Colonists = 400000
-    form.Map.Universe.planets[5].Relation = Stance.allied
+    form.map.universe.planets[5].surface.ironium = 20.0
+    form.map.universe.planets[5].surface.boranium = 130.0
+    form.map.universe.planets[5].surface.germanium = 100.0
+    form.map.universe.planets[5].crust.ironium = 70.0
+    form.map.universe.planets[5].crust.boranium = 30.0
+    form.map.universe.planets[5].crust.germanium = 90.0
+    form.map.universe.planets[5].explore(2400)
+    form.map.universe.planets[5].colonists = 400000
+    form.map.universe.planets[5].relation = Stance.allied
 
     x = -30
     y = -30
 
-    M0 = Minefield(form.Map.Universe, p.x, p.y, 2500, M.Normal, 0, people)
-    M0.Detected = True
-    form.Map.Universe.minefields.append(M0)
-    M0 = Minefield(form.Map.Universe, p.x, p.y, 25000, M.SpeedTrap, 11, people)
-    M0.Detected = True
-    form.Map.Universe.minefields.append(M0)
+    m0 = Minefield(form.map.universe, p.x, p.y, 2500, M.Normal, 0, people)
+    m0.detected = True
+    form.map.universe.minefields.append(m0)
+    m0 = Minefield(form.map.universe, p.x, p.y, 25000, M.SpeedTrap, 11, people)
+    m0.detected = True
+    form.map.universe.minefields.append(m0)
 
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 400, M.Normal, 4, people))
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x, y, 1400, M.SpeedTrap, 4, people))
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 10, y + 50, 25000, M.Normal, 0, people))
-    form.Map.Universe.minefields.append(Minefield(form.Map.Universe, x + 50, y - 10, 64000, M.Normal, -1, people))
+    form.map.universe.minefields.append(Minefield(form.map.universe, x, y, 400, M.Normal, 4, people))
+    form.map.universe.minefields.append(Minefield(form.map.universe, x, y, 1400, M.SpeedTrap, 4, people))
+    form.map.universe.minefields.append(Minefield(form.map.universe, x + 10, y + 50, 25000, M.Normal, 0, people))
+    form.map.universe.minefields.append(Minefield(form.map.universe, x + 50, y - 10, 64000, M.Normal, -1, people))
 
-    fleet_7.WarpSpeed = 10
-    fleet_8.RepeatTasks(True)
-    form.Map.Universe.ComputeTurn()
+    fleet_7.warp_speed = 10
+    fleet_8.repeat_tasks(True)
+    form.map.universe.compute_turn()
 
-    for p in form.Map.Universe.planets:
-        p.BuildStarbase()
-        p.Explore(2390)
-        p.UpdatePlanetView()
+    for p in form.map.universe.planets:
+        p.build_starbase()
+        p.explore(2390)
+        p.update_planet_view()
 
 
     form.show()                         # Show the form

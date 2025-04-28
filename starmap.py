@@ -14,12 +14,12 @@ class Starmap(QGraphicsView):
 
         super(self.__class__, self).__init__()
 
-        self.Universe = Universe(rules)
-        self.setScene(self.Universe)
+        self.universe = Universe(rules)
+        self.setScene(self.universe)
         self.setMouseTracking(True)
 #    self.setRenderHint(QPainter.RenderHint.Antialiasing)
         self.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-        self.CurrentScaling = 100
+        self.current_scaling = 100
         pol = QSizePolicy()
         pol.setHorizontalPolicy(pol.Policy.MinimumExpanding)
         pol.setVerticalPolicy(pol.Policy.MinimumExpanding)
@@ -27,12 +27,12 @@ class Starmap(QGraphicsView):
         self.setResizeAnchor(self.ViewportAnchor.AnchorViewCenter)
 
 
-    def ResizeStarmap(self, event, level):
+    def resize_starmap(self, event, level):
         if event:
             if level == 100:
                 self.resetTransform()
             else:
-                ratio = (1.0 * level) / self.CurrentScaling
+                ratio = (1.0 * level) / self.current_scaling
                 self.scale(ratio, ratio)
-            self.Universe.ResizeFlightPaths(GP.fp_width[level])
-            self.CurrentScaling = level
+            self.universe.resize_flight_paths(GP.fp_width[level])
+            self.current_scaling = level

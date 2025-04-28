@@ -8,18 +8,18 @@ class PlanetData:
 
     def __init__(self):
 
-        self.Radioactivity = 0                             # These parameters may be modified via
-        self.Gravity = 0                                   # terraforming technologies and influence
-        self.Temperature = 0                               # population density & growth
+        self.radioactivity = 0                             # These parameters may be modified via
+        self.gravity = 0                                   # terraforming technologies and influence
+        self.temperature = 0                               # population density & growth
 
-        self.RadioactivityRate = 0.0                       # TODO: Create a viable terraforming
-        self.GravityRate = 0.0                             # model to compute this rates.
-        self.TemperatureRate = 0.0
+        self.radioactivity_rate = 0.0                      # TODO: Create a viable terraforming
+        self.gravity_rate = 0.0                            # model to compute this rates.
+        self.temperature_rate = 0.0
 
-        self.Colonists = 0
+        self.colonists = 0
 
-        self.Relation = Stance.neutral
-        self.SpaceStation = False
+        self.relation = Stance.neutral
+        self.space_station = False
 
-        self.Crust = Minerals()
-        self.Surface = Minerals()
+        self.crust = Minerals()
+        self.surface = Minerals()

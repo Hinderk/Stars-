@@ -5,11 +5,11 @@ from pathlib import Path
 import os
 
 
-BaseDirectory = Path(__file__).resolve().parent
+base_directory = Path(__file__).resolve().parent
 
 
-def LoadFonts(Directory):
-    FontDB = QtGui.QFontDatabase()
-    Path = os.fspath(BaseDirectory / Directory)
-    for Font in QtCore.QDir(Path).entryInfoList(["*.ttf"]):
-        FontDB.addApplicationFont(Font.absoluteFilePath())
+def load_fonts(directory):
+    font_db = QtGui.QFontDatabase()
+    path = os.fspath(base_directory / directory)
+    for font in QtCore.QDir(path).entryInfoList(["*.ttf"]):
+        font_db.addApplicationFont(font.absoluteFilePath())

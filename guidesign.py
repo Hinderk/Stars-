@@ -4,20 +4,20 @@ from enum import Enum
 
 
 class GuiStyle(Enum):
-    GeneralGui = 0
-    StarMap = 1
-    SimpleSetup = 2
-    AdvancedSetup_1 = 3
-    AdvancedSetup_2 = 4
-    AdvancedSetup_3 = 5
-    PlayerMenu = 6
-    FileBrowser = 7
-    FactionSetup_1 = 8
+    GENERALGUI = 0
+    STARMAP = 1
+    SIMPLESETUP = 2
+    ADVANCEDSETUP_1 = 3
+    ADVANCEDSETUP_2 = 4
+    ADVANCEDSETUP_3 = 5
+    PLAYERMENU = 6
+    FILEBROWSER = 7
+    FACTIONSETUP_1 = 8
 
 
 class GuiDesign:
 
-    Style_0 = """
+    style_0 = """
 
              QCheckBox {
                  spacing: 0px;
@@ -121,7 +121,7 @@ class GuiDesign:
 
          """
 
-    Style_1 = """
+    style_1 = """
 
              QMenu {
                  border: 1.5px solid rgb(200,200,200) ;
@@ -149,7 +149,7 @@ class GuiDesign:
 
          """
 
-    Style_2 = """
+    style_2 = """
 
              QLineEdit {
                  padding: 5px 10px 10px 10px;
@@ -240,7 +240,7 @@ class GuiDesign:
 
          """
 
-    Style_3 = """
+    style_3 = """
 
              QWidget {
                  background-color: #f3f3f3;
@@ -304,7 +304,7 @@ class GuiDesign:
 
          """
 
-    Style_4 = """
+    style_4 = """
 
              QMenu {
                  border: 1px solid #787878;
@@ -337,7 +337,7 @@ class GuiDesign:
 
          """
 
-    Style_5 = """
+    style_5 = """
 
              QLabel {
                  font-size: 20pt;
@@ -370,7 +370,7 @@ class GuiDesign:
 
          """
 
-    Style_6 = """
+    style_6 = """
 
              QLineEdit {
                  padding: 5px 10px 10px 10px;
@@ -442,26 +442,26 @@ class GuiDesign:
 
          """
 
-    def getStyle(role, select=0):
-        if role == GuiStyle.GeneralGui:
-            return GuiDesign.Style_0
-        elif role == GuiStyle.StarMap:
-            return GuiDesign.Style_1
-        elif role == GuiStyle.SimpleSetup:
-            return GuiDesign.Style_2
-        elif role == GuiStyle.AdvancedSetup_1:
-            return GuiDesign.Style_2
-        elif role == GuiStyle.AdvancedSetup_2:
-            return GuiDesign.Style_3
-        elif role == GuiStyle.PlayerMenu:
-            return GuiDesign.Style_4
-        elif role == GuiStyle.AdvancedSetup_3:
-            return GuiDesign.Style_5
-        elif role == GuiStyle.FileBrowser:
-            return GuiDesign.Style_6
-        elif role == GuiStyle.FactionSetup_1:
-            return GuiDesign.Style_2  # FIX ME !!
+    def get_style(role, select=0):
+        if role == GuiStyle.GENERALGUI:
+            return GuiDesign.style_0
+        elif role == GuiStyle.STARMAP:
+            return GuiDesign.style_1
+        elif role == GuiStyle.SIMPLESETUP:
+            return GuiDesign.style_2
+        elif role == GuiStyle.ADVANCEDSETUP_1:
+            return GuiDesign.style_2
+        elif role == GuiStyle.ADVANCEDSETUP_2:
+            return GuiDesign.style_3
+        elif role == GuiStyle.PLAYERMENU:
+            return GuiDesign.style_4
+        elif role == GuiStyle.ADVANCEDSETUP_3:
+            return GuiDesign.style_5
+        elif role == GuiStyle.FILEBROWSER:
+            return GuiDesign.style_6
+        else:
+            return GuiDesign.style_2  # FIX ME !!
 
 
-    def getSize():
+    def get_size():
         return [2400, 1350]

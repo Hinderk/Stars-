@@ -1,71 +1,76 @@
 
+""" This module implements the box diagrams for a planets's mineral deposits """
+
 class Diagram:
 
+    """ This class renders crust & surface mineral diagrams onto the star map """
 
     def __init__(self):
 
-        self.BlueBox = None
-        self.GreenBox = None
-        self.YellowBox = None
-        self.VAxis = None
-        self.HAxis = None
-        self.ScaleLength = 0
+        self.blue_box = None
+        self.green_box = None
+        self.yellow_box = None
+        self.v_axis = None
+        self.h_axis = None
+        self.scale_length = 0
 
 
-    def Show(self, switch):
+    def show(self, switch):
+        """ Display or hide the boxes & axes of the diagram """
+        self.blue_box.setVisible(switch)
+        self.green_box.setVisible(switch)
+        self.yellow_box.setVisible(switch)
+        self.v_axis.setVisible(switch)
+        self.h_axis.setVisible(switch)
 
-        self.BlueBox.setVisible(switch)
-        self.GreenBox.setVisible(switch)
-        self.YellowBox.setVisible(switch)
-        self.VAxis.setVisible(switch)
-        self.HAxis.setVisible(switch)
 
-
-    def ShowCrustDiagram(self, planet):
-        minerals = ( planet.Explored.Crust.Ironium +
-                     planet.Explored.Crust.Boranium +
-                     planet.Explored.Crust.Germanium )
-        if planet.Discovered and minerals > 0:
-            box = self.BlueBox.rect()
-            box.setBottom(-self.ScaleLength * planet.Explored.Crust.Ironium / 100.0)
-            self.BlueBox.setRect(box)
-            box = self.GreenBox.rect()
-            box.setBottom(-self.ScaleLength * planet.Explored.Crust.Boranium / 100.0)
-            self.GreenBox.setRect(box)
-            box = self.YellowBox.rect()
-            box.setBottom(-self.ScaleLength * planet.Explored.Crust.Germanium / 100.0)
-            self.YellowBox.setRect(box)
-            self.Show(True)
+    def show_crust_diagram(self, planet):
+        """ Prepare the data for a crust diagram & display the diagram """
+        minerals = ( planet.explored.crust.ironium +
+                     planet.explored.crust.boranium +
+                     planet.explored.crust.germanium )
+        if planet.discovered and minerals > 0:
+            box = self.blue_box.rect()
+            box.setBottom(-self.scale_length * planet.explored.crust.ironium / 100.0)
+            self.blue_box.setRect(box)
+            box = self.green_box.rect()
+            box.setBottom(-self.scale_length * planet.explored.crust.boranium / 100.0)
+            self.green_box.setRect(box)
+            box = self.yellow_box.rect()
+            box.setBottom(-self.scale_length * planet.explored.crust.germanium / 100.0)
+            self.yellow_box.setRect(box)
+            self.show(True)
         else:
-            self.Show(False)
+            self.show(False)
 
 
-    def ShowSurfaceDiagram(self, planet):
-        minerals = ( planet.Explored.Surface.Ironium +
-                     planet.Explored.Surface.Boranium +
-                     planet.Explored.Surface.Germanium )
-        if planet.Discovered and minerals > 0:
-            if planet.Explored.Surface.Ironium < 120:
-                val = planet.Explored.Surface.Ironium / 100.0
+    def show_surface_diagram(self, planet):
+        """ Prepare the data for a surface diagram & display the diagram """
+        minerals = ( planet.explored.surface.ironium +
+                     planet.explored.surface.boranium +
+                     planet.explored.surface.germanium )
+        if planet.discovered and minerals > 0:
+            if planet.explored.surface.ironium < 120:
+                val = planet.explored.surface.ironium / 100.0
             else:
                 val = 1.2
-            box = self.BlueBox.rect()
-            box.setBottom(-self.ScaleLength * val)
-            self.BlueBox.setRect(box)
-            if planet.Explored.Surface.Boranium < 120:
-                val = planet.Explored.Surface.Boranium / 100.0
+            box = self.blue_box.rect()
+            box.setBottom(-self.scale_length * val)
+            self.blue_box.setRect(box)
+            if planet.explored.surface.boranium < 120:
+                val = planet.explored.surface.boranium / 100.0
             else:
                 val = 1.2
-            box = self.GreenBox.rect()
-            box.setBottom(-self.ScaleLength * val)
-            self.GreenBox.setRect(box)
-            if planet.Explored.Surface.Germanium < 120:
-                val = planet.Explored.Surface.Germanium / 100.0
+            box = self.green_box.rect()
+            box.setBottom(-self.scale_length * val)
+            self.green_box.setRect(box)
+            if planet.explored.surface.germanium < 120:
+                val = planet.explored.surface.germanium / 100.0
             else:
                 val = 1.2
-            box = self.YellowBox.rect()
-            box.setBottom(-self.ScaleLength * val)
-            self.YellowBox.setRect(box)
-            self.Show(True)
+            box = self.yellow_box.rect()
+            box.setBottom(-self.scale_length * val)
+            self.yellow_box.setRect(box)
+            self.show(True)
         else:
-            self.Show(False)
+            self.show(False)

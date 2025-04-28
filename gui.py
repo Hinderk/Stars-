@@ -1,4 +1,6 @@
 
+""" This module implements the graphical user interface of the game """
+
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtCore import Qt, QSize
@@ -16,668 +18,711 @@ from inspector import Inspector
 from fleetdata import Fleetdata
 from minedata import Minedata
 from starmap import Starmap
-from universe import Universe
 from newgame import NewGame
 from gamesetup import GameSetup
 from factionwizard import FactionWizard
 
 
 
-def _CreateButton(name):
-    Style = "padding: 0px 2px 0px 2px;border-width: 0px;background-color: transparent"
-    Icon = QIcon(name)
-    Button = QPushButton()
-    Button.setIcon(Icon)
-    Button.setIconSize(QSize(30, 30))
-    Button.setStyleSheet(Style)
-    Button.setVisible(False)
-    return Button
+def _create_button(name):
+    """ Helper function to create buttons in the title bar of the inspector """
+    style = "padding: 0px 2px 0px 2px;border-width: 0px;background-color: transparent"
+    icon = QIcon(name)
+    button = QPushButton()
+    button.setIcon(icon)
+    button.setIconSize(QSize(30, 30))
+    button.setStyleSheet(style)
+    button.setVisible(False)
+    return button
+
+
+def _setup_mine_filter():
+    """ Create a mine filter / show all mine fields """
+    fields = {}
+    fields[Stance.allied] = True
+    fields[Stance.friendly] = True
+    fields[Stance.neutral] = True
+    fields[Stance.hostile] = True
+    return fields
 
 
 
 class Gui(QMainWindow):
 
+    """ This class is responsible for rendering the user interface of the game """
+
     def __init__(self, people, rules):
-        super(self.__class__, self).__init__()
-        self.CurrentYear = rules.FirstYear()
-        self.SelectedPlanet = None
-        self.SelectedFleet = None
-        self.SelectedFields = []
-        self.SelectedFleets = []
-        self.MineFilter = Universe.SetupMineFilter()
-        self.NumberOfFields = 0
-        self.FilteredFields = 0
-        self.EnemyFleetIndex = 0
-        self.NeutralFleetIndex = 0
-        self.FleetIndex = 0
-        self.MineIndex = 0
-        self.FieldIndex = 0
-        self.EnemyFleetOffset = 0
-        self.NeutralFleetOffset = 0
-        self.FleetOffset = 0
-        self.MineOffset = 0
-        self.AlliedFleets = 0
-        self.NeutralFleets = 0
-        self.HostileFleets = 0
-        self.ShowFleetMovements = False
-        self.WaypointMode = False
-        self.setStyleSheet(GuiDesign.getStyle(GuiStyle.GeneralGui))
-        self.Action = dict()
-        self.SetupUI(people, rules)
-        self.Buttons.Zoom.setMenu(self.Menu.MenuZoom)
-        self.Buttons.actionRadarView.toggled.connect(self.Map.Universe.ShowScannerRanges)
-        self.Buttons.actionPlanetNames.toggled.connect(self.Map.Universe.ShowPlanetNames)
-        self.Buttons.actionConcentrationView.toggled.connect(self.ShowCrustDiagrams)
-        self.Buttons.actionSurfaceMineralView.toggled.connect(self.ShowSurfaceDiagrams)
-        self.Buttons.actionDefaultView.toggled.connect(self.ShowDefaultView)
-        self.Buttons.actionPopulationView.toggled.connect(self.ShowPopulationView)
-        self.Buttons.actionNoInfoView.toggled.connect(self.ShowMinimalView)
-        self.Buttons.actionPercentView.toggled.connect(self.ShowPercentageView)
-        self.Buttons.actionFoes.toggled.connect(self.Map.Universe.EnableFoeFilter)
-        self.Buttons.actionFriendlies.toggled.connect(self.Map.Universe.EnableFriendFilter)
-        self.Buttons.actionShipCount.toggled.connect(self.Map.Universe.ShowShipCount)
-        self.Buttons.actionWaitingFleets.toggled.connect(self.Map.Universe.FilterIdleFleets)
-        self.Buttons.actionPathOverlay.toggled.connect(self.ShowMovements)
-        self.Buttons.actionAddWaypoint.toggled.connect(self.AddWaypoints)
-        self.NextField.clicked.connect(self.ShowNextMineField)
-        self.PreviousField.clicked.connect(self.ShowPreviousMineField)
-        self.Buttons.actionNoInfoView.setChecked(True)
-        self.Buttons.RadarRange.valueChanged.connect(self.Map.Universe.ScaleRadarRanges)
-        self.Menu.ChangeZoom.connect(self.Map.ResizeStarmap)
-        self.Buttons.Mines.toggled.connect(self.Map.Universe.ShowFields)
-        self.Buttons.ShowMines.connect(self.Map.Universe.ShowMines)
-        self.Map.Universe.SelectField.connect(self.InspectMineField)
-        self.Map.Universe.SelectFleet.connect(self.InspectFleet)
-        self.Map.Universe.SelectPlanet.connect(self.InspectPlanet)
-        self.Map.Universe.UpdatePlanet.connect(self.UpdatePlanetView)
-        self.Map.Universe.UpdateFilter.connect(self.UpdateFields)
-        self.Map.Universe.UpdateRoute.connect(self.FleetInfo.UpdateInfo)
-        self.ShowPlanet.clicked.connect(self.InspectPlanets)
-        self.SelectNextEnemy.clicked.connect(self.InspectHostileFleet)
-        self.SelectNextNeutral.clicked.connect(self.InspectNeutralFleet)
-        self.SelectNextFleet.clicked.connect(self.InspectAlliedFleet)
-        self.ShowFields.clicked.connect(self.InspectMines)
-        self.ShowFleets.clicked.connect(self.InspectFleets)
-        self.Buttons.FilterEnemyFleets.connect(self.Map.Universe.FilterFoes)
-        self.Buttons.FilterMyFleets.connect(self.Map.Universe.FilterFleets)
-        self.Menu.actionNewGame.triggered.connect(self.NewGame.ConfigureGame)
-        self.Menu.actionWizard.triggered.connect(self.NewFaction.ConfigureWizard)
-        self.NewGame.FactionSetup.clicked.connect(self.ConfigureFaction)
-        self.NewGame.AdvancedGame.clicked.connect(self.ConfigureGame)
-        self.GameSetup.ConfigureFaction.connect(self.ConfigureFaction)
-        self.NewFaction.Cancel.clicked.connect(self.AbortFaction)
-        self.Map.Universe.HighlightPlanet(self.Map.Universe.planets[-1])
+        super().__init__()
+        self.current_year = rules.first_year()
+        self.selected_planet = None
+        self.selected_fleet = None
+        self.selected_fields = []
+        self.selected_fleets = []
+        self.mine_filter = _setup_mine_filter()
+        self.number_of_fields = 0
+        self.filtered_fields = 0
+        self.enemy_fleet_index = 0
+        self.neutral_fleet_index = 0
+        self.fleet_index = 0
+        self.mine_index = 0
+        self.field_index = 0
+        self.enemy_fleet_offset = 0
+        self.neutral_fleet_offset = 0
+        self.fleet_offset = 0
+        self.mine_offset = 0
+        self.allied_fleets = 0
+        self.neutral_fleets = 0
+        self.hostile_fleets = 0
+        self.show_fleet_movements = False
+        self.waypoint_mode = False
+        self.setStyleSheet(GuiDesign.get_style(GuiStyle.GENERALGUI))
+        self.action = {}
+        self.current_game_year = QLabel(self)
+        self.current_message = QPlainTextEdit(self)
+        self.previous_message = QPushButton(self)
+        self.next_message = QPushButton(self)
+        self.follow_message = QPushButton(self)
+        self.filter_message = QCheckBox(self)
+        self.buttons = ToolBar()
+        self.item_info = QStackedLayout(self)
+        self.planet_info = Inspector(people.my_faction())
+        self.fleet_info = Fleetdata()
+        self.mine_info = Minedata()
+        self.info_box = QGroupBox()
+        self.map = Starmap(rules)
+        self.selected_object = QLabel(self)
+        self.previous_field = _create_button(":/Icons/Previous")
+        self.next_field = _create_button(":/Icons/Next")
+        self.show_alien_base = _create_button(":/Icons/Fortress")
+        self.show_neutral_base = _create_button(":/Icons/Tradehub")
+        self.show_star_base = _create_button(":/Icons/Starbase")
+        self.select_next_enemy = _create_button(":/Icons/Enemies")
+        self.select_next_neutral = _create_button(":/Icons/Neutrals")
+        self.select_next_fleet = _create_button(":/Icons/Fleets")
+        self.show_planet = _create_button(":/Icons/Planet")
+        self.show_fields = _create_button(":/Icons/Mines")
+        self.show_fleets = _create_button(":/Icons/Ships")
+        self._setup_ui(people, rules)
+        self.buttons.zoom.setMenu(self.menu.menu_zoom)
+        self._connect_signals_and_slots()
 
 
-    def SetupUI(self, people, rules):
+    def _connect_signals_and_slots(self):
+        """ Connect the Qt signals with their corresponding slots """
+        self.buttons.action_radar_view.toggled.connect(self.map.universe.show_scanner_ranges)
+        self.buttons.action_planet_names.toggled.connect(self.map.universe.show_planet_names)
+        self.buttons.action_concentration_view.toggled.connect(self._show_crust_diagrams)
+        self.buttons.action_surface_mineral_view.toggled.connect(self._show_surface_diagrams)
+        self.buttons.action_default_view.toggled.connect(self._show_default_view)
+        self.buttons.action_population_view.toggled.connect(self._show_population_view)
+        self.buttons.action_no_info_view.toggled.connect(self._show_minimal_view)
+        self.buttons.action_percent_view.toggled.connect(self._show_percentage_view)
+        self.buttons.action_foes.toggled.connect(self.map.universe.enable_foe_filter)
+        self.buttons.action_friendlies.toggled.connect(self.map.universe.enable_friend_filter)
+        self.buttons.action_ship_count.toggled.connect(self.map.universe.show_ship_count)
+        self.buttons.action_waiting_fleets.toggled.connect(self.map.universe.filter_idle_fleets)
+        self.buttons.action_path_overlay.toggled.connect(self._show_movements)
+        self.buttons.action_add_waypoint.toggled.connect(self._add_waypoints)
+        self.next_field.clicked.connect(self._show_next_mine_field)
+        self.previous_field.clicked.connect(self._show_previous_mine_field)
+        self.buttons.action_no_info_view.setChecked(True)
+        self.buttons.radar_range.valueChanged.connect(self.map.universe.scale_radar_ranges)
+        self.menu.change_zoom.connect(self.map.resize_starmap)
+        self.buttons.mines.toggled.connect(self.map.universe.show_fields)
+        self.buttons.show_mines.connect(self.map.universe.show_mines)
+        self.map.universe.select_field.connect(self._inspect_mine_field)
+        self.map.universe.select_fleet.connect(self._inspect_fleet)
+        self.map.universe.select_planet.connect(self._inspect_planet)
+        self.map.universe.update_planet.connect(self.update_planet_view)
+        self.map.universe.update_filter.connect(self._update_fields)
+        self.map.universe.update_route.connect(self.fleet_info.update_waypoint_info)
+        self.show_planet.clicked.connect(self._inspect_planets)
+        self.select_next_enemy.clicked.connect(self._inspect_hostile_fleet)
+        self.select_next_neutral.clicked.connect(self._inspect_neutral_fleet)
+        self.select_next_fleet.clicked.connect(self._inspect_allied_fleet)
+        self.show_fields.clicked.connect(self._inspect_mines)
+        self.show_fleets.clicked.connect(self._inspect_fleets)
+        self.buttons.filter_enemy_fleets.connect(self.map.universe.filter_foes)
+        self.buttons.filter_my_fleets.connect(self.map.universe.filter_fleets)
+        self.menu.action_new_game.triggered.connect(self.new_game.configure_game)
+        self.menu.action_wizard.triggered.connect(self.new_faction.configure_wizard)
+        self.new_game.faction_setup.clicked.connect(self._configure_faction)
+        self.new_game.advanced_game.clicked.connect(self._configure_game)
+        self.game_setup.configure_faction.connect(self._configure_faction)
+        self.new_faction.cancel.clicked.connect(self._abort_faction)
+        self.map.universe.highlight_planet(self.map.universe.planets[-1])
 
-        sx, sy = GuiDesign.getSize()
+
+    def _setup_ui(self, people, rules):
+        """ Create the main layout of the user interface """
+        sx, sy = GuiDesign.get_size()
         self.resize(sx, sy)
         self.setWindowTitle("My Stars!")
-        Icon = QIcon()
-        Icon.addPixmap(QPixmap(":/Icons/Stars"))
-        self.setWindowIcon(Icon)
-        self.CentralWidget = QWidget(self)
-        self.setCentralWidget(self.CentralWidget)
-        self.CentralWidget.setMinimumSize(sx, sy)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/Icons/Stars"))
+        self.setWindowIcon(icon)
+        self.central_widget = QWidget(self)
+        self.setCentralWidget(self.central_widget)
+        self.central_widget.setMinimumSize(sx, sy)
+        self.new_game = NewGame(people, rules)
+        self.new_game.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.game_setup = GameSetup(people, rules)
+        self.game_setup.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.new_faction = FactionWizard(people, rules)
+        self.new_faction.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self._assemble_user_interface()
+        self.menu = Menu(self)
+        self.setMenuBar(self.menu)
+        self.setStatusBar(QStatusBar(self))
 
-        self.NewGame = NewGame(people, rules)
-        self.NewGame.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.GameSetup = GameSetup(people, rules)
-        self.GameSetup.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.NewFaction = FactionWizard(people, rules)
-        self.NewFaction.setWindowModality(Qt.WindowModality.ApplicationModal)
 
-        LeftSide = QWidget()
-        LeftSide.setMinimumWidth(875)        # Minimal feasible value ...
-        LeftSide.setMaximumWidth(875)
-
-        Layout_HL = QHBoxLayout(self.CentralWidget)
-        Layout_HL.setSpacing(0)
-        Layout_VL = QVBoxLayout(LeftSide)
-        Layout_VL.setSpacing(0)
-
-        self.Buttons = ToolBar()
-        self.Buttons.setAutoFillBackground(True)
-        self.Buttons.setMovable(False)
-        self.Buttons.setIconSize(QSize(40, 40))
-        Layout_VL.addWidget(self.Buttons)
-
-        InfoBox = QGroupBox()
+    def _assemble_user_interface(self):
+        """ Layout the control panels on the left side & the star map """
+        left_side = QWidget()
+        left_side.setMinimumWidth(875)        # Minimal feasible value ...
+        left_side.setMaximumWidth(875)
+        layout_hl = QHBoxLayout(self.central_widget)
+        layout_hl.setSpacing(0)
+        layout_vl = QVBoxLayout(left_side)
+        layout_vl.setSpacing(0)
+        self.buttons.setAutoFillBackground(True)
+        self.buttons.setMovable(False)
+        self.buttons.setIconSize(QSize(40, 40))
+        layout_vl.addWidget(self.buttons)
         policy = QSizePolicy()
         policy.setHorizontalPolicy(policy.Policy.MinimumExpanding)
         policy.setVerticalPolicy(policy.Policy.MinimumExpanding)
-        InfoBox.setSizePolicy(policy)
-        Data_VL = QVBoxLayout(InfoBox)
-        Label_A = QLabel("Test-A")
-        Label_B = QLabel("Test-B")
-        Data_VL.addWidget(Label_A)
-        Data_VL.addStretch()
-        Data_VL.addWidget(Label_B)
-
-        Layout_VL.addWidget(InfoBox)
-        Layout_VL.addWidget(self.SetupNewsReader())
-
-        InfoBox = QGroupBox()
-        InfoBox.setMinimumHeight(420)
-        InfoBox.setMaximumHeight(420)
-        Info_VL = QVBoxLayout(InfoBox)
-        Info_VL.setSpacing(0)
-        Info_VL.addWidget(self.SetupInspectorTitle())
-        self.ItemInfo = QStackedLayout()
-        self.PlanetInfo = Inspector(people.myFaction())
-        self.ItemInfo.addWidget(self.PlanetInfo)
-
-        self.FleetInfo = Fleetdata()
-        self.ItemInfo.addWidget(self.FleetInfo)
-        self.MineInfo = Minedata()
-        self.ItemInfo.addWidget(self.MineInfo)
-
-        Enigma = QWidget()
-        Enigma_HL = QHBoxLayout(Enigma)
-        Enigma_HL.addStretch()
-        Image = QSvgWidget(":/Graphics/Enigma")
-        Image.setMaximumSize(300, 300)
-        Enigma_HL.addWidget(Image)
-        Enigma_HL.addStretch()
-        self.ItemInfo.addWidget(Enigma)
-
-        Info_VL.addLayout(self.ItemInfo)
-        Layout_VL.addWidget(InfoBox)
-
-        self.Map = Starmap(rules)
-        Layout_HL.addWidget(LeftSide)
-        Layout_HL.addWidget(self.Map)
-
-        self.Menu = Menu(self)
-        self.setMenuBar(self.Menu)
-        self.Status = QStatusBar(self)
-        self.setStatusBar(self.Status)
+        self.info_box.setSizePolicy(policy)
+        layout_vl.addWidget(self.info_box)
+        layout_vl.addWidget(self._setup_news_reader())
+        info_box = QGroupBox()
+        info_box.setMinimumHeight(420)
+        info_box.setMaximumHeight(420)
+        info_vl = QVBoxLayout(info_box)
+        info_vl.setSpacing(0)
+        info_vl.addWidget(self._setup_inspector_title())
+        image = QSvgWidget(":/Graphics/Enigma")
+        image.setMaximumSize(300, 300)
+        enigma = QWidget()
+        enigma_hl = QHBoxLayout(enigma)
+        enigma_hl.addStretch()
+        enigma_hl.addWidget(image)
+        enigma_hl.addStretch()
+        self.item_info.addWidget(self.planet_info)
+        self.item_info.addWidget(self.fleet_info)
+        self.item_info.addWidget(self.mine_info)
+        self.item_info.addWidget(enigma)
+        info_vl.addLayout(self.item_info)
+        layout_vl.addWidget(info_box)
+        layout_hl.addWidget(left_side)
+        layout_hl.addWidget(self.map)
 
 
-    def SetupNewsReader(self):
-        Filter_HL = QHBoxLayout()
-        Filter_HL.setSpacing(0)
-        self.FilterMessage = QCheckBox()
-        self.FilterMessage.setToolTip("Show the likes of the current message ...")
-        self.FilterMessage.setStatusTip("Show the likes of the current message ...")
-        self.FilterMessage.setChecked(True)
-        Filter_HL.addWidget(self.FilterMessage)
-        Filter_HL.addStretch()
-        self.CurrentGameYear = QLabel(self.CentralWidget)
-        self.CurrentGameYear.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.CurrentGameYear.setToolTip("Current Age of the Galaxy ...")
-        self.CurrentGameYear.setText("Year 2400 - Message: 1 of 9999")
-        Filter_HL.addWidget(self.CurrentGameYear)
-        Filter_HL.addStretch()
-        Icon = QIcon()
-        Show = QPixmap(":/Icons/ShowNews")
-        NoShow = QPixmap(":/Icons/NoNews")
-        Icon.addPixmap(NoShow, QIcon.Mode.Normal, QIcon.State.Off)
-        Icon.addPixmap(Show, QIcon.Mode.Normal, QIcon.State.On)
-        Filter = QToolButton(self.CentralWidget)
-        Filter.setCheckable(True)
-        Filter.setIcon(Icon)
-        Filter.setAutoRepeat(False)
-        Filter.setToolTip("Show the likes of the current message ...")
-        Filter.setStatusTip("Show the likes of the current message ...")
-        Filter.setIconSize(QSize(30, 30))
-        Filter_HL.addWidget(Filter)
-        self.CurrentMessage = QPlainTextEdit(self.CentralWidget)
-        self.CurrentMessage.setReadOnly(True)
-        self.CurrentMessage.setPlainText("This is a very important message ...")  # DELETE ME!
-        NewsButtons_VL = QVBoxLayout()
-        NewsButtons_VL.addStretch()
-        self.PreviousMessage = QPushButton()
-        self.PreviousMessage.setText("Prev")
-        self.PreviousMessage.setToolTip("Read previous message ...")
-        self.PreviousMessage.setStatusTip("Read the previous message ...")
-        NewsButtons_VL.addWidget(self.PreviousMessage)
-        self.FollowMessage = QPushButton()
-        self.FollowMessage.setText("Goto")
-        self.FollowMessage.setToolTip("Follow up on current message ...")
-        self.FollowMessage.setStatusTip("Follow up on the current message ...")
-        NewsButtons_VL.addWidget(self.FollowMessage)
-        self.NextMessage = QPushButton()
-        self.NextMessage.setText("Next")
-        self.NextMessage.setToolTip("Read next message ...")
-        self.NextMessage.setStatusTip("Read the next message ...")
-        NewsButtons_VL.addWidget(self.NextMessage)
-        NewsButtons_VL.addStretch()
-        News_HL = QHBoxLayout()
-        News_HL.setSpacing(5)
-        News_HL.addWidget(self.CurrentMessage)
-        News_HL.addLayout(NewsButtons_VL)
-        News_VL = QVBoxLayout()
-        News_VL.addLayout(Filter_HL)
-        News_VL.addLayout(News_HL)
-        News_VL.addSpacing(5)
-        NewsReader = QGroupBox()
-        NewsReader.setLayout(News_VL)
-        NewsReader.setMaximumHeight(190)
-        return NewsReader
+    def _create_message_filter(self):
+        """ Create the message filter button in the title of the news reader """
+        icon = QIcon()
+        show = QPixmap(":/Icons/ShowNews")
+        no_show = QPixmap(":/Icons/NoNews")
+        icon.addPixmap(no_show, QIcon.Mode.Normal, QIcon.State.Off)
+        icon.addPixmap(show, QIcon.Mode.Normal, QIcon.State.On)
+        message_filter = QToolButton(self)
+        message_filter.setCheckable(True)
+        message_filter.setIcon(icon)
+        message_filter.setAutoRepeat(False)
+        message_filter.setToolTip("Show the likes of the current message ...")
+        message_filter.setStatusTip("Show the likes of the current message ...")
+        message_filter.setIconSize(QSize(30, 30))
+        message_filter.toggled.connect(self._apply_message_filter)
+        return message_filter
 
 
-    def SetupInspectorTitle(self):
-        Title = QWidget()
-        SelectedObject_HL = QHBoxLayout(Title)
-        SelectedObject_HL.setSpacing(0)
-        SelectedObject_HL.addSpacing(250)
-        self.SelectedObject = QLabel()
-        self.SelectedObject.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        SelectedObject_HL.addWidget(self.SelectedObject)
-        ButtonBox = QWidget()
-        ButtonBox.setMaximumWidth(180)
-        ButtonLayout_HL = QHBoxLayout(ButtonBox)
-        ButtonLayout_HL.setSpacing(0)
-        ButtonLayout_HL.addStretch()
-        self.PreviousField = _CreateButton(":/Icons/Previous")
-        ButtonLayout_HL.addWidget(self.PreviousField)
-        self.NextField = _CreateButton(":/Icons/Next")
-        ButtonLayout_HL.addWidget(self.NextField)
-        self.ShowAlienBase = _CreateButton(":/Icons/Fortress")
-        ButtonLayout_HL.addWidget(self.ShowAlienBase)
-        self.ShowNeutralBase = _CreateButton(":/Icons/Tradehub")
-        ButtonLayout_HL.addWidget(self.ShowNeutralBase)
-        self.ShowStarBase = _CreateButton(":/Icons/Starbase")
-        ButtonLayout_HL.addWidget(self.ShowStarBase)
-        self.SelectNextEnemy = _CreateButton(":/Icons/Enemies")
-        ButtonLayout_HL.addWidget(self.SelectNextEnemy)
-        self.SelectNextNeutral = _CreateButton(":/Icons/Neutrals")
-        ButtonLayout_HL.addWidget(self.SelectNextNeutral)
-        self.SelectNextFleet = _CreateButton(":/Icons/Fleets")
-        ButtonLayout_HL.addWidget(self.SelectNextFleet)
-        SelectedObject_HL.addWidget(ButtonBox)
-        SwitchBox = QWidget()
-        SwitchBox.setMaximumWidth(70)
-        SwitchLayout_HL = QHBoxLayout(SwitchBox)
-        SwitchLayout_HL.setSpacing(0)
-        SwitchLayout_HL.addStretch(0)
-        self.ShowPlanet = _CreateButton(":/Icons/Planet")
-        SwitchLayout_HL.addWidget(self.ShowPlanet)
-        self.ShowFields = _CreateButton(":/Icons/Mines")
-        SwitchLayout_HL.addWidget(self.ShowFields)
-        self.ShowFleets = _CreateButton(":/Icons/Ships")
-        SwitchLayout_HL.addWidget(self.ShowFleets)
-        SelectedObject_HL.addWidget(SwitchBox)
-        Title.setMinimumHeight(68)
-        return Title
+    def _setup_news_reader(self):
+        """ Create the news reader panel & its controls """
+        self.filter_message.setToolTip("Show the likes of the current message ...")
+        self.filter_message.setStatusTip("Show the likes of the current message ...")
+        self.filter_message.setChecked(True)
+        self.current_game_year.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.current_game_year.setToolTip("Current Age of the Galaxy ...")
+        self.current_game_year.setText("Year 2400 - Message: 1 of 9999")  # TODO: Create alongside messages - To be removed here!
+        filter_hl = QHBoxLayout()
+        filter_hl.addWidget(self.filter_message)
+        filter_hl.addStretch()
+        filter_hl.addWidget(self.current_game_year)
+        filter_hl.addStretch()
+        filter_hl.addWidget(self._create_message_filter())
+        self.current_message.setReadOnly(True)
+        self.current_message.setPlainText('This is a very important message ...')  # TODO: Delete this ...
+        self.previous_message.setText("Prev")
+        self.previous_message.setToolTip("Read previous message ...")
+        self.previous_message.setStatusTip("Read the previous message ...")
+        self.follow_message.setText("Goto")
+        self.follow_message.setToolTip("Follow up on current message ...")
+        self.follow_message.setStatusTip("Follow up on the current message ...")
+        self.next_message.setText("Next")
+        self.next_message.setToolTip("Read next message ...")
+        self.next_message.setStatusTip("Read the next message ...")
+        news_buttons_vl = QVBoxLayout()
+        news_buttons_vl.addStretch()
+        news_buttons_vl.addWidget(self.previous_message)
+        news_buttons_vl.addWidget(self.follow_message)
+        news_buttons_vl.addWidget(self.next_message)
+        news_buttons_vl.addStretch()
+        news_hl = QHBoxLayout()
+        news_hl.setSpacing(5)
+        news_hl.addWidget(self.current_message)
+        news_hl.addLayout(news_buttons_vl)
+        news_reader = QGroupBox()
+        news_vl = QVBoxLayout(news_reader)
+        news_vl.addLayout(filter_hl)
+        news_vl.addLayout(news_hl)
+        news_vl.addSpacing(5)
+        news_reader.setMaximumHeight(190)
+        return news_reader
 
 
-    def DisplayStarbaseIcons(self, p=None):
+    def _setup_inspector_title(self):
+        """ Create the visual elements of the inspector's title bar """
+        title = QWidget()
+        selected_object_hl = QHBoxLayout(title)
+        selected_object_hl.setSpacing(0)
+        selected_object_hl.addSpacing(250)
+        self.selected_object.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        selected_object_hl.addWidget(self.selected_object)
+        button_box = QWidget()
+        button_box.setMaximumWidth(180)
+        button_layout_hl = QHBoxLayout(button_box)
+        button_layout_hl.setSpacing(0)
+        button_layout_hl.addStretch()
+        button_layout_hl.addWidget(self.previous_field)
+        button_layout_hl.addWidget(self.next_field)
+        button_layout_hl.addWidget(self.show_alien_base)
+        button_layout_hl.addWidget(self.show_neutral_base)
+        button_layout_hl.addWidget(self.show_star_base)
+        button_layout_hl.addWidget(self.select_next_enemy)
+        button_layout_hl.addWidget(self.select_next_neutral)
+        button_layout_hl.addWidget(self.select_next_fleet)
+        selected_object_hl.addWidget(button_box)
+        switch_box = QWidget()
+        switch_box.setMaximumWidth(70)
+        switch_layout_hl = QHBoxLayout(switch_box)
+        switch_layout_hl.setSpacing(0)
+        switch_layout_hl.addStretch(0)
+        switch_layout_hl.addWidget(self.show_planet)
+        switch_layout_hl.addWidget(self.show_fields)
+        switch_layout_hl.addWidget(self.show_fleets)
+        selected_object_hl.addWidget(switch_box)
+        title.setMinimumHeight(68)
+        return title
+
+
+    def display_starbase_icons(self, p=None):
+        """ Display the proper button for the orbiting starbase """
         if p:
-            if p.Relation == Stance.allied:
-                self.ShowNeutralBase.setVisible(False)
-                self.ShowAlienBase.setVisible(False)
-                self.ShowStarBase.setVisible(p.SpaceStation)
-            elif p.Relation == Stance.hostile:
-                self.ShowNeutralBase.setVisible(False)
-                self.ShowStarBase.setVisible(False)
-                self.ShowAlienBase.setVisible(p.SpaceStation and p.ShipTracking)
+            if p.relation == Stance.allied:
+                self.show_neutral_base.setVisible(False)
+                self.show_alien_base.setVisible(False)
+                self.show_star_base.setVisible(p.space_station)
+            elif p.relation == Stance.hostile:
+                self.show_neutral_base.setVisible(False)
+                self.show_star_base.setVisible(False)
+                self.show_alien_base.setVisible(p.space_station and p.ship_tracking)
             else:
-                self.ShowAlienBase.setVisible(False)
-                self.ShowStarBase.setVisible(False)
-                self.ShowNeutralBase.setVisible(p.SpaceStation and p.ShipTracking)
+                self.show_alien_base.setVisible(False)
+                self.show_star_base.setVisible(False)
+                self.show_neutral_base.setVisible(p.space_station and p.ship_tracking)
         else:
-            self.ShowNeutralBase.setVisible(False)
-            self.ShowAlienBase.setVisible(False)
-            self.ShowStarBase.setVisible(False)
+            self.show_neutral_base.setVisible(False)
+            self.show_alien_base.setVisible(False)
+            self.show_star_base.setVisible(False)
 
 
-    def DisplayFleetIcons(self):
-        self.SelectNextEnemy.setVisible(self.HostileFleets > 0)
-        self.SelectNextNeutral.setVisible(self.NeutralFleets > 0)
-        self.SelectNextFleet.setVisible(self.AlliedFleets > 0)
+    def _display_fleet_icons(self):
+        """ Display indicators for fleets in a planet's orbit """
+        self.select_next_enemy.setVisible(self.hostile_fleets > 0)
+        self.select_next_neutral.setVisible(self.neutral_fleets > 0)
+        self.select_next_fleet.setVisible(self.allied_fleets > 0)
 
 
-    def UpdatePlanetView(self, p):
-        if self.ItemInfo.currentIndex() < 2:
-            self.AlliedFleets = p.TotalFriends
-            if p.ShipTracking:
-                self.HostileFleets = p.TotalFoes
-                self.NeutralFleets = p.TotalOthers
+    def update_planet_view(self, p):
+        """ Update the planetary data displayed in the inspector panel """
+        if self.item_info.currentIndex() < 2:
+            self.allied_fleets = p.total_friends
+            if p.ship_tracking:
+                self.hostile_fleets = p.total_foes
+                self.neutral_fleets = p.total_others
             else:
-                self.HostileFleets = 0
-                self.NeutralFleets = 0
-            self.DisplayFleetIcons()
-        if self.ItemInfo.currentIndex() == 1:
-            if self.EnemyFleetOffset > 0 and p.TotalFoes > 0:
-                self.EnemyFleetOffset = 0
-                self.InspectEnemyFleet()
-            elif self.NeutralFleetOffset > 0 and p.TotalOthers > 0:
-                self.NeutralFleetOffset = 0
-                self.InspectNeutralFleet()
-            elif self.FleetOffset > 0 and p.TotalFriends > 0:
-                self.FleetOffset = 0
-                self.InspectFleets()
-            elif p.TotalFoes > 0:
-                self.EnemyFleetOffset = 0
-                self.InspectEnemyFleet()
-            elif p.TotalOthers > 0:
-                self.NeutralFleetOffset = 0
-                self.InspectNeutralFleet()
-            elif p.TotalFriends > 0:
-                self.FleetOffset = 0
-                self.InspectFleets()
+                self.hostile_fleets = 0
+                self.neutral_fleets = 0
+            self._display_fleet_icons()
+        if self.item_info.currentIndex() == 1:
+            if self.enemy_fleet_offset > 0 and p.total_foes > 0:
+                self.enemy_fleet_offset = 0
+                self._inspect_hostile_fleet()
+            elif self.neutral_fleet_offset > 0 and p.total_others > 0:
+                self.neutral_fleet_offset = 0
+                self._inspect_neutral_fleet()
+            elif self.fleet_offset > 0 and p.total_friends > 0:
+                self.fleet_offset = 0
+                self._inspect_fleets()
+            elif p.total_foes > 0:
+                self.enemy_fleet_offset = 0
+                self._inspect_hostile_fleet()
+            elif p.total_others > 0:
+                self.neutral_fleet_offset = 0
+                self._inspect_neutral_fleet()
+            elif p.total_friends > 0:
+                self.fleet_offset = 0
+                self._inspect_fleets()
             else:
-                self.InspectPlanet(p)
+                self._inspect_planet(p)
 
 
-    def InspectPlanet(self, p):
-        self.SelectedPlanet = p
-        self.SelectedFleets = p.fleets_in_orbit
-        self.SelectedFields = p.mine_fields
-        self.ApplyMineFilter()
-        self.PreviousField.setVisible(False)
-        self.NextField.setVisible(False)
-        self.ShowPlanet.setVisible(False)
-        self.ShowFleets.setVisible(False)
-        self.ShowFields.setVisible(self.FilteredFields > 0)
-        self.EnemyFleetOffset = 0
-        self.NeutralFleetOffset = 0
-        self.FleetOffset = 0
-        self.MineOffset = 0
-        if p.Discovered:
-            self.ItemInfo.setCurrentIndex(0)
-            self.PlanetInfo.UpdateMinerals(p)
-            self.PlanetInfo.UpdateBiome(p)
-            self.PlanetInfo.UpdateText(self.CurrentYear, p)
+    def _inspect_planet(self, p):
+        """ Show planet data in the inspector panel """
+        self.selected_planet = p
+        self.selected_fleets = p.fleets_in_orbit
+        self.selected_fields = p.mine_fields
+        self._apply_mine_filter()
+        self.previous_field.setVisible(False)
+        self.next_field.setVisible(False)
+        self.show_planet.setVisible(False)
+        self.show_fleets.setVisible(False)
+        self.show_fields.setVisible(self.filtered_fields > 0)
+        self.enemy_fleet_offset = 0
+        self.neutral_fleet_offset = 0
+        self.fleet_offset = 0
+        self.mine_offset = 0
+        if p.discovered:
+            self.item_info.setCurrentIndex(0)
+            self.planet_info.update_minerals(p)
+            self.planet_info.update_biome(p)
+            self.planet_info.update_text(self.current_year, p)
         else:
-            self.ItemInfo.setCurrentIndex(3)
-        self.AlliedFleets = p.TotalFriends
-        if p.ShipTracking:
-            self.HostileFleets = p.TotalFoes
-            self.NeutralFleets = p.TotalOthers
+            self.item_info.setCurrentIndex(3)
+        self.allied_fleets = p.total_friends
+        if p.ship_tracking:
+            self.hostile_fleets = p.total_foes
+            self.neutral_fleets = p.total_others
         else:
-            self.HostileFleets = 0
-            self.NeutralFleets = 0
-        self.DisplayStarbaseIcons(p)
-        self.DisplayFleetIcons()
-        self.SelectedObject.setText(p.Name)
+            self.hostile_fleets = 0
+            self.neutral_fleets = 0
+        self.display_starbase_icons(p)
+        self._display_fleet_icons()
+        self.selected_object.setText(p.name)
 
 
-    def InspectFleet(self, planet, index, f_list, m_list):
-        self.EnemyFleetOffset = 0
-        self.NeutralFleetOffset = 0
-        self.FleetOffset = 0
-        self.FleetIndex = index % len(f_list)
-        self.SelectedFleets = f_list
-        self.SelectedPlanet = planet
-        self.SelectedFields = m_list
-        self.AlliedFleets = 0
-        self.HostileFleets = 0
-        self.NeutralFleets = 0
+    def _inspect_fleet(self, planet, index, f_list, m_list):
+        """ Show fleet data in the inspector panel """
+        self.enemy_fleet_offset = 0
+        self.neutral_fleet_offset = 0
+        self.fleet_offset = 0
+        self.fleet_index = index % len(f_list)
+        self.selected_fleets = f_list
+        self.selected_planet = planet
+        self.selected_fields = m_list
+        self.allied_fleets = 0
+        self.hostile_fleets = 0
+        self.neutral_fleets = 0
         fleets = 0
         for f in f_list:
-            if f.ShipCounter > 0:
-                if f.FriendOrFoe == Stance.allied:
-                    self.AlliedFleets += 1
-                elif f.FriendOrFoe == Stance.hostile:
-                    self.HostileFleets += 1
+            if f.ship_counter > 0:
+                if f.friend_or_foe == Stance.allied:
+                    self.allied_fleets += 1
+                elif f.friend_or_foe == Stance.hostile:
+                    self.hostile_fleets += 1
                 else:
-                    self.NeutralFleets += 1
+                    self.neutral_fleets += 1
                 fleets += 1
-        self.NextField.setVisible(False)
-        self.PreviousField.setVisible(False)
-        self.ShowFleets.setVisible(False)
+        self.next_field.setVisible(False)
+        self.previous_field.setVisible(False)
+        self.show_fleets.setVisible(False)
         if fleets > 0:
-            self.DisplayStarbaseIcons(planet)
-            self.ApplyMineFilter()
-            self.ShowFields.setVisible(self.FilteredFields > 0)
-            fof = f_list[self.FleetIndex].FriendOrFoe
+            self.display_starbase_icons(planet)
+            self._apply_mine_filter()
+            self.show_fields.setVisible(self.filtered_fields > 0)
+            fof = f_list[self.fleet_index].friend_or_foe
             if fof == Stance.allied:
-                self.InspectAlliedFleet()
+                self._inspect_allied_fleet()
             elif fof == Stance.hostile:
-                self.InspectHostileFleet()
+                self._inspect_hostile_fleet()
             else:
-                self.InspectNeutralFleet()
+                self._inspect_neutral_fleet()
         elif planet:
-            self.InspectPlanet(planet)
+            self._inspect_planet(planet)
         else:
-            self.ItemInfo.setCurrentIndex(3)
-            self.ShowFields.setVisible(False)
-            self.DisplayFleetIcons()
-            self.SelectedObject.setText("Deep Space")
+            self.item_info.setCurrentIndex(3)
+            self.show_fields.setVisible(False)
+            self._display_fleet_icons()
+            self.selected_object.setText("Deep Space")
 
 
-    def UpdateFields(self, NewFilter):
-        self.MineFilter = NewFilter
-        self.ApplyMineFilter()
-        if self.ItemInfo.currentIndex() < 2:
-            self.ShowFields.setVisible(self.FilteredFields > 0)
-        elif self.ItemInfo.currentIndex() < 3:
-            if self.FilteredFields > 0:
-                self.InspectMines()
-            elif self.SelectedPlanet:
-                self.InspectPlanets()
-            elif self.SelectedFleets:
-                self.InspectFleets()
+    def _update_fields(self, new_filter):
+        """ Filter mine field data in the inspector panel """
+        self.mine_filter = new_filter
+        self._apply_mine_filter()
+        if self.item_info.currentIndex() < 2:
+            self.show_fields.setVisible(self.filtered_fields > 0)
+        elif self.item_info.currentIndex() < 3:
+            if self.filtered_fields > 0:
+                self._inspect_mines()
+            elif self.selected_planet:
+                self._inspect_planets()
+            elif self.selected_fleets:
+                self._inspect_fleets()
             else:
-                self.ItemInfo.setCurrentIndex(3)
-                self.PreviousField.setVisible(False)
-                self.NextField.setVisible(False)
-                self.ShowFleets.setVisible(False)
-                self.SelectedObject.setText("Deep Space")
+                self.item_info.setCurrentIndex(3)
+                self.previous_field.setVisible(False)
+                self.next_field.setVisible(False)
+                self.show_fleets.setVisible(False)
+                self.selected_object.setText("Deep Space")
 
 
-    def InspectMineField(self, planet, index, m_list, f_list):
-        self.SelectedFields = m_list
-        self.MineIndex = index
-        self.SelectedPlanet = planet
-        self.SelectedFleets = f_list
-        self.InspectMines()
+    def _inspect_mine_field(self, planet, index, m_list, f_list):
+        """ Show mine fields in the inspector panel """
+        self.selected_fields = m_list
+        self.mine_index = index
+        self.selected_planet = planet
+        self.selected_fleets = f_list
+        self._inspect_mines()
 
 
-    def NextFleet(self, index, offset, fof):
-        if self.SelectedPlanet:
-            self.ShowPlanet.setVisible(True)
-            self.ShowFields.setVisible(False)
+    def _next_fleet(self, index, offset, fof):
+        """ Skip to a new fleet in the inspector panel using the
+            index of the current fleet and an arbitrary offset """
+        if self.selected_planet:
+            self.show_planet.setVisible(True)
+            self.show_fields.setVisible(False)
         else:
-            self.ShowPlanet.setVisible(False)
-        if self.SelectedFleet:
-            self.SelectedFleet.ColourCourse(False)
-            self.SelectedFleet.ShowCourse(self.ShowFleetMovements)
-        self.DisplayFleetIcons()
-        self.ItemInfo.setCurrentIndex(1)
-        nmax = len(self.SelectedFleets)
+            self.show_planet.setVisible(False)
+        if self.selected_fleet:
+            self.selected_fleet.colour_course(False)
+            self.selected_fleet.show_course(self.show_fleet_movements)
+        self._display_fleet_icons()
+        self.item_info.setCurrentIndex(1)
+        nmax = len(self.selected_fleets)
         n = (index + offset) % nmax
         while n < nmax:
-            f = self.SelectedFleets[n]
-            if f.ShipCounter > 0 and f.FriendOrFoe in fof:
-                self.SelectedObject.setText(f.Name + ' #' + str(f.id))
-                self.FleetInfo.UpdateCargo(f)
-                f.ShowCourse(True)
-                f.ColourCourse(True)
-                self.SelectedFleet = f
-                self.Map.Universe.SelectedFleet = f
-                self.Map.Universe.FleetIndex = n
+            f = self.selected_fleets[n]
+            if f.ship_counter > 0 and f.friend_or_foe in fof:
+                self.selected_object.setText(f.name + ' #' + str(f.id))
+                self.fleet_info.update_fleet_data(f)
+                f.show_course(True)
+                f.colour_course(True)
+                self.selected_fleet = f
+                self.map.universe.selected_fleet = f
+                self.map.universe.fleet_index = n
                 return n
             n += 1
         n = 0
         while n <= index:
-            f = self.SelectedFleets[n]
-            if f.ShipCounter > 0 and f.FriendOrFoe in fof:
-                self.SelectedObject.setText(f.Name + ' #' + str(f.id))
-                self.FleetInfo.UpdateCargo(f)
-                f.ShowCourse(True)
-                f.ColourCourse(True)
-                self.Map.Universe.SelectedFleet = f
-                self.Map.Universe.FleetIndex = n
-                return n
+            f = self.selected_fleets[n]
+            if f.ship_counter > 0 and f.friend_or_foe in fof:
+                self.selected_object.setText(f.name + ' #' + str(f.id))
+                self.fleet_info.update_fleet_data(f)
+                f.show_course(True)
+                f.colour_course(True)
+                self.map.universe.selected_fleet = f
+                self.map.universe.fleet_index = n
+                break
             n += 1
+        return n
 
 
-    def NextMinefield(self, i0, offset):
-        self.FieldIndex += self.FilteredFields + offset
-        self.FieldIndex %= self.FilteredFields
-        i = (i0 + self.NumberOfFields + offset) % self.NumberOfFields
-        while i < self.NumberOfFields:
-            m = self.SelectedFields[i]
-            if self.MineFilter[m.fof]:
-                self.MineInfo.UpdateData(m, self.FieldIndex + 1, self.FilteredFields)
-                self.SelectedObject.setText(m.model.value + ' Mine Field #' + str(m.id))
+    def _next_minefield(self, i0, offset):
+        """ Skip to a new mine field in the inspector panel using the
+            index of the current mine field and an arbitrary offset """
+        self.field_index += self.filtered_fields + offset
+        self.field_index %= self.filtered_fields
+        i = (i0 + self.number_of_fields + offset) % self.number_of_fields
+        while i < self.number_of_fields:
+            m = self.selected_fields[i]
+            if self.mine_filter[m.fof]:
+                self.mine_info.update_data(m, self.field_index + 1, self.filtered_fields)
+                self.selected_object.setText(m.model.value + ' Mine Field #' + str(m.id))
                 return i
             i += 1
         i = 0
         while i <= i0:
-            m = self.SelectedFields[i]
-            if self.MineFilter[m.fof]:
-                self.MineInfo.UpdateData(m, self.FieldIndex + 1, self.FilteredFields)
-                self.SelectedObject.setText(m.model.value + ' Mine Field #' + str(m.id))
-                return i
+            m = self.selected_fields[i]
+            if self.mine_filter[m.fof]:
+                self.mine_info.update_data(m, self.field_index + 1, self.filtered_fields)
+                self.selected_object.setText(m.model.value + ' Mine Field #' + str(m.id))
+                break
             i += 1
+        return i
 
 
-    def InspectHostileFleet(self):
-        self.HostileFleets -= 1
-        self.EnemyFleetIndex = self.NextFleet(self.EnemyFleetIndex, self.EnemyFleetOffset, [Stance.hostile])
-        self.HostileFleets += 1
-        self.EnemyFleetOffset = 1
-        self.NeutralFleetOffset = 0
-        self.FleetOffset = 0
+    def _inspect_hostile_fleet(self):
+        """ Show hostile fleets in the inspector panel """
+        self.hostile_fleets -= 1
+        self.enemy_fleet_index = self._next_fleet(self.enemy_fleet_index, self.enemy_fleet_offset, [Stance.hostile])
+        self.hostile_fleets += 1
+        self.enemy_fleet_offset = 1
+        self.neutral_fleet_offset = 0
+        self.fleet_offset = 0
 
 
-    def InspectNeutralFleet(self):
+    def _inspect_neutral_fleet(self):
+        """ Show neutral fleets in the inspector panel """
         fof = [Stance.friendly, Stance.neutral]
-        self.NeutralFleets -= 1
-        self.NeutralFleetIndex = self.NextFleet(self.NeutralFleetIndex, self.NeutralFleetOffset, fof)
-        self.NeutralFleets += 1
-        self.EnemyFleetOffset = 0
-        self.NeutralFleetOffset = 1
-        self.FleetOffset = 0
+        self.neutral_fleets -= 1
+        self.neutral_fleet_index = self._next_fleet(self.neutral_fleet_index, self.neutral_fleet_offset, fof)
+        self.neutral_fleets += 1
+        self.enemy_fleet_offset = 0
+        self.neutral_fleet_offset = 1
+        self.fleet_offset = 0
 
 
-    def InspectAlliedFleet(self):
-        self.AlliedFleets -= 1
-        self.FleetIndex = self.NextFleet(self.FleetIndex, self.FleetOffset, [Stance.allied])
-        self.AlliedFleets += 1
-        self.EnemyFleetOffset = 0
-        self.NeutralFleetOffset = 0
-        self.FleetOffset = 1
+    def _inspect_allied_fleet(self):
+        """ Show allied fleets in the inspector panel """
+        self.allied_fleets -= 1
+        self.fleet_index = self._next_fleet(self.fleet_index, self.fleet_offset, [Stance.allied])
+        self.allied_fleets += 1
+        self.enemy_fleet_offset = 0
+        self.neutral_fleet_offset = 0
+        self.fleet_offset = 1
 
 
-    def InspectPlanets(self):
-        self.InspectPlanet(self.SelectedPlanet)
+    def _inspect_planets(self):
+        """ Switch to the planet view in the inspector panel """
+        self._inspect_planet(self.selected_planet)
 
 
-    def InspectFleets(self):
-        self.ShowFleets.setVisible(False)
-        self.InspectFleet(self.SelectedPlanet, self.FleetIndex, self.SelectedFleets, self.SelectedFields)
+    def _inspect_fleets(self):
+        """ Switch to the fleet view in the inspector panel """
+        self.show_fleets.setVisible(False)
+        self._inspect_fleet(self.selected_planet, self.fleet_index, self.selected_fleets, self.selected_fields)
 
 
-    def InspectMines(self):
-        self.EnemyFleetOffset = 0
-        self.NeutralFleetOffset = 0
-        self.FleetOffset = 0
-        self.SelectNextEnemy.setVisible(False)
-        self.SelectNextNeutral.setVisible(False)
-        self.SelectNextFleet.setVisible(False)
-        self.ShowNeutralBase.setVisible(False)
-        self.ShowAlienBase.setVisible(False)
-        self.ShowStarBase.setVisible(False)
-        if self.SelectedPlanet:
-            self.ShowPlanet.setVisible(True)
-            self.ShowFleets.setVisible(False)
-        elif self.SelectedFleets:
-            self.ShowPlanet.setVisible(False)
-            self.ShowFleets.setVisible(True)
+    def _inspect_mines(self):
+        """ Switch to the mine field view in the inspector panel """
+        self.enemy_fleet_offset = 0
+        self.neutral_fleet_offset = 0
+        self.fleet_offset = 0
+        self.select_next_enemy.setVisible(False)
+        self.select_next_neutral.setVisible(False)
+        self.select_next_fleet.setVisible(False)
+        self.show_neutral_base.setVisible(False)
+        self.show_alien_base.setVisible(False)
+        self.show_star_base.setVisible(False)
+        if self.selected_planet:
+            self.show_planet.setVisible(True)
+            self.show_fleets.setVisible(False)
+        elif self.selected_fleets:
+            self.show_planet.setVisible(False)
+            self.show_fleets.setVisible(True)
         else:
-            self.ShowPlanet.setVisible(False)
-            self.ShowFleets.setVisible(False)
-        if self.SelectedFleet:
-            self.SelectedFleet.ColourCourse(False)
-            self.SelectedFleet.ShowCourse(self.ShowFleetMovements)
-        self.ShowFields.setVisible(False)
-        self.ApplyMineFilter()
-        if self.FilteredFields > 0:
-            self.ItemInfo.setCurrentIndex(2)
-            self.NextField.setVisible(self.FilteredFields > 1)
-            self.PreviousField.setVisible(self.FilteredFields > 1)
-            self.NextMinefield(self.MineIndex, 0)
+            self.show_planet.setVisible(False)
+            self.show_fleets.setVisible(False)
+        if self.selected_fleet:
+            self.selected_fleet.colour_course(False)
+            self.selected_fleet.show_course(self.show_fleet_movements)
+        self.show_fields.setVisible(False)
+        self._apply_mine_filter()
+        self.next_field.setVisible(self.filtered_fields > 1)
+        self.previous_field.setVisible(self.filtered_fields > 1)
+        self.item_info.setCurrentIndex(2)
+        self._next_minefield(self.mine_index, 0)
+
+
+    def _apply_mine_filter(self):
+        """ Apply new filter settings to the mine fields on the star map """
+        self.filtered_fields = 0
+        self.number_of_fields = 0
+        if self.selected_fields:
+            self.number_of_fields = len(self.selected_fields)
+            for m in self.selected_fields:
+                if self.mine_filter[m.fof]:
+                    self.filtered_fields += 1
+
+
+    def _show_next_mine_field(self):
+        """ Cycle through mine fields in the standard direction """
+        self.mine_index = self._next_minefield(self.mine_index, 1)
+
+
+    def _show_previous_mine_field(self):
+        """ Cycle through mine fields in the reversed direction """
+        self.mine_index = self._next_minefield(self.mine_index, -1)
+
+
+    def _show_crust_diagrams(self, event):
+        """ Toggle a diagram of the planet's mineral wealth """
+        if event:
+            self.map.universe.show_crust_diagrams()
         else:
-            print('filtered fields should always be > 0')
-            self.SelectedObject.setText('Error : FilteredFields < 1!')
-            self.ItemInfo.setCurrentIndex(3)
+            self.map.universe.remove_diagrams()
 
 
-    def ApplyMineFilter(self):
-        self.FilteredFields = 0
-        self.NumberOfFields = 0
-        if self.SelectedFields:
-            self.NumberOfFields = len(self.SelectedFields)
-            for m in self.SelectedFields:
-                if self.MineFilter[m.fof]:
-                    self.FilteredFields += 1
-
-
-    def ShowNextMineField(self, event):
-        self.MineIndex = self.NextMinefield(self.MineIndex, 1)
-
-
-    def ShowPreviousMineField(self, event):
-        self.MineIndex = self.NextMinefield(self.MineIndex, -1)
-
-
-    def ShowCrustDiagrams(self, event):
+    def _show_surface_diagrams(self, event):
+        """ Toggle a diagram of the minerals available for transport of planet """
         if event:
-            self.Map.Universe.ShowCrustDiagrams()
+            self.map.universe.show_surface_diagrams()
         else:
-            self.Map.Universe.RemoveDiagrams()
+            self.map.universe.remove_diagrams()
 
 
-    def ShowSurfaceDiagrams(self, event):
+    def _show_population_view(self, event):
+        """ Enable the population view of the star map """
         if event:
-            self.Map.Universe.ShowSurfaceDiagrams()
-        else:
-            self.Map.Universe.RemoveDiagrams()
+            self.map.universe.show_population_view()
 
 
-    def ShowPopulationView(self, event):
+    def _show_default_view(self, event):
+        """ Enable the default view of the star map """
         if event:
-            self.Map.Universe.ShowPopulationView()
+            self.map.universe.show_default_view()
 
 
-    def ShowDefaultView(self, event):
+    def _show_minimal_view(self, event):
+        """ Enable the minimalistic view of the star map """
         if event:
-            self.Map.Universe.ShowDefaultView()
+            self.map.universe.show_minimal_view()
 
 
-    def ShowMinimalView(self, event):
+    def _show_percentage_view(self, event):
+        """ Enable the planet value view of the star map """
         if event:
-            self.Map.Universe.ShowMinimalView()
+            self.map.universe.show_percentage_view()
 
 
-    def ShowPercentageView(self, event):
-        if event:
-            self.Map.Universe.ShowPercentageView()
+    def _show_movements(self, event):
+        """ Display or hide the flight paths of fleets on the star map """
+        self.show_fleet_movements = event
+        self.map.universe.show_movements(event)
 
 
-    def ShowMovements(self, event):
-        self.ShowFleetMovements = event
-        self.Map.Universe.ShowMovements(event)
+    def _add_waypoints(self, event):
+        """ Toggle a mode in which new waypoints can be added to existing
+            flight paths by using the mouse pointer """
+        self.waypoint_mode = event
+        self.map.universe.set_waypoint_mode(event)
 
 
-    def AddWaypoints(self, event):
-        self.WaypointMode = event
-        self.Map.Universe.SetWaypointMode(event)
+    def _configure_game(self):
+        """ Switch to the advanced game configuration wizard """
+        self.new_game.hide()
+        self.game_setup.configure_game(self.new_game.map_size)
 
 
-    def ConfigureGame(self):
-        self.NewGame.hide()
-        self.GameSetup.ConfigureGame(self.NewGame.MapSize)
+    def _configure_faction(self):
+        """ Show the faction configuration wizard hiding all other dialogs
+            and taking note from whence the wizard has been opened """
+        advanced = self.game_setup.isVisible()
+        simple = self.new_game.isVisible()
+        self.game_setup.hide()
+        self.new_game.hide()
+        self.new_faction.configure_wizard(simple, advanced)
 
 
-    def ConfigureFaction(self):
-        advanced = self.GameSetup.isVisible()
-        simple = self.NewGame.isVisible()
-        self.GameSetup.hide()
-        self.NewGame.hide()
-        self.NewFaction.ConfigureWizard(simple, advanced)
+    def _abort_faction(self):
+        """ Close the faction configuration dialog and return to any other
+            dialog from whence the wizard has been called """
+        self.new_faction.hide()
+        self.game_setup.setVisible(self.new_faction.restart_game_wizard)
+        self.new_game.setVisible(self.new_faction.restart_new_game)
 
 
-    def AbortFaction(self):
-        self.NewFaction.hide()
-        self.GameSetup.setVisible(self.NewFaction.RestartGameWizard)
-        self.NewGame.setVisible(self.NewFaction.RestartNewGame)
-
-
+    def _apply_message_filter(self, state):
+        """ Either engage or disengage the message filter """
+        print('Message filter: ' + str(state) + ' ...')

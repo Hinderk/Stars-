@@ -12,80 +12,80 @@ from defines import AIMode as AI
 class PlayerData(QAbstractTableModel):
 
     def __init__(self, people, pcount):
-        super(self.__class__, self).__init__()
-        self.ufCount = 0
-        self.exCount = 0
-        self.aiCount = 0
-        self.cpCount = dict()
-        self.NumberOfPlayers = pcount
-        self.Players = dict()
-        self.AddPlayer(0, PT.HUP, None, people.myFaction())
+        super().__init__()
+        self.uf_count = 0
+        self.ex_count = 0
+        self.ai_count = 0
+        self.cp_count = {}
+        self.number_of_players = pcount
+        self.players = {}
+        self.add_player(0, PT.HUP, None, people.my_faction())
         n = 1
-        while n < self.NumberOfPlayers:
-            self.AddPlayer(n, PT.AIP, AI.AI1, people.randomFaction())
+        while n < self.number_of_players:
+            self.add_player(n, PT.AIP, AI.AI1, people.random_faction())
             n += 1
 
 
-    def AddPlayer(self, row, ptype, pmode, pfaction):
-        NextRow = row + 1
-        if self.NumberOfPlayers < NextRow:
-            self.beginInsertRows(QModelIndex(), NextRow, NextRow)
-            self.NumberOfPlayers = NextRow
+    def add_player(self, row, ptype, pmode, pfaction):
+        next_row = row + 1
+        if self.number_of_players < next_row:
+            self.beginInsertRows(QModelIndex(), next_row, next_row)
+            self.number_of_players = next_row
             self.endInsertRows()
-        if row in self.Players:
-            _, _, _, pname = self.Players[row]
+        if row in self.players:
+            _, _, _, pname = self.players[row]
         elif ptype == PT.EXP:
-            self.exCount += 1
-            pname = 'AI Stewarts ' + str(self.exCount).zfill(2)
+            self.ex_count += 1
+            pname = 'AI Stewarts ' + str(self.ex_count).zfill(2)
         elif ptype == PT.RNG:
             if pmode:
-                self.aiCount += 1
-                pname = 'AI Antagonists ' + str(self.aiCount).zfill(2)
+                self.ai_count += 1
+                pname = 'AI Antagonists ' + str(self.ai_count).zfill(2)
             else:
-                self.ufCount += 1
-                pname = 'Unknown Actors ' + str(self.ufCount).zfill(2)
+                self.uf_count += 1
+                pname = 'Unknown Actors ' + str(self.uf_count).zfill(2)
         else:
-            pname = pfaction.Name
-            if pname in self.cpCount:
-                self.cpCount[pname] += 1
+            pname = pfaction.name
+            if pname in self.cp_count:
+                self.cp_count[pname] += 1
             else:
-                self.cpCount[pname] = 1
-            pname += ' ' + str(self.cpCount[pname]).zfill(2)
-        self.Players[row] = (ptype, pmode, pfaction, pname)
+                self.cp_count[pname] = 1
+            pname += ' ' + str(self.cp_count[pname]).zfill(2)
+        self.players[row] = (ptype, pmode, pfaction, pname)
 
 
-    def RemovePlayer(self, row):
-        if row in self.Players:
+    def remove_player(self, row):
+        if row in self.players:
             self.beginRemoveRows(QModelIndex(), row, row)
-            self.Players.pop(row)
-            self.NumberOfPlayers -= 1
+            self.players.pop(row)
+            self.number_of_players -= 1
             self.endRemoveRows()
         n = 0
-        Target = dict()
-        for key in self.Players:
-            Target[n] = self.Players[key]
+        target = {}
+        for key in self.players:
+            target[n] = self.players[key]
             n += 1
-        self.Players = Target
+        self.players = target
 
 
-    def ResetModel(self, people, pcount):
-        self.ufCount = 0
-        self.exCount = 0
-        self.aiCount = 0
-        self.cpCount.clear()
+    def reset_model(self, people, pcount):
+        self.uf_count = 0
+        self.ex_count = 0
+        self.ai_count = 0
+        self.cp_count.clear()
         self.beginResetModel()
-        self.NumberOfPlayers = pcount
-        self.Players.clear()
-        self.AddPlayer(0, PT.HUP, None, people.myFaction())
+        self.number_of_players = pcount
+        self.players.clear()
+        self.add_player(0, PT.HUP, None, people.my_faction())
         n = 1
         while n < pcount:
-            self.AddPlayer(n, PT.AIP, AI.AI1, people.randomFaction())
+            self.add_player(n, PT.AIP, AI.AI1, people.random_faction())
             n += 1
         self.endResetModel()
 
 
     def rowCount(self, index):
-        return self.NumberOfPlayers + 1
+        return self.number_of_players + 1
 
 
     def columnCount(self, index):
@@ -95,14 +95,15 @@ class PlayerData(QAbstractTableModel):
     def setData(self, index, value, role):
         if role == Qt.ItemDataRole.EditRole:
             row = index.row()
-            if row in self.Players:
-                t, m, f, _ = self.Players[row]
-                self.Players[row] = (t, m, f, value)
+            if row in self.players:
+                t, m, f, _ = self.players[row]
+                self.players[row] = (t, m, f, value)
                 return True
         return False
 
 
     def data(self, index, role):
+        """ Return either the content or the alignment for the indexed cell """
         col = index.column()
         row = index.row()
         if role == Qt.ItemDataRole.TextAlignmentRole:
@@ -110,28 +111,30 @@ class PlayerData(QAbstractTableModel):
             if col < 2:
                 align = Qt.AlignmentFlag.AlignHCenter
             return align | Qt.AlignmentFlag.AlignVCenter
-        elif role == Qt.ItemDataRole.DisplayRole:
-            if row in self.Players:
-                t, m, f, name = self.Players[row]
+        content = None
+        if role == Qt.ItemDataRole.DisplayRole:
+            content = ''
+            if row in self.players:
+                t, m, f, content = self.players[row]
                 if col == 0:
                     if m:
-                        return 'AI (' + m.value + ')'
+                        content = 'AI (' + m.value + ')'
+                    elif t == PT.RNG:
+                        content = 'Human Player'
+                    else:
+                        content = t.value
+                elif col == 1:
                     if t == PT.RNG:
-                        return 'Human Player'
-                    return t.value
-                if col == 1:
-                    if t == PT.RNG:
-                        return 'Random Choice'
-                    return f.Species
-                return name
-            return ''
-        return None
+                        content = 'Random Choice'
+                    else:
+                        content = f.species
+        return content
 
 
     def flags(self, index):
         if index.isValid():
             flags = super().flags(index)
-            if index.column() == 2 and index.row() in self.Players:
+            if index.column() == 2 and index.row() in self.players:
                 flags |= Qt.ItemFlag.ItemIsEditable
             flags &= ~Qt.ItemFlag.ItemIsSelectable
             return flags
