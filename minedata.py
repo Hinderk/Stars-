@@ -28,7 +28,7 @@ class Minedata(QGraphicsView):
 
 
     def __init__(self):
-        super(self.__class__, self).__init__()
+        super().__init__()
         self.scene = QGraphicsScene(self)
         self.add_static_text()
         self.add_info_text()
@@ -101,9 +101,9 @@ class Minedata(QGraphicsView):
         else:
             self.index_label.setVisible(False)
             self.field_index.setVisible(False)
-        if field.fof == Stance.allied:
+        if field.fof == Stance.ALLIED:
             self.backdrop.setBrush(Brush.blue_p)
-        elif field.fof == Stance.friendly:
+        elif field.fof == Stance.FRIENDLY:
             self.backdrop.setBrush(Brush.yellow_p)
         else:
             self.backdrop.setBrush(Brush.red_p)

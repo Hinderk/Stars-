@@ -130,11 +130,11 @@ class Fleetdata(QGraphicsView):
 
     def _update_fleet_banner(self, fleet):
         """ Display the proper faction banner & fleet symbol """
-        if fleet.friend_or_foe == Stance.allied:
+        if fleet.friend_or_foe == Stance.ALLIED:
             self.backdrop.setBrush(Brush.blue_p)
-        elif fleet.friend_or_foe == Stance.friendly:
+        elif fleet.friend_or_foe == Stance.FRIENDLY:
             self.backdrop.setBrush(Brush.green_p)
-        elif fleet.friend_or_foe == Stance.neutral:
+        elif fleet.friend_or_foe == Stance.NEUTRAL:
             self.backdrop.setBrush(Brush.yellow_p)
         else:
             self.backdrop.setBrush(Brush.red_p)

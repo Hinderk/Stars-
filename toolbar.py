@@ -32,10 +32,10 @@ class ToolBar(QToolBar):
         for sc in ShipClass:
             self.alien_designs[sc.name] = True
         self.mine_filter = dict()
-        self.mine_filter[Stance.allied] = True
-        self.mine_filter[Stance.friendly] = True
-        self.mine_filter[Stance.neutral] = True
-        self.mine_filter[Stance.hostile] = True
+        self.mine_filter[Stance.ALLIED] = True
+        self.mine_filter[Stance.FRIENDLY] = True
+        self.mine_filter[Stance.NEUTRAL] = True
+        self.mine_filter[Stance.HOSTILE] = True
 
         icon = QIcon(":/Toolbar/Mine")
         self.mines = QToolButton(self)
@@ -315,12 +315,12 @@ class ToolBar(QToolBar):
 
         menu = QMenu(self)
         menu.setStyleSheet("QMenu::item{padding: 5px 40px 5px 0px}")
-        self.all_mines = MineAction(Stance.accept)
-        self.no_mines = MineAction(Stance.none)
-        self.allied_mines = MineAction(Stance.allied)
-        self.friendly_mines = MineAction(Stance.friendly)
-        self.neutral_mines = MineAction(Stance.neutral)
-        self.hostile_mines = MineAction(Stance.hostile)
+        self.all_mines = MineAction(Stance.ACCEPT)
+        self.no_mines = MineAction(Stance.IGNORE)
+        self.allied_mines = MineAction(Stance.ALLIED)
+        self.friendly_mines = MineAction(Stance.FRIENDLY)
+        self.neutral_mines = MineAction(Stance.NEUTRAL)
+        self.hostile_mines = MineAction(Stance.HOSTILE)
         add_action(menu, self.all_mines, '   All Mine Fields', False)
         add_action(menu, self.no_mines, '   No Mine Fields', False)
         menu.addSeparator()
@@ -332,7 +332,7 @@ class ToolBar(QToolBar):
 
 
     def change_mine_display(self, event):
-        show = (self.sender().mine_view == Stance.accept)
+        show = (self.sender().mine_view == Stance.ACCEPT)
         if not show:
             self.mines.setChecked(False)
         self.allied_mines.setChecked(show)

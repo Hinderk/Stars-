@@ -6,9 +6,8 @@ from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtWidgets import QWidget, QStackedLayout, QSizePolicy
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel
-from PyQt6.QtWidgets import QMainWindow, QPushButton, QToolButton
-from PyQt6.QtWidgets import QStatusBar, QGroupBox, QCheckBox
-from PyQt6.QtWidgets import QPlainTextEdit
+from PyQt6.QtWidgets import QStatusBar, QGroupBox
+from PyQt6.QtWidgets import QMainWindow, QPushButton
 
 from guidesign import GuiDesign, GuiStyle
 from defines import Stance
@@ -20,6 +19,7 @@ from minedata import Minedata
 from starmap import Starmap
 from newgame import NewGame
 from gamesetup import GameSetup
+from newsreader import NewsReader
 from factionwizard import FactionWizard
 
 
@@ -39,10 +39,10 @@ def _create_button(name):
 def _setup_mine_filter():
     """ Create a mine filter / show all mine fields """
     fields = {}
-    fields[Stance.allied] = True
-    fields[Stance.friendly] = True
-    fields[Stance.neutral] = True
-    fields[Stance.hostile] = True
+    fields[Stance.ALLIED] = True
+    fields[Stance.FRIENDLY] = True
+    fields[Stance.NEUTRAL] = True
+    fields[Stance.HOSTILE] = True
     return fields
 
 
@@ -75,21 +75,15 @@ class Gui(QMainWindow):
         self.hostile_fleets = 0
         self.show_fleet_movements = False
         self.waypoint_mode = False
-        self.setStyleSheet(GuiDesign.get_style(GuiStyle.GENERALGUI))
         self.action = {}
-        self.current_game_year = QLabel(self)
-        self.current_message = QPlainTextEdit(self)
-        self.previous_message = QPushButton(self)
-        self.next_message = QPushButton(self)
-        self.follow_message = QPushButton(self)
-        self.filter_message = QCheckBox(self)
         self.buttons = ToolBar()
         self.item_info = QStackedLayout(self)
         self.planet_info = Inspector(people.my_faction())
         self.fleet_info = Fleetdata()
         self.mine_info = Minedata()
         self.info_box = QGroupBox()
-        self.map = Starmap(rules)
+        self.news_reader = NewsReader()
+        self.map = Starmap(people, rules)
         self.selected_object = QLabel(self)
         self.previous_field = _create_button(":/Icons/Previous")
         self.next_field = _create_button(":/Icons/Next")
@@ -103,7 +97,6 @@ class Gui(QMainWindow):
         self.show_fields = _create_button(":/Icons/Mines")
         self.show_fleets = _create_button(":/Icons/Ships")
         self._setup_ui(people, rules)
-        self.buttons.zoom.setMenu(self.menu.menu_zoom)
         self._connect_signals_and_slots()
 
 
@@ -155,6 +148,7 @@ class Gui(QMainWindow):
 
     def _setup_ui(self, people, rules):
         """ Create the main layout of the user interface """
+        self.setStyleSheet(GuiDesign.get_style(GuiStyle.GENERALGUI))
         sx, sy = GuiDesign.get_size()
         self.resize(sx, sy)
         self.setWindowTitle("My Stars!")
@@ -173,6 +167,7 @@ class Gui(QMainWindow):
         self._assemble_user_interface()
         self.menu = Menu(self)
         self.setMenuBar(self.menu)
+        self.buttons.zoom.setMenu(self.menu.menu_zoom)
         self.setStatusBar(QStatusBar(self))
 
 
@@ -194,7 +189,7 @@ class Gui(QMainWindow):
         policy.setVerticalPolicy(policy.Policy.MinimumExpanding)
         self.info_box.setSizePolicy(policy)
         layout_vl.addWidget(self.info_box)
-        layout_vl.addWidget(self._setup_news_reader())
+        layout_vl.addWidget(self.news_reader)
         info_box = QGroupBox()
         info_box.setMinimumHeight(420)
         info_box.setMaximumHeight(420)
@@ -216,68 +211,6 @@ class Gui(QMainWindow):
         layout_vl.addWidget(info_box)
         layout_hl.addWidget(left_side)
         layout_hl.addWidget(self.map)
-
-
-    def _create_message_filter(self):
-        """ Create the message filter button in the title of the news reader """
-        icon = QIcon()
-        show = QPixmap(":/Icons/ShowNews")
-        no_show = QPixmap(":/Icons/NoNews")
-        icon.addPixmap(no_show, QIcon.Mode.Normal, QIcon.State.Off)
-        icon.addPixmap(show, QIcon.Mode.Normal, QIcon.State.On)
-        message_filter = QToolButton(self)
-        message_filter.setCheckable(True)
-        message_filter.setIcon(icon)
-        message_filter.setAutoRepeat(False)
-        message_filter.setToolTip("Show the likes of the current message ...")
-        message_filter.setStatusTip("Show the likes of the current message ...")
-        message_filter.setIconSize(QSize(30, 30))
-        message_filter.toggled.connect(self._apply_message_filter)
-        return message_filter
-
-
-    def _setup_news_reader(self):
-        """ Create the news reader panel & its controls """
-        self.filter_message.setToolTip("Show the likes of the current message ...")
-        self.filter_message.setStatusTip("Show the likes of the current message ...")
-        self.filter_message.setChecked(True)
-        self.current_game_year.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.current_game_year.setToolTip("Current Age of the Galaxy ...")
-        self.current_game_year.setText("Year 2400 - Message: 1 of 9999")  # TODO: Create alongside messages - To be removed here!
-        filter_hl = QHBoxLayout()
-        filter_hl.addWidget(self.filter_message)
-        filter_hl.addStretch()
-        filter_hl.addWidget(self.current_game_year)
-        filter_hl.addStretch()
-        filter_hl.addWidget(self._create_message_filter())
-        self.current_message.setReadOnly(True)
-        self.current_message.setPlainText('This is a very important message ...')  # TODO: Delete this ...
-        self.previous_message.setText("Prev")
-        self.previous_message.setToolTip("Read previous message ...")
-        self.previous_message.setStatusTip("Read the previous message ...")
-        self.follow_message.setText("Goto")
-        self.follow_message.setToolTip("Follow up on current message ...")
-        self.follow_message.setStatusTip("Follow up on the current message ...")
-        self.next_message.setText("Next")
-        self.next_message.setToolTip("Read next message ...")
-        self.next_message.setStatusTip("Read the next message ...")
-        news_buttons_vl = QVBoxLayout()
-        news_buttons_vl.addStretch()
-        news_buttons_vl.addWidget(self.previous_message)
-        news_buttons_vl.addWidget(self.follow_message)
-        news_buttons_vl.addWidget(self.next_message)
-        news_buttons_vl.addStretch()
-        news_hl = QHBoxLayout()
-        news_hl.setSpacing(5)
-        news_hl.addWidget(self.current_message)
-        news_hl.addLayout(news_buttons_vl)
-        news_reader = QGroupBox()
-        news_vl = QVBoxLayout(news_reader)
-        news_vl.addLayout(filter_hl)
-        news_vl.addLayout(news_hl)
-        news_vl.addSpacing(5)
-        news_reader.setMaximumHeight(190)
-        return news_reader
 
 
     def _setup_inspector_title(self):
@@ -318,11 +251,11 @@ class Gui(QMainWindow):
     def display_starbase_icons(self, p=None):
         """ Display the proper button for the orbiting starbase """
         if p:
-            if p.relation == Stance.allied:
+            if p.relation == Stance.ALLIED:
                 self.show_neutral_base.setVisible(False)
                 self.show_alien_base.setVisible(False)
                 self.show_star_base.setVisible(p.space_station)
-            elif p.relation == Stance.hostile:
+            elif p.relation == Stance.HOSTILE:
                 self.show_neutral_base.setVisible(False)
                 self.show_star_base.setVisible(False)
                 self.show_alien_base.setVisible(p.space_station and p.ship_tracking)
@@ -426,9 +359,9 @@ class Gui(QMainWindow):
         fleets = 0
         for f in f_list:
             if f.ship_counter > 0:
-                if f.friend_or_foe == Stance.allied:
+                if f.friend_or_foe == Stance.ALLIED:
                     self.allied_fleets += 1
-                elif f.friend_or_foe == Stance.hostile:
+                elif f.friend_or_foe == Stance.HOSTILE:
                     self.hostile_fleets += 1
                 else:
                     self.neutral_fleets += 1
@@ -441,9 +374,9 @@ class Gui(QMainWindow):
             self._apply_mine_filter()
             self.show_fields.setVisible(self.filtered_fields > 0)
             fof = f_list[self.fleet_index].friend_or_foe
-            if fof == Stance.allied:
+            if fof == Stance.ALLIED:
                 self._inspect_allied_fleet()
-            elif fof == Stance.hostile:
+            elif fof == Stance.HOSTILE:
                 self._inspect_hostile_fleet()
             else:
                 self._inspect_neutral_fleet()
@@ -555,7 +488,8 @@ class Gui(QMainWindow):
     def _inspect_hostile_fleet(self):
         """ Show hostile fleets in the inspector panel """
         self.hostile_fleets -= 1
-        self.enemy_fleet_index = self._next_fleet(self.enemy_fleet_index, self.enemy_fleet_offset, [Stance.hostile])
+        self.enemy_fleet_index = self._next_fleet(self.enemy_fleet_index,
+                                                  self.enemy_fleet_offset, [Stance.HOSTILE])
         self.hostile_fleets += 1
         self.enemy_fleet_offset = 1
         self.neutral_fleet_offset = 0
@@ -564,9 +498,10 @@ class Gui(QMainWindow):
 
     def _inspect_neutral_fleet(self):
         """ Show neutral fleets in the inspector panel """
-        fof = [Stance.friendly, Stance.neutral]
+        fof = [Stance.FRIENDLY, Stance.NEUTRAL]
         self.neutral_fleets -= 1
-        self.neutral_fleet_index = self._next_fleet(self.neutral_fleet_index, self.neutral_fleet_offset, fof)
+        self.neutral_fleet_index = self._next_fleet(self.neutral_fleet_index,
+                                                    self.neutral_fleet_offset, fof)
         self.neutral_fleets += 1
         self.enemy_fleet_offset = 0
         self.neutral_fleet_offset = 1
@@ -576,7 +511,7 @@ class Gui(QMainWindow):
     def _inspect_allied_fleet(self):
         """ Show allied fleets in the inspector panel """
         self.allied_fleets -= 1
-        self.fleet_index = self._next_fleet(self.fleet_index, self.fleet_offset, [Stance.allied])
+        self.fleet_index = self._next_fleet(self.fleet_index, self.fleet_offset, [Stance.ALLIED])
         self.allied_fleets += 1
         self.enemy_fleet_offset = 0
         self.neutral_fleet_offset = 0
@@ -591,7 +526,8 @@ class Gui(QMainWindow):
     def _inspect_fleets(self):
         """ Switch to the fleet view in the inspector panel """
         self.show_fleets.setVisible(False)
-        self._inspect_fleet(self.selected_planet, self.fleet_index, self.selected_fleets, self.selected_fields)
+        self._inspect_fleet(self.selected_planet, self.fleet_index,
+                            self.selected_fleets, self.selected_fields)
 
 
     def _inspect_mines(self):
@@ -721,8 +657,3 @@ class Gui(QMainWindow):
         self.new_faction.hide()
         self.game_setup.setVisible(self.new_faction.restart_game_wizard)
         self.new_game.setVisible(self.new_faction.restart_new_game)
-
-
-    def _apply_message_filter(self, state):
-        """ Either engage or disengage the message filter """
-        print('Message filter: ' + str(state) + ' ...')

@@ -15,7 +15,7 @@ from guidesign import GuiDesign, GuiStyle
 class NewGame(QWidget):
 
     def __init__(self, people, rules):
-        super(self.__class__, self).__init__()
+        super().__init__()
         self.setWindowTitle('New Game')
         self.setStyleSheet(GuiDesign.get_style(GuiStyle.SIMPLESETUP))
         icon = QIcon()

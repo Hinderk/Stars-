@@ -1,12 +1,16 @@
 
+""" This module implements the various types of ship hulls available in the game """
+
 from enum import Enum
 from defines import ShipClass as SC
 from layout import Layout as HL
 
+# pylint: disable=line-too-long
 
 #  Index  Name  Role  En  We  Pr  Co  El  Bi  Weight Resources  Iro Bor Ger  Cargo  Fuel  Armor  Layout
 
 class Hull(Enum):
+    """ This enumeration compiles the relevant ship parameters defining each hull type """
     SFR = [0, 'Small Freighter', SC.FRT, 0, 0, 0, 0, 0, 0, 25, 20, 12, 0, 17, 70, 130, 25, HL.SFR]
     MFR = [1, 'Medium Freighter', SC.FRT, 0, 0, 0, 3, 0, 0, 60, 40, 20, 0, 19, 210, 450, 50, HL.MFR]
     LFR = [2, 'Large Freighter', SC.FRT, 0, 0, 0, 8, 0, 0, 125, 100, 35, 0, 21, 1200, 2600, 150, HL.LFR]

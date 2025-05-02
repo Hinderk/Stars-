@@ -1,46 +1,52 @@
 
-import random
+""" This module implements rules & procedures to generate the 'Stars!' universe """
+
 import math
+import copy
+import random
 
 from guiprop import GuiProps
 from scanner import Model
 
 
-# This class facilities the generation of a random "Stars!" universe ...
 
-class Ruleset(random.Random):
-
-    f_id0 = 0   # Define the index of the faction controlled by the player ...
+F_ID0 = 0   # Define the index of the faction controlled by the player ...
 
 
-    def minefield_decay(f_id):
-        return 0.02
+def minefield_decay(_):
+    """ Return the decay rate of mine fields belonging to a certain faction """
+    return 0.02
 
 
-    def cloaking_ratio(cloaking, weight):
-        cloak = cloaking / weight
-        if cloak <= 100:
-            c = cloak / 2
+def cloaking_ratio(cloaking, weight):
+    """ Compute the cloaking effectivenes of fleets """
+    cloak = cloaking / weight
+    if cloak <= 100:
+        c = cloak / 2
+    else:
+        cloak -= 100
+        if cloak <= 200:
+            c = 50 + cloak / 8
         else:
-            cloak -= 100
-            if cloak <= 200:
-                c = 50 + cloak / 8
+            cloak -= 200
+            if cloak <= 312:
+                c = 75 + cloak / 24
             else:
-                cloak -= 200
-                if cloak <= 312:
-                    c = 75 + cloak / 24
+                cloak -= 312
+                if cloak <= 512:
+                    c = 88 + cloak / 64
+                elif cloak < 768:
+                    c = 96
+                elif cloak < 1000:
+                    c = 97
                 else:
-                    cloak -= 312
-                    if cloak <= 512:
-                        c = 88 + cloak / 64
-                    elif cloak < 768:
-                        c = 96
-                    elif cloak < 1000:
-                        c = 97
-                    else:
-                        c = 98
-        return c / 100
+                    c = 98
+    return c / 100
 
+
+class Ruleset:
+
+    """ This class facilities the generation of a randomized 'Stars!' universe """
 
     name_list = ["Aarhus", "Abderhalden", "Aberdonia", "Abilunon", "Abkhazia",
               "Achaemenides", "Adachi", "Adelheid", "Admetos", "Adonis",
@@ -139,82 +145,107 @@ class Ruleset(random.Random):
 
 
     def __init__(self, seed=128):
-        super(self.__class__, self).__init__(seed)
+        random.seed(seed)
         self.seed = seed
         self.location = []
-        self.planet_names = list(Ruleset.name_list)
+        self.planet_names = copy.deepcopy(Ruleset.name_list)
 
 
-    def _FindClosest(self, x0, y0):
+    def _find_closest(self, x0, y0):
+        """ Find the nearest star & determine its distance """
         dist = 1e20
         for [x, y] in self.location:
             d = (x - x0) * (x - x0) + (y - y0) * (y - y0)
-            if d < dist:
-                dist = d
+            dist = min(d, dist)
         return math.sqrt(dist)
 
 
-    def Random(self, min_val, max_val, optimum):
-        return self.triangular(min_val, max_val, optimum)
+    def random(self, min_val, max_val, optimum):
+        """ Compute a random number using a trianguler probability density """
+        return random.triangular(min_val, max_val, optimum)
 
 
-    def find_name(self):
+    def _find_name(self):
+        """ Select a name for the new planet at random """
         try:
-            name = self.choice(self.planet_names)
+            name = random.choice(self.planet_names)
             self.planet_names.remove(name)
             return name
-        except:
+        except IndexError:
             return None
 
 
     def find_position(self):
+        """ Determine a suitable location for a new star system """
         rmin = GuiProps.planet_distance / GuiProps.xscale
         xlim = self.xmax()
         ylim = self.ymax()
         retries = 0
         while retries < 128:
-            x = self.randrange(-xlim, xlim)
-            y = self.randrange(-ylim, ylim)
-            r = self._FindClosest(x, y)
+            x = random.randrange(-xlim, xlim)
+            y = random.randrange(-ylim, ylim)
+            r = self._find_closest(x, y)
             if r > self.rmin() and r > rmin:
                 self.location.append([x, y])
                 return [x, y]
         return None
 
 
+    def get_default_game_name(self):
+        """ Return the name of the game if none has been specified """
+        return 'Silent Running'
+
+
     def first_year(self):
+        """ Return the very first game year """
         return 2400
 
 
-    def get_population_ceiling():
-        return 400000                    # TODO: Species dependent model
+    def get_population_ceiling(self, _):
+        """ Return the population ceiling for the specified faction """
+        return 400000     # TODO: faction dependent ...
 
 
-    def first_scanner(self):
-#    return Model.Scoper150
-        return Model.Snooper500X
+    def first_scanner(self, _):
+        """ Return the scanner model installed on the player's home world
+            at the very start of a new game """
+#    return Model.SCOPER150
+        return Model.SNOOPER500X   # TODO: faction dependent model!
+
 
     def get_max_resources(self):
+        """ Highest probability to find minerals in a planet's crust """
         return 100.0
 
     def get_min_resources(self):
+        """ Lowest probability to find minerals in a planet's crust """
         return 5.0
 
     def get_resources(self):
+        """ Peak probability to find minerals in a planet's crust """
         return 70.0
 
-    def planet_count():
-        return 15
+
+    def planet_count(self):
+        """ Return the number of star systems in the galaxy """
+        return 15  # TODO: Make this dependent on the size code of the galaxy ...
+
 
     def xmax(self):
+        """ Half the size of the galaxy map in the horizontal direction """
         return 1000
+
 
     def ymax(self):
+        """ Half the size of the galaxy map in the vertical direction """
         return 1000
 
+
     def rmin(self):
+        """ The minimal allowed distance between two star systems """
         return 20
 
 
-    def get_number_of_players(self):  # This must depend on the size of the star map
+    def get_number_of_players(self):  # TODO: This must depend on the size of the star map
+        """ Return the number of players if default game settings are used """
         return 4

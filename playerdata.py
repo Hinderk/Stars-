@@ -1,4 +1,6 @@
 
+""" This module implements the model/view/controller mechanism for the game roster """
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QAbstractTableModel
 from PyQt6.QtCore import QModelIndex
@@ -10,6 +12,8 @@ from defines import AIMode as AI
 
 
 class PlayerData(QAbstractTableModel):
+
+    """ This class defines the table model for the game roster """
 
     def __init__(self, people, pcount):
         super().__init__()
@@ -27,6 +31,7 @@ class PlayerData(QAbstractTableModel):
 
 
     def add_player(self, row, ptype, pmode, pfaction):
+        """ Add a new player to the game roster or modify an existing one """
         next_row = row + 1
         if self.number_of_players < next_row:
             self.beginInsertRows(QModelIndex(), next_row, next_row)
@@ -34,7 +39,7 @@ class PlayerData(QAbstractTableModel):
             self.endInsertRows()
         if row in self.players:
             _, _, _, pname = self.players[row]
-        elif ptype == PT.EXP:
+        elif ptype in (PT.EXP, PT.REX):
             self.ex_count += 1
             pname = 'AI Stewarts ' + str(self.ex_count).zfill(2)
         elif ptype == PT.RNG:
@@ -55,20 +60,23 @@ class PlayerData(QAbstractTableModel):
 
 
     def remove_player(self, row):
+        """ Remove a player from the game roster """
         if row in self.players:
             self.beginRemoveRows(QModelIndex(), row, row)
             self.players.pop(row)
             self.number_of_players -= 1
             self.endRemoveRows()
         n = 0
-        target = {}
-        for key in self.players:
-            target[n] = self.players[key]
+        roster = {}
+        for player in self.players.items():
+            roster[n] = player[1]
             n += 1
-        self.players = target
+        self.players = roster
 
 
     def reset_model(self, people, pcount):
+        """ Initialize the game roster using random AI factions of standard strength
+            as well as the faction the player has chosen for himself """
         self.uf_count = 0
         self.ex_count = 0
         self.ai_count = 0
@@ -84,15 +92,24 @@ class PlayerData(QAbstractTableModel):
         self.endResetModel()
 
 
-    def rowCount(self, index):
+# The following methods are overloaded methods of the QAbstractTableModel which is
+# employed to render the game roster. Camel case will be used below ...
+
+# pylint: disable=invalid-name
+
+
+    def rowCount(self, _):
+        """ Return the number of rows currently in the game roster """
         return self.number_of_players + 1
 
 
-    def columnCount(self, index):
+    def columnCount(self, _):
+        """ Return the fixed number of columns in the game roster """
         return 3
 
 
     def setData(self, index, value, role):
+        """ Change the name / callsign of a player in the game roster """
         if role == Qt.ItemDataRole.EditRole:
             row = index.row()
             if row in self.players:
@@ -119,12 +136,14 @@ class PlayerData(QAbstractTableModel):
                 if col == 0:
                     if m:
                         content = 'AI (' + m.value + ')'
+                    elif t == PT.REX:
+                        content = 'Expansion Slot'
                     elif t == PT.RNG:
                         content = 'Human Player'
                     else:
                         content = t.value
                 elif col == 1:
-                    if t == PT.RNG:
+                    if t in (PT.REX, PT.RNG):
                         content = 'Random Choice'
                     else:
                         content = f.species
@@ -132,6 +151,7 @@ class PlayerData(QAbstractTableModel):
 
 
     def flags(self, index):
+        """ Indicate whether cells in the table can be selected / edited """
         if index.isValid():
             flags = super().flags(index)
             if index.column() == 2 and index.row() in self.players:
@@ -142,6 +162,7 @@ class PlayerData(QAbstractTableModel):
 
 
     def headerData(self, index, hv, role):
+        """ Return the table header for the game roster & the row count """
         if role == Qt.ItemDataRole.DisplayRole:
             if hv == Qt.Orientation.Horizontal:
                 if index == 0:

@@ -10,11 +10,9 @@ from guiprop import GuiProps as GP
 
 class Starmap(QGraphicsView):
 
-    def __init__(self, rules):
-
-        super(self.__class__, self).__init__()
-
-        self.universe = Universe(rules)
+    def __init__(self, people, rules):
+        super().__init__()
+        self.universe = Universe(people, rules)
         self.setScene(self.universe)
         self.setMouseTracking(True)
 #    self.setRenderHint(QPainter.RenderHint.Antialiasing)

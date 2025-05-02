@@ -6,6 +6,8 @@ from defines import Stance
 
 class PlanetData:
 
+    """ This class is used to store the biome data as reported by visiting fleets """
+
     def __init__(self):
 
         self.radioactivity = 0                             # These parameters may be modified via
@@ -18,7 +20,7 @@ class PlanetData:
 
         self.colonists = 0
 
-        self.relation = Stance.neutral
+        self.relation = Stance.NEUTRAL
         self.space_station = False
 
         self.crust = Minerals()

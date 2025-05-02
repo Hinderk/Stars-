@@ -14,13 +14,13 @@ from PyQt6.QtCore import pyqtSignal as QSignal
 
 from guidesign import GuiDesign, GuiStyle
 from scanner import Scanner
-from ruleset import Ruleset
 from planet import Planet
-from colours import Pen
-from colours import Brush
+from colours import Pen, Brush
 from defines import Stance, Task
 from waypoint import Waypoint
 from guiprop import GuiProps as GP
+
+
 
 
 _arrow = QPolygonF()
@@ -41,10 +41,10 @@ _flag.append(QPointF(GP.flag_stem, 0))
 def _setup_mine_filter():
     """ Create a mine filter / show all mine fields """
     fields = {}
-    fields[Stance.allied] = True
-    fields[Stance.friendly] = True
-    fields[Stance.neutral] = True
-    fields[Stance.hostile] = True
+    fields[Stance.ALLIED] = True
+    fields[Stance.FRIENDLY] = True
+    fields[Stance.NEUTRAL] = True
+    fields[Stance.HOSTILE] = True
     return fields
 
 
@@ -61,7 +61,7 @@ class Universe(QGraphicsScene):
 
     current_path_width = GP.fp_width[100]
 
-    def __init__(self, rules):
+    def __init__(self, people, rules):
         super().__init__()
 
         self.planets = []
@@ -72,6 +72,7 @@ class Universe(QGraphicsScene):
         self.selected_planet = None
         self.selected_fleet = None
         self.selected_waypoint = None
+        self.context = None
         self.waypoint_index = 0
         self.waypoint_offset = 0
         self.fleet_index = 0
@@ -89,23 +90,28 @@ class Universe(QGraphicsScene):
         self.movement_approved = False
         self.waypoint_selected = False
         self.names_visible = False
+        self.waypoint_mode = False
 
         self.show_field = _setup_mine_filter()
-        self.population_ceiling = Ruleset.get_population_ceiling()
+        self.population_ceiling = rules.get_population_ceiling(people.my_faction())
+        self.year = rules.first_year()
 
         self.pointer = None
         self.select = None
         self.wpselect = None
 
         self._create_indicator()
-        self._create_planets(rules)
+        self._create_planets(people, rules)
         self._colonize_planets()
 
         self.setBackgroundBrush(Brush.black)
 
 
-    def _colonize_planets(self):
-        """ Populate the planets with NPC factions """
+
+# The following methods are overloaded event handlers whence their names must follow Qt
+# coding conventions. Until further notice, camel case will be used ...
+
+# pylint: disable=invalid-name
 
 
     def focusOutEvent(self, _):
@@ -138,18 +144,20 @@ class Universe(QGraphicsScene):
 
 
     def keyReleaseEvent(self, key_press):
+        """ Prevent waypoint movement if the shift key is released """
         key = key_press.key()
         if key == Qt.Key.Key_Shift:
             self.movement_approved = False
 
 
     def contextMenuEvent(self, mouse_click):
+        """ Create a context menu for the selected object on the star map """
         select = QMenu()
         select.setStyleSheet(GuiDesign.get_style(GuiStyle.STARMAP))
         n = 0
         if self.context[0]:
             p = self.context[0]
-            a = select.addAction(p.Name)
+            a = select.addAction(p.name)
             a.setData((0, 0))
             n = 1
             if p.fleets_in_orbit:
@@ -171,7 +179,7 @@ class Universe(QGraphicsScene):
                 a = select.addAction(f.name + ' #' + str(f.id))
                 a.setData((3, n))
                 n += 1
-            fields = self.context[2][0].MineFields
+            fields = self.context[2][0].mine_fields
             if fields:
                 select.addSeparator()
                 n = 0
@@ -193,29 +201,7 @@ class Universe(QGraphicsScene):
                 a = select.addAction(name + ' - WP ' + str(w[2]))
                 a.setData((6, n))
                 n += 1
-        selected = select.exec(mouse_click.screenPos())
-        if selected:
-            itemtype, item = selected.data()
-            if itemtype == 0:
-                self.highlight_planet(self.context[0])
-            elif itemtype == 1:
-                p = self.context[0]
-                self.highlight_planet(p)
-                self.select_fleet.emit(p, item, p.fleets_in_orbit, p.mine_fields)
-            elif itemtype == 2:
-                p = self.context[0]
-                self.highlight_planet(p)
-                self.select_field.emit(p, item, p.mine_fields, [])
-            elif itemtype == 3:
-                self.highlight_fleet(item)
-            elif itemtype == 4:
-                self.fleet_offset = 0
-                self.highlight_fleet()
-                self.select_field.emit(None, item, fields, self.context[2])
-            elif itemtype == 5:
-                self.highlight_minefield(item)
-            elif itemtype == 6:
-                self.highlight_waypoint(item)
+        self._process_context_menu(select.exec(mouse_click.screenPos()))
 
 
     def mouseReleaseEvent(self, _):
@@ -224,28 +210,30 @@ class Universe(QGraphicsScene):
 
 
     def mousePressEvent(self, mouse_click):
+        """ Event handler: Select items on the star map closest to the mouse pointer """
         p0 = mouse_click.scenePos()
         self.waypoint_selected = False
         xo = round(0.5 + p0.x() / GP.xscale)
         yo = round(0.5 + p0.y() / GP.xscale)
-        self.context = self.identify_context(xo, yo)
+        self.context = self._identify_context(xo, yo)
         if mouse_click.buttons() == Qt.MouseButton.LeftButton:
             if self.context[1]:
                 self.waypoint_offset = 0
                 self.fleet_offset = 0
-                self.highlight_minefield(0)
+                self._highlight_minefield(0)
             elif self.context[0]:
                 self.waypoint_offset = 0
                 self.fleet_offset = 0
                 self.highlight_planet(self.context[0])
             elif self.context[2]:
                 self.waypoint_offset = 0
-                self.highlight_fleet()
+                self._highlight_fleet()
             elif self.context[3]:
-                self.highlight_waypoint()
+                self._highlight_waypoint()
 
 
     def mouseMoveEvent(self, event):
+        """ Event handler: Move the selected waypoint around on the star map """
         if self.waypoint_selected and self.movement_approved:
             w0 = self.selected_waypoint[0]
             f0 = self.selected_fleet
@@ -265,7 +253,38 @@ class Universe(QGraphicsScene):
             self.wpselect.setPos(p0)
 
 
-    def identify_context(self, xo, yo):
+# pylint: enable=invalid-name
+
+
+    def _process_context_menu(self, selected):
+        """ Process the context menu & select the proper item """
+        if selected:
+            itemtype, item = selected.data()
+            if itemtype == 0:
+                self.highlight_planet(self.context[0])
+            elif itemtype == 1:
+                p = self.context[0]
+                self.highlight_planet(p)
+                self.select_fleet.emit(p, item, p.fleets_in_orbit, p.mine_fields)
+            elif itemtype == 2:
+                p = self.context[0]
+                self.highlight_planet(p)
+                self.select_field.emit(p, item, p.mine_fields, [])
+            elif itemtype == 3:
+                self._highlight_fleet(item)
+            elif itemtype == 4:
+                self.fleet_offset = 0
+                self._highlight_fleet()
+                fields = self.context[2][0].mine_fields
+                self.select_field.emit(None, item, fields, self.context[2])
+            elif itemtype == 5:
+                self._highlight_minefield(item)
+            elif itemtype == 6:
+                self._highlight_waypoint(item)
+
+
+    def _identify_context(self, xo, yo):
+        """ Find the objects closest to the specified coordinates """
         dist = 1e20
         po = None
         for p in self.planets:
@@ -285,7 +304,7 @@ class Universe(QGraphicsScene):
                     po = None
                 elif d == dist:
                     f_list.append(f)
-                if f.friend_or_foe == Stance.allied:
+                if f.friend_or_foe == Stance.ALLIED:
                     if self.show_fleet_movements or f == self.selected_fleet:
                         n = 0
                         selectable = False
@@ -341,6 +360,7 @@ class Universe(QGraphicsScene):
 
 
     def highlight_planet(self, p):
+        """ Select & highlight a planet on the star map """
         self.select.setVisible(False)
         self.wpselect.setVisible(False)
         if self.selected_planet:
@@ -365,7 +385,8 @@ class Universe(QGraphicsScene):
         self.select_planet.emit(p)
 
 
-    def highlight_fleet(self, index=-1):
+    def _highlight_fleet(self, index=-1):
+        """ Select & highlight the indexed fleet on the star map """
         self.wpselect.setVisible(False)
         self.pointer.setVisible(False)
         if self.selected_planet:
@@ -385,7 +406,8 @@ class Universe(QGraphicsScene):
         self.select_fleet.emit(None, index, self.context[2], f0.mine_fields)
 
 
-    def highlight_minefield(self, index):
+    def _highlight_minefield(self, index):
+        """ Select & highlight the indexed mine field on the star map """
         self.select.setVisible(False)
         if self.selected_planet:
             self.selected_planet.label.setPen(Pen.white_l)
@@ -401,7 +423,8 @@ class Universe(QGraphicsScene):
         self.select_field.emit(None, index, self.context[1], [])
 
 
-    def highlight_waypoint(self, index=-1):
+    def _highlight_waypoint(self, index=-1):
+        """ Select & highlight the indexed waypoint on the star map """
         self.pointer.setVisible(False)
         if self.selected_planet:
             self.selected_planet.label.setPen(Pen.white_l)
@@ -426,7 +449,8 @@ class Universe(QGraphicsScene):
         self.select_fleet.emit(None, index, self.selected_fleets, [])
 
 
-    def segment_path(self, path, xa, ya, xb, yb):
+    def _segment_path(self, path, xa, ya, xb, yb):
+        """ Interrupt the flight path to create a halo effect around nearby fleets """
         dx = GP.xscale * (xb - xa)
         dy = GP.xscale * (yb - ya)
         d2 = float(dx * dx + dy * dy)
@@ -560,12 +584,11 @@ class Universe(QGraphicsScene):
 
 
     def show_population_view(self):
+        """ Indicate the size of each planet's population in relative terms """
         for p in self.planets:
             p.show_population_view()
             if p.body_visible:
-                q = math.sqrt(p.colonists / self.population_ceiling)
-                if q > 1.0:
-                    q = 1.0
+                q = min(1.0, math.sqrt(p.colonists / self.population_ceiling))
                 rnew = GP.p_radius * (1 + q) / 2 + q * GP.d_radius
                 x = GP.xscale * p.x - rnew
                 y = GP.xscale * p.y - rnew
@@ -612,13 +635,13 @@ class Universe(QGraphicsScene):
                 w = 2 * rnew
                 p.body.setRect(QRectF(x, y, w, w))
             if p.flag_visible:
-                if p.relation == Stance.allied:
+                if p.relation == Stance.ALLIED:
                     p.flag.setPen(Pen.blue_l)
                     p.flag.setBrush(Brush.blue)
-                elif p.relation == Stance.friendly:
+                elif p.relation == Stance.FRIENDLY:
                     p.flag.setPen(Pen.green_d)
                     p.flag.setBrush(Brush.green)
-                elif p.relation == Stance.neutral:
+                elif p.relation == Stance.NEUTRAL:
                     p.flag.setPen(Pen.yellow_d)
                     p.flag.setBrush(Brush.yellow)
                 else:
@@ -628,11 +651,15 @@ class Universe(QGraphicsScene):
         self.default_view = False
 
 
-    def _create_planets(self, rules):
+    def _colonize_planets(self):
+        """ Populate the planets with NPC factions """
+
+
+    def _create_planets(self, people, rules):
         """ Populate the star map with randomly placed solar systems / planets """
         x = []
         y = []
-        n = Ruleset.planet_count()
+        n = rules.planet_count()
         while n > 0:
             n -= 1
             p = self.create_planet(rules, n < 1)
@@ -644,7 +671,7 @@ class Universe(QGraphicsScene):
         ymin = GP.xscale * min(y) - GP.map_frame
         ymax = GP.xscale * max(y) + GP.map_frame
         self.setSceneRect(xmin, ymin, xmax - xmin, ymax - ymin)
-        model = rules.first_scanner()
+        model = rules.first_scanner(people.my_faction())
         if model:
             p.scanner = self._create_scanner(p.x, p.y, model.value[0], model.value[1])
 
@@ -690,7 +717,7 @@ class Universe(QGraphicsScene):
         else:
             xo = p.x
             yo = p.y
-        if fleet.friend_or_foe == Stance.allied and fleet.max_range > 0:
+        if fleet.friend_or_foe == Stance.ALLIED and fleet.max_range > 0:
             fleet.scanner = self._create_scanner(xo, yo, fleet.max_range, fleet.pen_range)
         fleet.ship_count = self.create_orbit_label(0, 0)
         fleet.xc = xo
@@ -862,7 +889,8 @@ class Universe(QGraphicsScene):
             else:
                 self.wpselect.setVisible(False)
                 self.select.setVisible(False)
-            self.select_fleet.emit(self.selected_planet, self.fleet_index, self.selected_fleets, self.selected_fleet.mine_fields)
+            self.select_fleet.emit(self.selected_planet, self.fleet_index,
+                                   self.selected_fleets, self.selected_fleet.mine_fields)
 
 
     def filter_foes(self, enabled, select):
@@ -871,25 +899,25 @@ class Universe(QGraphicsScene):
             self.active_foe_filter = select
         if self.show_idle_fleets_only:
             for f in self.fleets:
-                if f.friend_or_foe != Stance.allied:
+                if f.friend_or_foe != Stance.ALLIED:
                     f.ship_counter = 0
         elif enabled:
             for f in self.fleets:
-                if f.friend_or_foe != Stance.allied:
+                if f.friend_or_foe != Stance.ALLIED:
                     f.apply_foe_filter(select)
                     f.update_ship_count()
         else:
             for f in self.fleets:
-                if f.friend_or_foe != Stance.allied:
+                if f.friend_or_foe != Stance.ALLIED:
                     f.ship_counter = len(f.ship_list)
                     f.update_ship_count()
         for p in self.planets:
             total_others = 0
             total_foes = 0
             for f in p.fleets_in_orbit:
-                if f.friend_or_foe == Stance.hostile:
+                if f.friend_or_foe == Stance.HOSTILE:
                     total_foes += f.ship_counter
-                elif f.friend_or_foe != Stance.allied:
+                elif f.friend_or_foe != Stance.ALLIED:
                     total_others += f.ship_counter
             p.update_foes(total_foes - p.total_foes)
             p.update_others(total_others - p.total_others)
@@ -907,12 +935,12 @@ class Universe(QGraphicsScene):
             self.active_friend_filter = select
         if enabled:
             for f in self.fleets:
-                if f.friend_or_foe == Stance.allied:
+                if f.friend_or_foe == Stance.ALLIED:
                     f.apply_my_filter(self.show_idle_fleets_only, select)
                     f.update_ship_count()
         elif self.show_idle_fleets_only:
             for f in self.fleets:
-                if f.friend_or_foe == Stance.allied:
+                if f.friend_or_foe == Stance.ALLIED:
                     if f.idle:
                         f.ship_counter = len(f.ship_list)
                         f.update_ship_count()
@@ -920,13 +948,13 @@ class Universe(QGraphicsScene):
                         f.ship_counter = 0
         else:
             for f in self.fleets:
-                if f.friend_or_foe == Stance.allied:
+                if f.friend_or_foe == Stance.ALLIED:
                     f.ship_counter = len(f.ship_list)
                     f.update_ship_count()
         for p in self.planets:
             total_friends = 0
             for f in p.fleets_in_orbit:
-                if f.friend_or_foe == Stance.allied:
+                if f.friend_or_foe == Stance.ALLIED:
                     total_friends += f.ship_counter
             p.update_friends(total_friends - p.total_friends)
             if self.default_view:
@@ -982,16 +1010,16 @@ class Universe(QGraphicsScene):
             f.resting_fleet.setPos(x0, y0)
             f.resting_fleet.setVisible(True)
         f.course = None
-        if f.friend_or_foe == Stance.allied:
+        if f.friend_or_foe == Stance.ALLIED:
             path = QPainterPath()
             render = False
             a = f.first_waypoint
             while a:
                 if a == f.next_waypoint:
                     render = True
-                    self.segment_path(path, f.xc, f.yc, a.xo, a.yo)
+                    self._segment_path(path, f.xc, f.yc, a.xo, a.yo)
                 if (render or a.retain) and a.next:
-                    self.segment_path(path, a.xo, a.yo, a.next.xo, a.next.yo)
+                    self._segment_path(path, a.xo, a.yo, a.next.xo, a.next.yo)
                 a = a.next
             if f.next_waypoint:
                 f.course = self.addPath(path)
@@ -1000,11 +1028,13 @@ class Universe(QGraphicsScene):
             length = f.warp_speed * f.warp_speed * GP.time_horizon
             dx = length * math.cos(f.heading)
             dy = length * math.sin(f.heading)
-            self.segment_path(path, f.xc, f.yc, f.xc + dx, f.yc + dy)
+            self._segment_path(path, f.xc, f.yc, f.xc + dx, f.yc + dy)
             f.course = self.addPath(path)
 
 
     def compute_turn(self):
+        """ Update the star map to reflect the new game turn """
+        self.year += 1
         for p in self.planets:
             p.clear_orbit()
             p.fleets_in_orbit = []
@@ -1036,7 +1066,7 @@ class Universe(QGraphicsScene):
                 f.ship_count.setVisible(self.show_fleet_strength)
                 f.show_course(self.show_fleet_movements)
         for p in self.planets:
-            p.update_ship_tracking()
+            p.update_ship_tracking(self.year)
             p.mine_fields = []
             for m in self.minefields:
                 d = (m.x - p.x) * (m.x - p.x) + (m.y - p.y) * (m.y - p.y)

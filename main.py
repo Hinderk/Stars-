@@ -34,7 +34,7 @@ def main():
 
     s = System()
     s.item_count = 1
-    s.item_type = Model.Rhino
+    s.item_type = Model.RHINO
     s.domain = ST.SCANNER
 
     ship = Ship(Design(0, Hull.SCT))
@@ -114,7 +114,7 @@ def main():
     form.map.universe.add_waypoint(fleet_8, -120, 600)
 
     form.map.universe.planets[0].build_starbase()
-    form.map.universe.planets[0].relation = Stance.neutral
+    form.map.universe.planets[0].relation = Stance.NEUTRAL
     form.map.universe.planets[0].colonists = 24000
 
     form.map.universe.planets[5].surface.ironium = 20.0
@@ -125,7 +125,7 @@ def main():
     form.map.universe.planets[5].crust.germanium = 90.0
     form.map.universe.planets[5].explore(2400)
     form.map.universe.planets[5].colonists = 400000
-    form.map.universe.planets[5].relation = Stance.allied
+    form.map.universe.planets[5].relation = Stance.ALLIED
 
     x = -30
     y = -30
@@ -149,7 +149,7 @@ def main():
     for p in form.map.universe.planets:
         p.build_starbase()
         p.explore(2390)
-        p.update_planet_view()
+        p.update_planet_view(2395)
 
 
     form.show()                         # Show the form

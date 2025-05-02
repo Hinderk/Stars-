@@ -18,15 +18,15 @@ class Planet:
     """ This class represents the solar systems of the Stars universe each of
         which is represented by just one of its planets and named after its sun. """
 
-    game_year = 2400                  # Modify this date prior to creating the user interface ...
-
     def __init__(self, rules, home_world=False):
 
-        self.name = rules.find_name()                      # The name of the solar system
+        self.name = rules._find_name()                     # The name of the solar system
+        self.x = 0                                         # The coordinates of the solar system
+        self.y = 0                                         # on the star map [ly]
 
-        self.radioactivity = rules.Random(0, 100, 50)      # These parameters may be modified via
-        self.gravity = 64.0 ** rules.Random(-0.5, 0.5, 0)  # terraforming technologies and influence
-        self.temperature = rules.Random(-200, 200, 0)      # population density & growth
+        self.radioactivity = rules.random(0, 100, 50)      # These parameters may be modified via
+        self.gravity = 64.0 ** rules.random(-0.5, 0.5, 0)  # terraforming technologies and influence
+        self.temperature = rules.random(-200, 200, 0)      # population density & growth
 
         self.radioactivity_rate = 0.0                      # TODO: Create a viable terraforming
         self.gravity_rate = 0.0                            # model to compute these rates.
@@ -79,11 +79,11 @@ class Planet:
         self.explored = PlanetData()                     # inside the planet's crust and - for
         if home_world:                                   # the home world - on its surface
             self.surface = Minerals(rules, 0.1)
-            self.relation = Stance.allied
-            self.explore(Planet.game_year)               # Start with the first game year ...
+            self.relation = Stance.ALLIED
+            self.explore(rules.first_year())             # Start with the first game year ...
         else:
             self.surface = Minerals()
-            self.relation = Stance.neutral
+            self.relation = Stance.NEUTRAL
 
 
     def explore(self, year):
@@ -108,27 +108,27 @@ class Planet:
         return random.triangular(0.0, 1.0, 0.5)
 
 
-    def update_ship_tracking(self):
+    def update_ship_tracking(self, year):
         """ Check if a planet has been explored by nearby allied ships,
             an orbiting space station or colonists on its surface """
-        if self.relation == Stance.allied:
+        if self.relation == Stance.ALLIED:
             if self.space_station or self.colonists > 0:
                 self.ship_tracking = True
         if self.total_friends > 0:
             for f in self.fleets_in_orbit:
-                if f.friend_or_foe == Stance.allied:
+                if f.friend_or_foe == Stance.ALLIED:
                     self.ship_tracking = True
                     break
         if self.ship_tracking:
-            self.explore(Planet.game_year)
+            self.explore(year)
 
 
     def enter_orbit(self, fleet):
         """ Update the planet's data if a fleet enters it's orbit """
         if fleet.ship_counter > 0:
-            if fleet.friend_or_foe == Stance.allied:
+            if fleet.friend_or_foe == Stance.ALLIED:
                 self.update_friends(fleet.ship_counter)
-            elif fleet.friend_or_foe == Stance.hostile:
+            elif fleet.friend_or_foe == Stance.HOSTILE:
                 self.update_foes(fleet.ship_counter)
             else:
                 self.update_others(fleet.ship_counter)
@@ -214,10 +214,10 @@ class Planet:
         self.starbase_visible = False
 
 
-    def update_planet_view(self):
+    def update_planet_view(self, year):
         """ Update the planet's state to reflect changes in the composition
             of the orbiting objects such as starbases or fleets """
-        self.update_ship_tracking()
+        self.update_ship_tracking(year)
         self.update_foes()
         self.update_others()
         self.update_friends()
@@ -229,7 +229,7 @@ class Planet:
             self.orbit_visible |= self.ship_tracking
         self.core_visible = self.ship_tracking or self.discovered
         if self.colonists > 0:
-            self.body_visible = self.relation == Stance.allied
+            self.body_visible = self.relation == Stance.ALLIED
             self.flag_visible = self.core_visible
         else:
             self.flag_visible = False

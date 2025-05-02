@@ -7,12 +7,13 @@ from PyQt6.QtGui import QPen
 
 from universe import Universe
 from design import Design
-from defines import Perks, Stance, Task
+from defines import Stance, Task
+from perks import Perks
 from colours import Pen, Brush
 from system import SystemType
-from ruleset import Ruleset
 from guiprop import GuiProps as GP
 
+import ruleset
 
 
 def get_delta(dx, dy):
@@ -67,7 +68,7 @@ class Fleet:
         self.name = None
         self.index = None
         self.picture = None
-        self.friend_or_foe = people.get_stance(Ruleset.f_id0, f_id)  # TODO: just a test
+        self.friend_or_foe = people.get_stance(ruleset.F_ID0, f_id)  # TODO: just a test
         self.ship_counter = len(ships)
         for s in ships:
             self.add_ship(s)
@@ -130,7 +131,7 @@ class Fleet:
             if s.cloaking > 0:
                 cloak += s.cloaking * s.empty_weight
             total += s.total_weight
-        return Ruleset.cloaking_ratio(cloak, total)
+        return ruleset.cloaking_ratio(cloak, total)
 
 
     def set_fleet_name_and_index(self):
@@ -167,14 +168,14 @@ class Fleet:
     def get_colours(self, selected=False):
         """ Retrieve pens & brushes for fleets on the star map """
         if selected:
-            if self.friend_or_foe == Stance.allied:
+            if self.friend_or_foe == Stance.ALLIED:
                 return (QPen(Pen.blue_h), Brush.blue)
-            if self.friend_or_foe == Stance.hostile:
+            if self.friend_or_foe == Stance.HOSTILE:
                 return (QPen(Pen.red_l), Brush.red_d)
             return (QPen(Pen.green), Brush.green)
-        if self.friend_or_foe == Stance.allied:
+        if self.friend_or_foe == Stance.ALLIED:
             return (QPen(Pen.blue_l), Brush.blue)
-        if self.friend_or_foe == Stance.hostile:
+        if self.friend_or_foe == Stance.HOSTILE:
             return (QPen(Pen.red), Brush.red_d)
         return (QPen(Pen.green), Brush.green)
 

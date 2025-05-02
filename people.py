@@ -9,18 +9,18 @@ from faction import Faction
 class People:
 
     species = ['Humanoid', 'Rabbitoid', 'Insectoid', 'Nucletoid', 'Silicanoid', 'Antetheral']
-    names = ['Robotoids', 'Turindrones', 'Automitrons', 'Rototills', 'Cybertrons', 'Macinti']
+    name = ['Robotoids', 'Turindrones', 'Automitrons', 'Rototills', 'Cybertrons', 'Macinti']
     ai_faction = []
 
     max_ai = 0
-    for name in names:
+    for s in species:
         fi = Faction(max_ai)
-        fi.name = names[max_ai]
+        fi.name = name[max_ai]
         fi.species = species[max_ai]
         max_ai += 1
         ai_faction.append(fi)
 
-        
+
     def __init__(self):
         self.player_id = 0
         self.player_count = 1
@@ -29,13 +29,12 @@ class People:
 
     def get_stance(self, f_ida, f_idb):  # TODO: For testing purposes only ...
         if f_ida == f_idb:
-            return Stance.allied
-        elif f_idb < 4:
-            return Stance.friendly
-        elif f_idb < 8:
-            return Stance.neutral
-        else:
-            return Stance.hostile
+            return Stance.ALLIED
+        if f_idb < 4:
+            return Stance.FRIENDLY
+        if f_idb < 8:
+            return Stance.NEUTRAL
+        return Stance.HOSTILE
 
 
     def my_faction(self):
