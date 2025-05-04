@@ -18,24 +18,25 @@ from planet import Planet
 from colours import Pen, Brush
 from defines import Stance, Task
 from waypoint import Waypoint
-from guiprop import GuiProps as GP
+
+import guiprop as GP
 
 
 
 
 _arrow = QPolygonF()
-_arrow.append( QPointF(GP.h_vector - GP.dh_vector, 0))
-_arrow.append( QPointF(-GP.dh_vector, -GP.w_vector))
+_arrow.append(QPointF(GP.H_VECTOR - GP.DH_VECTOR, 0))
+_arrow.append( QPointF(-GP.DH_VECTOR, -GP.W_VECTOR))
 _arrow.append(QPointF(0, 0))
-_arrow.append(QPointF(-GP.dh_vector, GP.w_vector))
+_arrow.append(QPointF(-GP.DH_VECTOR, GP.W_VECTOR))
 
 _flag = QPolygonF()
 _flag.append( QPointF(0, 0))
-_flag.append(QPointF(0, - GP.flag_height - GP.flag_width))
-_flag.append(QPointF(GP.flag_width + GP.flag_stem, -GP.flag_height - GP.flag_width))
-_flag.append(QPointF(GP.flag_width + GP.flag_stem, -GP.flag_height))
-_flag.append(QPointF(GP.flag_stem, -GP.flag_height))
-_flag.append(QPointF(GP.flag_stem, 0))
+_flag.append(QPointF(0, - GP.FLAG_HEIGHT - GP.FLAG_WIDTH))
+_flag.append(QPointF(GP.FLAG_WIDTH + GP.FLAG_STEM, -GP.FLAG_HEIGHT - GP.FLAG_WIDTH))
+_flag.append(QPointF(GP.FLAG_WIDTH + GP.FLAG_STEM, -GP.FLAG_HEIGHT))
+_flag.append(QPointF(GP.FLAG_STEM, -GP.FLAG_HEIGHT))
+_flag.append(QPointF(GP.FLAG_STEM, 0))
 
 
 def _setup_mine_filter():
@@ -59,7 +60,7 @@ class Universe(QGraphicsScene):
     select_fleet = QSignal(object, int, list, list)
     select_field = QSignal(object, int, list, list)
 
-    current_path_width = GP.fp_width[100]
+    current_path_width = GP.FP_WIDTH[100]
 
     def __init__(self, people, rules):
         super().__init__()
@@ -68,6 +69,8 @@ class Universe(QGraphicsScene):
         self.fleets = []
         self.minefields = []
         self.debris = []
+        self.xo = 0
+        self.yo = 0
 
         self.selected_planet = None
         self.selected_fleet = None
@@ -91,6 +94,7 @@ class Universe(QGraphicsScene):
         self.waypoint_selected = False
         self.names_visible = False
         self.waypoint_mode = False
+        self.mouse_button_engaged = False
 
         self.show_field = _setup_mine_filter()
         self.population_ceiling = rules.get_population_ceiling(people.my_faction())
@@ -102,7 +106,7 @@ class Universe(QGraphicsScene):
 
         self._create_indicator()
         self._create_planets(people, rules)
-        self._colonize_planets()
+        self._colonize_planets(people, rules)
 
         self.setBackgroundBrush(Brush.black)
 
@@ -120,27 +124,41 @@ class Universe(QGraphicsScene):
 
 
     def keyPressEvent(self, key_press):
-        """ Event handler: Process mouse interactions with the star map """
+        """ Event handler: Process keyboard interactions with the star map """
         key = key_press.key()
         if key == Qt.Key.Key_Shift:
             self.movement_approved = True
         elif key == Qt.Key.Key_Delete:
             if self.waypoint_selected:
-                wp = self.selected_fleet.DeleteWaypoint(self.selected_waypoint[1])
+                wp = self.selected_fleet.delete_waypoint(self.selected_waypoint[1])
                 if wp:
                     dx = wp.xo - self.selected_fleet.xc
                     dy = wp.yo - self.selected_fleet.yc
-                    self.selected_fleet.Heading = math.atan2(dy, dx)
-                    self.selected_fleet.UpdateSchedule()
+                    self.selected_fleet.heading = math.atan2(dy, dx)
+                    self.selected_fleet.update_schedule()
                 else:
                     self.selected_fleet.warp_speed = 0
-                    self.removeItem(self.selected_fleet.MovingFleet)
+                    self.removeItem(self.selected_fleet.moving_fleet)
                     self.selected_fleet.MovingFleet = None
                 self.plot_course(self.selected_fleet)
                 self.selected_fleet.colour_course(True)
                 self.waypoint_selected = False
                 self.wpselect.setVisible(False)
-
+        elif key == Qt.Key.Key_Insert:
+            f0 = self.selected_fleet
+            if f0 and self.waypoint_selected:
+                self.add_waypoint(f0, self.xo, self.yo)
+                w0 = f0.active_waypoint[0]
+                f0.update_course(w0, self.planets)
+                if f0.next_waypoint == w0:
+                    f0.Heading = math.atan2(w0.yo - f0.yc, w0.xo - f0.xc)
+                    f0.update_ship_count()
+                    self.update_route.emit(f0.warp_speed, w0)
+                else:
+                    self.update_route.emit(f0.warp_speed, None)
+                self.plot_course(f0)
+                f0.colour_course(True)
+                self.wpselect.setPos(QPointF(GP.XSCALE * w0.xo, GP.XSCALE * w0.yo))
 
 
     def keyReleaseEvent(self, key_press):
@@ -205,18 +223,19 @@ class Universe(QGraphicsScene):
 
 
     def mouseReleaseEvent(self, _):
-        """ Event handler: Cancel waypoint selection by releasing the mouse """
-        self.waypoint_selected = False
+        """ Event handler: Cancel waypoint movement by releasing the mouse """
+#        self.movement_approved = False
 
 
     def mousePressEvent(self, mouse_click):
         """ Event handler: Select items on the star map closest to the mouse pointer """
         p0 = mouse_click.scenePos()
         self.waypoint_selected = False
-        xo = round(0.5 + p0.x() / GP.xscale)
-        yo = round(0.5 + p0.y() / GP.xscale)
-        self.context = self._identify_context(xo, yo)
+        self.xo = round(0.5 + p0.x() / GP.XSCALE)
+        self.yo = round(0.5 + p0.y() / GP.XSCALE)
+        self.context = self._identify_context(self.xo, self.yo)
         if mouse_click.buttons() == Qt.MouseButton.LeftButton:
+            self.mouse_button_engaged = True
             if self.context[1]:
                 self.waypoint_offset = 0
                 self.fleet_offset = 0
@@ -234,14 +253,15 @@ class Universe(QGraphicsScene):
 
     def mouseMoveEvent(self, event):
         """ Event handler: Move the selected waypoint around on the star map """
+        p0 = event.scenePos()
+        self.xo = round(0.5 + p0.x() / GP.XSCALE)
+        self.yo = round(0.5 + p0.y() / GP.XSCALE)
         if self.waypoint_selected and self.movement_approved:
             w0 = self.selected_waypoint[0]
             f0 = self.selected_fleet
-            p0 = event.scenePos()
-            w0.xo = round(0.5 + p0.x() / GP.xscale)
-            w0.yo = round(0.5 + p0.y() / GP.xscale)
+            w0.xo = self.xo
+            w0.yo = self.yo
             f0.update_course(w0, self.planets)
-            p0 = QPointF(GP.xscale * w0.xo, GP.xscale * w0.yo)
             if f0.next_waypoint == w0:
                 f0.Heading = math.atan2(w0.yo - f0.yc, w0.xo - f0.xc)
                 f0.update_ship_count()
@@ -250,7 +270,7 @@ class Universe(QGraphicsScene):
                 self.update_route.emit(f0.warp_speed, None)
             self.plot_course(f0)
             f0.colour_course(True)
-            self.wpselect.setPos(p0)
+            self.wpselect.setPos(QPointF(GP.XSCALE * w0.xo, GP.XSCALE * w0.yo))
 
 
 # pylint: enable=invalid-name
@@ -338,23 +358,23 @@ class Universe(QGraphicsScene):
                         dist = d
                     elif d == dist:
                         m_list.append(m)
-        return po, m_list, f_list, w_list, xo, yo
+        return po, m_list, f_list, w_list # , xo, yo
 
 
     def _create_indicator(self):
         """ Create the object designator for the starmap """
         triangle = QPolygonF()
         triangle.append(QPointF(0, 0))
-        triangle.append(QPointF(GP.pointer_size / 2, GP.pointer_size * math.sqrt(3.0) / 2))
-        triangle.append(QPointF(-GP.pointer_size / 2, GP.pointer_size * math.sqrt(3.0) / 2))
+        triangle.append(QPointF(GP.POINTER_SIZE / 2, GP.POINTER_SIZE * math.sqrt(3.0) / 2))
+        triangle.append(QPointF(-GP.POINTER_SIZE / 2, GP.POINTER_SIZE * math.sqrt(3.0) / 2))
         self.pointer = self.addPolygon(triangle, Pen.white_08, Brush.yellow)
         self.pointer.setZValue(8)
-        w = GP.fp_radius
+        w = GP.FP_RADIUS
         self.select = self.addEllipse(-w, -w, w + w, w + w, Pen.white_08, Brush.yellow)
         self.select.setZValue(-2)
-        w = GP.wp_radius
+        w = GP.WP_RADIUS
         pen = QPen(Pen.yellow)
-        pen.setWidthF(GP.wp_width)
+        pen.setWidthF(GP.WP_WIDTH)
         self.wpselect = self.addEllipse(-w, -w, w + w, w + w, pen)
         self.wpselect.setZValue(-2)
 
@@ -377,8 +397,8 @@ class Universe(QGraphicsScene):
             p.label.setBrush(Brush.white)
             self.pointer.setVisible(False)
         else:
-            xp = GP.xscale * p.x
-            yp = GP.xscale * p.y + GP.p_radius + GP.dy_pointer
+            xp = GP.XSCALE * p.x
+            yp = GP.XSCALE * p.y + GP.P_RADIUS + GP.DY_POINTER
             self.pointer.setPos(xp, yp)
             self.pointer.setVisible(True)
         self.selected_planet = p
@@ -397,7 +417,7 @@ class Universe(QGraphicsScene):
         if index < 0:
             index = (self.fleet_index + self.fleet_offset) % len(self.context[2])
         f0 = self.context[2][index]
-        self.select.setPos(GP.xscale * f0.xc, GP.xscale * f0.yc)
+        self.select.setPos(GP.XSCALE * f0.xc, GP.XSCALE * f0.yc)
         self.select.setVisible(True)
         self.selected_fleet = f0
         self.fleet_index = index
@@ -416,8 +436,8 @@ class Universe(QGraphicsScene):
         self.selected_fleet = None
         self.selected_fleets = []
         self.selected_planet = None
-        xp = GP.xscale * self.context[1][0].x
-        yp = GP.xscale * self.context[1][0].y + GP.dy_pointer
+        xp = GP.XSCALE * self.context[1][0].x
+        yp = GP.XSCALE * self.context[1][0].y + GP.DY_POINTER
         self.pointer.setPos(xp, yp)
         self.pointer.setVisible(True)
         self.select_field.emit(None, index, self.context[1], [])
@@ -435,8 +455,8 @@ class Universe(QGraphicsScene):
         elif index < 0:
             index = (self.waypoint_index + self.waypoint_offset) % len(self.context[3])
         f0, w0, n0 = self.context[3][index]
-        self.wpselect.setPos(GP.xscale * w0.xo, GP.xscale * w0.yo)
-        self.select.setPos(GP.xscale * f0.xc, GP.xscale * f0.yc)
+        self.wpselect.setPos(GP.XSCALE * w0.xo, GP.XSCALE * w0.yo)
+        self.select.setPos(GP.XSCALE * f0.xc, GP.XSCALE * f0.yc)
         self.wpselect.setVisible(True)
         self.select.setVisible(True)
         self.selected_waypoint = (w0, n0)
@@ -451,16 +471,16 @@ class Universe(QGraphicsScene):
 
     def _segment_path(self, path, xa, ya, xb, yb):
         """ Interrupt the flight path to create a halo effect around nearby fleets """
-        dx = GP.xscale * (xb - xa)
-        dy = GP.xscale * (yb - ya)
+        dx = GP.XSCALE * (xb - xa)
+        dy = GP.XSCALE * (yb - ya)
         d2 = float(dx * dx + dy * dy)
         if d2 > 0.0:
             sval = [(0.0, -1), (1.0, 1)]
-            r2 = GP.fleet_halo * GP.fleet_halo / d2
+            r2 = GP.FLEET_HALO * GP.FLEET_HALO / d2
             for f in self.fleets:
                 if f.discovered and f.ship_counter > 0 and not f.orbiting:
-                    fx = GP.xscale * (xa - f.xc)
-                    fy = GP.xscale * (ya - f.yc)
+                    fx = GP.XSCALE * (xa - f.xc)
+                    fy = GP.XSCALE * (ya - f.yc)
                     p = (fx * dx + fy * dy) / d2
                     q2 = (fx * fx + fy * fy) / d2
                     s2 = r2 + p * p - q2
@@ -473,8 +493,8 @@ class Universe(QGraphicsScene):
                             sval.append((sp, -1))
             sval.sort(key=lambda p: p[0])
             s = 1
-            x = GP.xscale * xa
-            y = GP.xscale * ya
+            x = GP.XSCALE * xa
+            y = GP.XSCALE * ya
             for (so, ds) in sval:
                 s += ds
                 if s < 1:
@@ -534,8 +554,8 @@ class Universe(QGraphicsScene):
                 self.selected_planet.label.setBrush(Brush.white)
                 self.pointer.setVisible(False)
             else:
-                xp = GP.xscale * self.selected_planet.x
-                yp = GP.xscale * self.selected_planet.y + GP.p_radius + GP.dy_pointer
+                xp = GP.XSCALE * self.selected_planet.x
+                yp = GP.XSCALE * self.selected_planet.y + GP.P_RADIUS + GP.DY_POINTER
                 self.pointer.setPos(xp, yp)
                 self.pointer.setVisible(True)
         for p in self.planets:
@@ -589,9 +609,9 @@ class Universe(QGraphicsScene):
             p.show_population_view()
             if p.body_visible:
                 q = min(1.0, math.sqrt(p.colonists / self.population_ceiling))
-                rnew = GP.p_radius * (1 + q) / 2 + q * GP.d_radius
-                x = GP.xscale * p.x - rnew
-                y = GP.xscale * p.y - rnew
+                rnew = GP.P_RADIUS * (1 + q) / 2 + q * GP.D_RADIUS
+                x = GP.XSCALE * p.x - rnew
+                y = GP.XSCALE * p.y - rnew
                 w = 2 * rnew
                 p.body.setRect(QRectF(x, y, w, w))
                 p.body.setPen(Pen.brown)
@@ -602,6 +622,7 @@ class Universe(QGraphicsScene):
 
 
     def scale_radar_ranges(self, factor):
+        """ Show effective scanner detection ranges to account for cloaking """
         f = factor / 100.0
         for p in self.planets:
             if p.scanner:
@@ -613,10 +634,11 @@ class Universe(QGraphicsScene):
 
 
     def show_percentage_view(self):
+        """ Indicate panet values by color & size coding the star systems """
         for p in self.planets:
             p.show_percentage_view()
             if p.core_visible:
-                q = p.value()
+                q = max(0.0, p.value())
                 if q < 0.33:
                     p.body.setPen(Pen.red)
                     p.body.setBrush(Brush.red)
@@ -624,14 +646,14 @@ class Universe(QGraphicsScene):
                 elif q < 0.66:
                     p.body.setPen(Pen.yellow)
                     p.body.setBrush(Brush.yellow)
-                    q = 3 * (q - 0.33)
+                    q = 3 * q - 1.0
                 else:
                     p.body.setPen(Pen.green)
                     p.body.setBrush(Brush.green)
-                    q = 3 * (q - 0.66)
-                rnew = GP.p_radius * (1 + q) / 2 + q * GP.d_radius
-                x = GP.xscale * p.x - rnew
-                y = GP.xscale * p.y - rnew
+                    q = 3 * q - 2.0
+                rnew = GP.P_RADIUS * (1 + q) / 2 + q * GP.D_RADIUS
+                x = GP.XSCALE * p.x - rnew
+                y = GP.XSCALE * p.y - rnew
                 w = 2 * rnew
                 p.body.setRect(QRectF(x, y, w, w))
             if p.flag_visible:
@@ -651,8 +673,32 @@ class Universe(QGraphicsScene):
         self.default_view = False
 
 
-    def _colonize_planets(self):
+    def _colonize_planets(self, people, rules):
         """ Populate the planets with NPC factions """
+        f0 = people.my_faction()
+        delta_r = (f0.max_radioactivity - f0.min_radioactivity) / 200.0
+        opt_r = (f0.max_radioactivity + f0.min_radioactivity) / 200.0
+        delta_g = (math.log2(f0.max_gravity) - math.log2(f0.min_gravity)) / 12.0
+        opt_g = (math.log2(f0.max_gravity) + math.log2(f0.min_gravity)) / 12.0
+        delta_t = (f0.max_temperatur - f0.min_temperatur) / 800.0
+        opt_t = (f0.max_temperatur + f0.min_temperatur) / 800.0
+        if f0.ignore_radioactivity:
+            delta_r = 1e8
+        if f0.ignore_gravity:
+            delta_g = 1e8
+        if f0.ignore_temperature:
+            delta_t = 1e8
+        for p in self.planets:
+            if p.home_world:
+                p.radioactivity = opt_r * 100.0
+                p.gravity = 64.0 ** opt_g
+                p.temperature = opt_t * 400.0
+            p.center_radioactivity = opt_r
+            p.delta_radioactivity = delta_r
+            p.center_gravity = opt_g
+            p.delta_gravity = delta_g
+            p.center_temperature = opt_t
+            p.delta_temperature = delta_t
 
 
     def _create_planets(self, people, rules):
@@ -666,10 +712,10 @@ class Universe(QGraphicsScene):
             x.append(p.x)
             y.append(p.y)
             self.planets.append(p)
-        xmin = GP.xscale * min(x) - GP.map_frame
-        xmax = GP.xscale * max(x) + GP.map_frame
-        ymin = GP.xscale * min(y) - GP.map_frame
-        ymax = GP.xscale * max(y) + GP.map_frame
+        xmin = GP.XSCALE * min(x) - GP.MAP_FRAME
+        xmax = GP.XSCALE * max(x) + GP.MAP_FRAME
+        ymin = GP.XSCALE * min(y) - GP.MAP_FRAME
+        ymax = GP.XSCALE * max(y) + GP.MAP_FRAME
         self.setSceneRect(xmin, ymin, xmax - xmin, ymax - ymin)
         model = rules.first_scanner(people.my_faction())
         if model:
@@ -679,16 +725,16 @@ class Universe(QGraphicsScene):
     def _create_scanner(self, xo, yo, rmax, rpen=0):
         """ Create the visual elements indicating the scanning range of a fleet or planet """
         s = Scanner(xo, yo, rmax, rpen)
-        x = GP.xscale * xo
-        y = GP.xscale * yo
+        x = GP.XSCALE * xo
+        y = GP.XSCALE * yo
         if rmax > 0:
-            r = rmax * GP.xscale
+            r = rmax * GP.XSCALE
             box = QRectF(x - r, y - r, r + r, r + r)
             s.detection = self.addEllipse(box, Pen.red_s, Brush.red_s)
             s.detection.setZValue(-10)
             s.detection.setVisible(False)
         if rpen > 0:
-            r = rpen * GP.xscale
+            r = rpen * GP.XSCALE
             box = QRectF(x - r, y - r, r + r, r + r)
             s.penetration = self.addEllipse(box, Pen.yellow_s, Brush.yellow_s)
             s.penetration.setZValue(-8)
@@ -708,8 +754,8 @@ class Universe(QGraphicsScene):
 
 
     def register_fleet(self, fleet, p, y=None):
-        w = GP.f_radius + GP.f_radius
-        fleet.resting_fleet = self.addEllipse(-GP.f_radius, -GP.f_radius, w, w)
+        w = GP.F_RADIUS + GP.F_RADIUS
+        fleet.resting_fleet = self.addEllipse(-GP.F_RADIUS, -GP.F_RADIUS, w, w)
         fleet.resting_fleet.setVisible(False)
         if y:
             xo = p
@@ -719,7 +765,7 @@ class Universe(QGraphicsScene):
             yo = p.y
         if fleet.friend_or_foe == Stance.ALLIED and fleet.max_range > 0:
             fleet.scanner = self._create_scanner(xo, yo, fleet.max_range, fleet.pen_range)
-        fleet.ship_count = self.create_orbit_label(0, 0)
+        fleet.ship_count = self._create_orbit_label(0, 0)
         fleet.xc = xo
         fleet.yc = yo
         self.fleets.append(fleet)
@@ -741,10 +787,12 @@ class Universe(QGraphicsScene):
 
 
     def set_waypoint_mode(self, event):
+        """ Enable or disable the waypoint insertion mode """
         self.waypoint_mode = event
 
 
     def add_waypoint(self, fleet, x, y, index=0):   # FIX ME!
+        """ Add a new waypoint to the flight path of a fleet """
         wa = Waypoint(x, y)
         if fleet.first_waypoint:
             w0 = fleet.active_waypoint[index]
@@ -767,8 +815,9 @@ class Universe(QGraphicsScene):
         fleet.active_waypoint = [wa]
 
 
-    def create_orbit_label(self, x, y):
-        label = self.addSimpleText("", GP.map_font)
+    def _create_orbit_label(self, x, y):
+        """ Create labels for fleet strengths and population sizes """
+        label = self.addSimpleText("", GP.MAP_FONT)
         label.setPen(Pen.white_l)
         label.setBrush(Brush.white_l)
         label.setPos(x, y)
@@ -777,24 +826,26 @@ class Universe(QGraphicsScene):
         return label
 
 
-    def create_diagram(self, diagram, x, y, w):
-        line = QLineF(0, -GP.scale_length, 0, 0)
-        line.translate(x + w / 2 - GP.scale_length / 2, y - GP.dy_label)
+    def _create_diagram(self, diagram, x, y, w):
+        """ Prepare the box diagrams used to indicate the amount of mineral resources
+            which can be found on the surface of a planet and inside its crust """
+        line = QLineF(0, -GP.SCALE_LENGTH, 0, 0)
+        line.translate(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
         diagram.v_axis = self.addLine(line, Pen.white_08)
-        d = GP.scale_length / 13
-        box = QRectF(d, 0, 3 * d, -GP.scale_length)
+        d = GP.SCALE_LENGTH / 13
+        box = QRectF(d, 0, 3 * d, -GP.SCALE_LENGTH)
         diagram.blue_box = self.addRect(box, Pen.blue, Brush.blue)
-        diagram.blue_box.setPos(x + w / 2 - GP.scale_length / 2, y - GP.dy_label)
-        box = QRectF(5 * d, 0, 3 * d, -GP.scale_length)
+        diagram.blue_box.setPos(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
+        box = QRectF(5 * d, 0, 3 * d, -GP.SCALE_LENGTH)
         diagram.green_box = self.addRect(box, Pen.green, Brush.green)
-        diagram.green_box.setPos(x + w / 2 - GP.scale_length / 2, y - GP.dy_label)
-        box = QRectF(9 * d, 0, 3 * d, -GP.scale_length)
+        diagram.green_box.setPos(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
+        box = QRectF(9 * d, 0, 3 * d, -GP.SCALE_LENGTH)
         diagram.yellow_box = self.addRect(box, Pen.yellow, Brush.yellow)
-        diagram.yellow_box.setPos(x + w / 2 - GP.scale_length / 2, y - GP.dy_label)
-        line = QLineF(GP.scale_length, 0, 0, 0)
-        line.translate(x + w / 2 - GP.scale_length / 2, y - GP.dy_label)
+        diagram.yellow_box.setPos(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
+        line = QLineF(GP.SCALE_LENGTH, 0, 0, 0)
+        line.translate(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
         diagram.h_axis = self.addLine(line, Pen.white_08)
-        diagram.scale_length = GP.scale_length
+        diagram.scale_length = GP.SCALE_LENGTH   # TODO: Remove this! GP.SCALE_LENGTH can be used in diagram.py directly ...
         diagram.show(False)
 
 
@@ -802,24 +853,24 @@ class Universe(QGraphicsScene):
         """ Render a planet onto the star map but keep it invisible """
         p = Planet(rules, homeworld)
         [p.x, p.y] = rules.find_position()
-        w = GP.p_radius
-        xo = p.x * GP.xscale - w
-        yo = p.y * GP.xscale - w
+        w = GP.P_RADIUS
+        xo = p.x * GP.XSCALE - w
+        yo = p.y * GP.XSCALE - w
         x = xo + w / 2
         y = yo + w / 2
         p.center = self.addEllipse(x, y, w, w, Pen.white, Brush.white)
-        w += GP.p_radius
+        w += GP.P_RADIUS
         p.core = self.addEllipse(xo, yo, w, w, Pen.brown, Brush.brown)
         p.core.setVisible(False)
-        x = xo - GP.d_radius
-        y = yo - GP.d_radius
-        w += 2 * GP.d_radius
-        c = 2 * GP.o_radius
+        x = xo - GP.D_RADIUS
+        y = yo - GP.D_RADIUS
+        w += 2 * GP.D_RADIUS
+        c = 2 * GP.O_RADIUS
         w0 = w / math.sqrt(8.0) + 0.5
-        xm = x + w / 2 - w0 - GP.o_radius
-        xp = x + w / 2 + w0 - GP.o_radius
-        ym = y + w / 2 - w0 - GP.o_radius
-        yp = y + w / 2 + w0 - GP.o_radius
+        xm = x + w / 2 - w0 - GP.O_RADIUS
+        xp = x + w / 2 + w0 - GP.O_RADIUS
+        ym = y + w / 2 - w0 - GP.O_RADIUS
+        yp = y + w / 2 + w0 - GP.O_RADIUS
         p.body = self.addEllipse(x, y, w, w)
         p.orbit = self.addEllipse(x, y, w, w, Pen.white_2)
         p.orbit.setVisible(False)
@@ -831,20 +882,20 @@ class Universe(QGraphicsScene):
         p.neutral.setVisible(False)
         p.foes.setVisible(False)
         p.friends.setVisible(False)
-        p.label = self.addSimpleText(p.name, GP.map_font)
+        p.label = self.addSimpleText(p.name, GP.MAP_FONT)
         p.label.setPen(Pen.white_l)
         p.label.setBrush(Brush.white_l)
         p.label.setVisible(False)
         w0 = p.label.boundingRect().width()
-        p.label.setPos(x - w0 / 2 + w / 2, y + w + GP.dy_label)
-        p.ships = self.create_orbit_label(x - c / 2, y + w - GP.fontsize)
-        p.attackers = self.create_orbit_label(x - c / 2, y - GP.fontsize / 2)
-        p.others = self.create_orbit_label(x + w + c / 2, y + w - GP.fontsize)
-        p.population = self.create_orbit_label(x + w + c / 2, y - GP.fontsize / 2)
+        p.label.setPos(x - w0 / 2 + w / 2, y + w + GP.DY_LABEL)
+        p.ships = self._create_orbit_label(x - c / 2, y + w - GP.FONTSIZE)
+        p.attackers = self._create_orbit_label(x - c / 2, y - GP.FONTSIZE / 2)
+        p.others = self._create_orbit_label(x + w + c / 2, y + w - GP.FONTSIZE)
+        p.population = self._create_orbit_label(x + w + c / 2, y - GP.FONTSIZE / 2)
         p.flag = self.addPolygon(_flag)
-        p.flag.setPos(x + w / 2 - GP.flag_stem / 2, y + w / 2)
+        p.flag.setPos(x + w / 2 - GP.FLAG_STEM / 2, y + w / 2)
         p.flag.setVisible(False)
-        self.create_diagram(p.diagram, x, y, w)
+        self._create_diagram(p.diagram, x, y, w)
         return p
 
 
@@ -995,8 +1046,8 @@ class Universe(QGraphicsScene):
 
 
     def plot_course(self, f):
-        x0 = GP.xscale * f.xc
-        y0 = GP.xscale * f.yc
+        x0 = GP.XSCALE * f.xc
+        y0 = GP.XSCALE * f.yc
         if f.course:
             self.removeItem(f.course)
         if f.warp_speed > 0:
@@ -1025,7 +1076,7 @@ class Universe(QGraphicsScene):
                 f.course = self.addPath(path)
         elif f.warp_speed > 0:
             path = QPainterPath()
-            length = f.warp_speed * f.warp_speed * GP.time_horizon
+            length = f.warp_speed * f.warp_speed * GP.TIME_HORIZON
             dx = length * math.cos(f.heading)
             dy = length * math.sin(f.heading)
             self._segment_path(path, f.xc, f.yc, f.xc + dx, f.yc + dy)

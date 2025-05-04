@@ -16,4 +16,5 @@ class Waypoint:
 
 
     def at(self, wp):
+        """ Check whether two points coincide """
         return self.xo == wp.xo and self.yo == wp.yo

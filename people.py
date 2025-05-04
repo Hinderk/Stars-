@@ -38,18 +38,20 @@ class People:
 
 
     def my_faction(self):
+        """ Return the faction of the game master """
         return self.player[self.player_id]
 
 
     def get_faction(self, f_id):
+        """ Return a specific player operated game faction """
         return self.player[f_id % self.player_count]
 
 
     def get_ai_faction(self, f_id):
+        """ Return a specific AI controlled game faction """
         return People.ai_faction[f_id % People.max_ai]
 
 
     def random_faction(self):
+        """ Choose an AI controlled game faction at random """
         return People.ai_faction[random.randint(0, People.max_ai - 1)]
-
-

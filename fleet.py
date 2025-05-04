@@ -7,13 +7,13 @@ from PyQt6.QtGui import QPen
 
 from universe import Universe
 from design import Design
-from defines import Stance, Task
-from perks import Perks
+from defines import Stance, Task, Feature
 from colours import Pen, Brush
 from system import SystemType
-from guiprop import GuiProps as GP
 
+import guiprop as GP
 import ruleset
+
 
 
 def get_delta(dx, dy):
@@ -22,7 +22,7 @@ def get_delta(dx, dy):
 
     length = math.sqrt(dx * dx + dy * dy)
     if length > 0:
-        scale = GP.xscale * 100.0 / length   # Warp 10
+        scale = GP.XSCALE * 100.0 / length   # Warp 10
         return scale * dx, scale * dy
     return 0, 0
 
@@ -111,7 +111,7 @@ class Fleet:
             if s.domain == SystemType.SCANNER:
                 mr = s.item_type.value[0]
                 pr = s.item_type.value[1]
-                if s.item_type.value[15] == Perks.ROB:
+                if s.item_type.value[15] == Feature.CROB:
                     self.steal_cargo = True
                 maxrange += s.item_count * mr * mr * mr * mr
                 penrange += s.item_count * pr * pr * pr * pr
@@ -184,13 +184,13 @@ class Fleet:
         """ Show the fleet's current ship count on the star map """
         self.ship_count.setText(str(self.ship_counter))
         h = self.ship_count.boundingRect().height() - 2
-        xs = GP.xscale * self.xc
-        ys = GP.xscale * self.yc
+        xs = GP.XSCALE * self.xc
+        ys = GP.XSCALE * self.yc
         if abs(self.heading) > 0.5 * math.pi:
-            xs += GP.f_radius + GP.f_dist
+            xs += GP.F_RADIUS + GP.F_DIST
         else:
             w = self.ship_count.boundingRect().width()
-            xs -= GP.f_radius + GP.f_dist + w
+            xs -= GP.F_RADIUS + GP.F_DIST + w
         self.ship_count.setPos(xs, ys - h / 2)
 
 
@@ -224,7 +224,7 @@ class Fleet:
         wp.planet = None
         for p in planets:
             d = (p.x - wp.xo) * (p.x - wp.xo) + (p.y - wp.yo) * (p.y - wp.yo)
-            if d < GP.p_snap:
+            if d < GP.P_SNAP:
                 wp.xo = p.x
                 wp.yo = p.y
                 wp.planet = p

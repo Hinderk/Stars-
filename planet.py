@@ -2,7 +2,7 @@
 """ This module implements the solar systems of the Stars universe """
 
 import copy
-import random
+import math
 
 from minerals import Minerals
 from planetdata import PlanetData
@@ -18,11 +18,12 @@ class Planet:
     """ This class represents the solar systems of the Stars universe each of
         which is represented by just one of its planets and named after its sun. """
 
-    def __init__(self, rules, home_world=False):
+    def __init__(self, rules, home_world=False):    # TODO: remove the home_world flag
 
         self.name = rules._find_name()                     # The name of the solar system
         self.x = 0                                         # The coordinates of the solar system
         self.y = 0                                         # on the star map [ly]
+        self.faction = None                                # The planet is uninhabited by default.
 
         self.radioactivity = rules.random(0, 100, 50)      # These parameters may be modified via
         self.gravity = 64.0 ** rules.random(-0.5, 0.5, 0)  # terraforming technologies and influence
@@ -31,6 +32,13 @@ class Planet:
         self.radioactivity_rate = 0.0                      # TODO: Create a viable terraforming
         self.gravity_rate = 0.0                            # model to compute these rates.
         self.temperature_rate = 0.0
+
+        self.delta_radioactivity = 1e8                     # These values depend on the faction the
+        self.delta_gravity = 1e8                           # player is controlling himself. They
+        self.delta_temperature = 1e8                       # require an initial setup. Unit: [%]
+        self.center_radioactivity = 0.5                    # The values used by default correspond
+        self.center_gravity = 0.0                          # to a species that is completely immune
+        self.center_temperature = 0.0                      # to adverse environmental factors.
 
         self.orbit = None                                  # The following class members will be
         self.starbase = None                               # used to render planets on the star
@@ -68,12 +76,16 @@ class Planet:
         self.total_orbit = 0
         self.colonists = 0
 
-        self.discovered = home_world                     # Obviously, the home world is settled
-        self.ship_tracking = home_world                  # from the first turn of the game ...
         self.show_idle_only = False
         self.strength_visible = False
 
         self.space_station = False
+
+        # TODO: Compute these class members in a dedicated 'colonize' procedure ...
+
+        self.discovered = home_world                     # Obviously, the home world is settled
+        self.ship_tracking = home_world                  # from the first turn of the game ...
+        self.home_world = home_world
 
         self.crust = Minerals(rules)                     # Create a random amount of minerals
         self.explored = PlanetData()                     # inside the planet's crust and - for
@@ -103,9 +115,23 @@ class Planet:
         self.discovered = True
 
 
-    def value(self):  # TODO : Find the proper formula to compute this value ...
+    def value(self):
         """ Compute a planet value based on the habitability of its biome """
-        return random.triangular(0.0, 1.0, 0.5)
+        gravity = math.log(self.gravity) / math.log(64.0)
+        delta_r = abs(self.radioactivity / 100.0 - self.center_radioactivity)
+        delta_g = abs(gravity - self.center_gravity)
+        delta_t = abs(self.temperature / 400.0 - self.center_temperature)
+        res = (max(min(self.delta_radioactivity - delta_r, 0.0), -0.15)
+               + max(min(self.delta_gravity - delta_g, 0.0), -0.15)
+               + max(min(self.delta_temperature - delta_t, 0.0), -0.15))
+        if res < 0.0:
+            return res
+        q_r = delta_r / self.delta_radioactivity
+        q_g = delta_g / self.delta_gravity
+        q_t = delta_t / self.delta_temperature
+        q = ((1 - q_r) * (1 - q_r) + (1 - q_g) * (1 - q_g) + (1 - q_t) * (1 - q_t)) / 3
+        res = (1.5 - max(q_r, 0.5)) * (1.5 - max(q_g, 0.5)) * (1.5 - max(q_t, 0.5))
+        return res * math.sqrt(q)
 
 
     def update_ship_tracking(self, year):

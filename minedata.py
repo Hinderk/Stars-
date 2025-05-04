@@ -6,10 +6,11 @@ from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtWidgets import QGraphicsView
 from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
-from guiprop import GuiProps as GP
 from colours import Brush, Pen
 from minefield import Minefield
 from defines import Stance
+
+import guiprop as GP
 
 
 
@@ -39,45 +40,45 @@ class Minedata(QGraphicsView):
 
 
     def add_static_text(self):
-        location = self.scene.addSimpleText("Location:", GP.info_font)
+        location = self.scene.addSimpleText("Location:", GP.INFO_FONT)
         xpos = self.x_offset
         ypos = 0
         location.moveBy(xpos, ypos)
-        field_type = self.scene.addSimpleText("Field Type:", GP.info_font)
+        field_type = self.scene.addSimpleText("Field Type:", GP.INFO_FONT)
         ypos += self.y_delta
         field_type.moveBy(xpos, ypos)
-        field_radius = self.scene.addSimpleText("Field Radius:", GP.info_font)
+        field_radius = self.scene.addSimpleText("Field Radius:", GP.INFO_FONT)
         ypos += self.y_delta
         field_radius.moveBy(xpos, ypos)
-        mine_count = self.scene.addSimpleText("Live Mines:", GP.info_font)
+        mine_count = self.scene.addSimpleText("Live Mines:", GP.INFO_FONT)
         ypos += self.y_delta
         mine_count.moveBy(xpos, ypos)
-        decay_rate = self.scene.addSimpleText("Decay Rate:", GP.info_font)
+        decay_rate = self.scene.addSimpleText("Decay Rate:", GP.INFO_FONT)
         ypos += self.y_delta
         decay_rate.moveBy(xpos, ypos)
-        self.index_label = self.scene.addSimpleText("Field:", GP.info_font)
+        self.index_label = self.scene.addSimpleText("Field:", GP.INFO_FONT)
         ypos += 2 * self.y_delta
         self.index_label.moveBy(xpos, ypos)
 
 
     def add_info_text(self):
-        self.location = self.scene.addSimpleText("", GP.info_font)
+        self.location = self.scene.addSimpleText("", GP.INFO_FONT)
         xpos = self.x_offset + self.data_offset
         ypos = 0
         self.location.moveBy(xpos, ypos)
-        self.field_type = self.scene.addSimpleText("", GP.info_font)
+        self.field_type = self.scene.addSimpleText("", GP.INFO_FONT)
         ypos += self.y_delta
         self.field_type.moveBy(xpos, ypos)
-        self.field_radius = self.scene.addSimpleText("", GP.info_font)
+        self.field_radius = self.scene.addSimpleText("", GP.INFO_FONT)
         ypos += self.y_delta
         self.field_radius.moveBy(xpos, ypos)
-        self.mine_count = self.scene.addSimpleText("", GP.info_font)
+        self.mine_count = self.scene.addSimpleText("", GP.INFO_FONT)
         ypos += self.y_delta
         self.mine_count.moveBy(xpos, ypos)
-        self.decay_rate = self.scene.addSimpleText("", GP.info_font)
+        self.decay_rate = self.scene.addSimpleText("", GP.INFO_FONT)
         ypos += self.y_delta
         self.decay_rate.moveBy(xpos, ypos)
-        self.field_index = self.scene.addSimpleText("", GP.info_font)
+        self.field_index = self.scene.addSimpleText("", GP.INFO_FONT)
         ypos += 2 * self.y_delta
         self.field_index.moveBy(xpos, ypos)
 

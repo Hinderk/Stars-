@@ -1,45 +1,44 @@
 
+""" This module is used to configure visual elements of the star map """
+
 from PyQt6.QtGui import QFont
 
 
+FONTSIZE = 14
+MAP_FONT = QFont('Courier', pointSize=FONTSIZE, weight=50)
+INFO_FONT = QFont('Segoe', pointSize=16, weight=400)
+CARGO_FONT = QFont('Segoe', pointSize=14, weight=800)
 
-class GuiProps:
+XSCALE = 0.75       # Change to resize the star map ...
 
-    fontsize = 14
-    map_font = QFont('Courier', pointSize=fontsize, weight=50)
-    info_font = QFont('Segoe', pointSize=16, weight=400)
-    cargo_font = QFont('Segoe', pointSize=14, weight=800)
+# The following numbers denote screen coordinates.
 
-    xscale = 0.75       # Change to resize the star map ...
+H_VECTOR = 10
+DH_VECTOR = 4
+W_VECTOR = 6
+F_RADIUS = 4
+F_DIST = 8
+FP_RADIUS = 8
+WP_RADIUS = 3
+WP_WIDTH = 2.0
 
-    # The following numbers denote screen coordinates.
+DY_LABEL = 10
+DY_POINTER = 20
+D_RADIUS = 8
+P_RADIUS = 8
+O_RADIUS = 5
+FLAG_HEIGHT = 25
+FLAG_WIDTH = 10
+FLAG_STEM = 2
+CENTER_SIZE = 3
+SCALE_LENGTH = 30
+POINTER_SIZE = 20
 
-    h_vector = 10
-    dh_vector = 4
-    w_vector = 6
-    f_radius = 4
-    f_dist = 8
-    fp_radius = 8
-    wp_radius = 3
-    wp_width = 2.0
+MAP_FRAME = 200
+PLANET_DISTANCE = 100
+FLEET_HALO = 15.0
+TIME_HORIZON = 5    # Applies to enemy fleets only ...
 
-    dy_label = 10
-    dy_pointer = 20
-    d_radius = 8
-    p_radius = 8
-    o_radius = 5
-    flag_height = 25
-    flag_width = 10
-    flag_stem = 2
-    center_size = 3
-    scale_length = 30
-    pointer_size = 20
+P_SNAP = 16
 
-    map_frame = 200
-    planet_distance = 100
-    fleet_halo = 15.0
-    time_horizon = 5    # Applies to enemy fleets only ...
-    
-    p_snap = 16
-
-    fp_width = {25: 2.8, 50: 2.0, 75: 1.8, 100: 1.8, 125: 1.4, 150: 1.4, 200: 1.2, 400: 1.0}
+FP_WIDTH = {25: 2.8, 50: 2.0, 75: 1.8, 100: 1.8, 125: 1.4, 150: 1.4, 200: 1.2, 400: 1.0}

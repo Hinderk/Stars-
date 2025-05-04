@@ -1,4 +1,6 @@
 
+""" This module implements the game mechanics for mine fields """
+
 import math
 from enum import Enum
 
@@ -7,25 +9,28 @@ from PyQt6.QtGui import QPolygonF
 
 from colours import Pen, Brush
 from defines import Stance
-from guiprop import GuiProps
 
+import guiprop as GP
 import ruleset
 
 
 class Model(Enum):
+    """ These types of mine fields may be deployed """
     Normal = 'Standard'
     Heavy = 'Heavy'
     SpeedTrap = 'Speed Trap'
 
 
+_caret = QPolygonF()
+_caret.append(QPointF(0, - GP.CENTER_SIZE))
+_caret.append(QPointF(GP.CENTER_SIZE, 0))
+_caret.append(QPointF(0, GP.CENTER_SIZE))
+_caret.append(QPointF(-GP.CENTER_SIZE, 0))
+
 
 class Minefield:
 
-    caret = QPolygonF()
-    caret << QPointF(0, - GuiProps.center_size)
-    caret << QPointF(GuiProps.center_size, 0)
-    caret << QPointF(0, GuiProps.center_size)
-    caret << QPointF(-GuiProps.center_size, 0)
+    """ This class is used to render mine fields in the star map """
 
     counter = {}
     for m in Model:
@@ -33,7 +38,7 @@ class Minefield:
 
     def __init__(self, scene, x, y, m, model, f_id, people):
 
-        r = math.sqrt(m) * GuiProps.xscale
+        r = math.sqrt(m) * GP.XSCALE
         Minefield.counter[model] += 1
 
         self.id = Minefield.counter[model]
@@ -52,21 +57,21 @@ class Minefield:
         self.rate_of_decay = ruleset.minefield_decay(f_id)
         self.countdown = 0
 
-        x *= GuiProps.xscale
-        y *= GuiProps.xscale
+        x *= GP.XSCALE
+        y *= GP.XSCALE
         box = QRectF(x - r, y - r, r + r, r + r)
         if self.fof == Stance.ALLIED:
             self.area = scene.addEllipse(box, Pen.blue_m, Brush.blue_m)
             self.area.setZValue(-6)
-            self.center = scene.addPolygon(self.caret, Pen.blue_l, Brush.blue)
+            self.center = scene.addPolygon(_caret, Pen.blue_l, Brush.blue)
         elif self.fof == Stance.FRIENDLY:
             self.area = scene.addEllipse(box, Pen.yellow_m, Brush.yellow_m)
             self.area.setZValue(-5)
-            self.center = scene.addPolygon(self.caret, Pen.noshow, Brush.yellow)
+            self.center = scene.addPolygon(_caret, Pen.noshow, Brush.yellow)
         else:
             self.area = scene.addEllipse(box, Pen.red_m, Brush.red_m)
             self.area.setZValue(-4)
-            self.center = scene.addPolygon(self.caret, Pen.noshow, Brush.red)
+            self.center = scene.addPolygon(_caret, Pen.noshow, Brush.red)
         self.center.setZValue(4)
         self.center.setPos(x, y)
         self.area.setVisible(False)

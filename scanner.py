@@ -5,9 +5,10 @@ from enum import Enum
 
 from PyQt6.QtCore import QRectF
 
-from guiprop import GuiProps
 from defines import Feature as F
 from traits import Traits as T
+
+import guiprop as GP
 
 
 
@@ -65,13 +66,13 @@ class Scanner:
 
     def scale_ranges(self, factor):
         """ Scale the range indicators when zooming into or out of the map """
-        x = GuiProps.xscale * self.xo
-        y = GuiProps.xscale * self.yo
+        x = GP.XSCALE * self.xo
+        y = GP.XSCALE * self.yo
         if self.detection:
-            r = factor * self.maxrange * GuiProps.xscale
+            r = factor * self.maxrange * GP.XSCALE
             box = QRectF(x - r, y - r, r + r, r + r)
             self.detection.setRect(box)
         if self.penetration:
-            r = factor * self.penrange * GuiProps.xscale
+            r = factor * self.penrange * GP.XSCALE
             box = QRectF(x - r, y - r, r + r, r + r)
             self.penetration.setRect(box)

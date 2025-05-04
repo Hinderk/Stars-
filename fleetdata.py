@@ -6,9 +6,10 @@ from PyQt6.QtWidgets import QGraphicsView
 from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
-from guiprop import GuiProps as GP
 from colours import Brush, Pen
 from defines import Stance
+
+import guiprop as GP
 
 
 
@@ -46,53 +47,53 @@ class Fleetdata(QGraphicsView):
 
     def _add_static_text(self):
         """ Add the static text elements to the inspector panel for fleets """
-        ship_count = self.scene.addSimpleText("Ship count:", GP.info_font)
+        ship_count = self.scene.addSimpleText("Ship count:", GP.INFO_FONT)
         xpos = self.x_offset
         ypos = 0
         ship_count.moveBy(xpos, ypos)
-        fuel_load = self.scene.addSimpleText("Fuel:", GP.info_font)
+        fuel_load = self.scene.addSimpleText("Fuel:", GP.INFO_FONT)
         ypos += self.y_delta + 5
         fuel_load.moveBy(xpos, ypos)
-        cargo = self.scene.addSimpleText("Cargo:", GP.info_font)
+        cargo = self.scene.addSimpleText("Cargo:", GP.INFO_FONT)
         ypos += self.y_delta
         cargo.moveBy(xpos, ypos)
-        fleet_mass = self.scene.addSimpleText("Fleet Mass:", GP.info_font)
+        fleet_mass = self.scene.addSimpleText("Fleet Mass:", GP.INFO_FONT)
         ypos += self.y_delta + 5
         fleet_mass.moveBy(xpos, ypos)
-        waypoint = self.scene.addSimpleText("Next Waypoint:", GP.info_font)
+        waypoint = self.scene.addSimpleText("Next Waypoint:", GP.INFO_FONT)
         ypos += self.y_delta
         waypoint.moveBy(xpos, ypos)
-        task = self.scene.addSimpleText("Waypoint Task:", GP.info_font)
+        task = self.scene.addSimpleText("Waypoint Task:", GP.INFO_FONT)
         ypos += self.y_delta
         task.moveBy(xpos, ypos)
-        speed = self.scene.addSimpleText("Warp Speed:", GP.info_font)
+        speed = self.scene.addSimpleText("Warp Speed:", GP.INFO_FONT)
         ypos += self.y_delta
         speed.moveBy(xpos, ypos)
 #    self.Mines = self.Scene.addSimpleText("", GP.infoFont)
 #    ypos += self.yDelta
 #    self.Mines.moveBy(xpos, ypos)
-        self.sweeps = self.scene.addSimpleText("", GP.info_font)
+        self.sweeps = self.scene.addSimpleText("", GP.INFO_FONT)
         ypos += self.y_delta
         self.sweeps.moveBy(xpos, ypos)
 
 
     def _add_info_text(self):
         """ Create the variable text elements of the inspector panel """
-        self.ship_count = self.scene.addSimpleText('', GP.info_font)
+        self.ship_count = self.scene.addSimpleText('', GP.INFO_FONT)
         xpos = self.x_offset + self.data_offset
         ypos = 0
         self.ship_count.moveBy(xpos, ypos)
         ypos += 2 * self.y_delta + 10
-        self.mass = self.scene.addSimpleText('', GP.info_font)
+        self.mass = self.scene.addSimpleText('', GP.INFO_FONT)
         ypos += self.y_delta
         self.mass.moveBy(xpos, ypos)
-        self.waypoint = self.scene.addSimpleText('', GP.info_font)
+        self.waypoint = self.scene.addSimpleText('', GP.INFO_FONT)
         ypos += self.y_delta
         self.waypoint.moveBy(xpos, ypos)
-        self.task = self.scene.addSimpleText('', GP.info_font)
+        self.task = self.scene.addSimpleText('', GP.INFO_FONT)
         ypos += self.y_delta
         self.task.moveBy(xpos, ypos)
-        self.speed = self.scene.addSimpleText('', GP.info_font)
+        self.speed = self.scene.addSimpleText('', GP.INFO_FONT)
         ypos += self.y_delta
         self.speed.moveBy(xpos, ypos)
 
@@ -106,14 +107,14 @@ class Fleetdata(QGraphicsView):
         self.scene.addRect(box, Pen.black_2, Brush.grey)
         box = QRectF(xp, yp, self.x_width / 2, self.y_size)
         self.fuel = self.scene.addRect(box, Pen.black_2, brush[4])
-        self.fuel_weight = self.scene.addSimpleText("", GP.cargo_font)
+        self.fuel_weight = self.scene.addSimpleText("", GP.CARGO_FONT)
         yp += self.y_delta + 2
         box = QRectF(xp, yp, self.x_width, self.y_size)
         self.scene.addRect(box, Pen.black_2, Brush.grey)
         for n in (0, 1, 2, 3):
             box = QRectF(xp, yp, self.x_width, self.y_size)
             self.freight.append(self.scene.addRect(box, Pen.black_2, brush[n]))
-        self.cargo = self.scene.addSimpleText("", GP.cargo_font)
+        self.cargo = self.scene.addSimpleText("", GP.CARGO_FONT)
 
 
     def _compute_cargo_fractions(self, fleet):

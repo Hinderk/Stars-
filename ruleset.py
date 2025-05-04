@@ -5,7 +5,8 @@ import math
 import copy
 import random
 
-from guiprop import GuiProps
+import guiprop as GP
+
 from scanner import Model
 
 
@@ -177,7 +178,7 @@ class Ruleset:
 
     def find_position(self):
         """ Determine a suitable location for a new star system """
-        rmin = GuiProps.planet_distance / GuiProps.xscale
+        rmin = GP.PLANET_DISTANCE / GP.XSCALE
         xlim = self.xmax()
         ylim = self.ymax()
         retries = 0

@@ -20,6 +20,9 @@ class Faction:
         self.max_gravity = 2.5
         self.min_temperatur = -40.0
         self.max_temperatur = 50.0
+        self.ignore_temperature = False
+        self.ignore_gravity = False
+        self.ignore_radioactivity = False
         self.cargo_robber = False
 
 
@@ -29,6 +32,9 @@ class Faction:
         result += [self.min_radioactivity, self.max_radioactivity]
         result += [self.min_gravity, self.max_gravity]
         result += [self.min_temperatur, self.max_temperatur]
+        result += [self.ignore_radioactivity]
+        result += [self.ignore_gravity]
+        result += [self.ignore_temperature]
         return result + [self.cargo_robber, self.banner_index]
 
 
@@ -44,5 +50,8 @@ class Faction:
         self.max_gravity = data[7]
         self.min_temperatur = data[8]
         self.max_temperatur = data[9]
-        self.cargo_robber = data[10]
-        self.banner_index = data[11]
+        self.ignore_radioactivity = data[10]
+        self.ignore_gravity = data[11]
+        self.ignore_temperature = data[12]
+        self.cargo_robber = data[13]
+        self.banner_index = data[14]
