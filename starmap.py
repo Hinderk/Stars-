@@ -1,7 +1,7 @@
 
 """ This module implements graphics view for the star map """
 
-from PyQt6.QtGui import QPainter
+from PyQt6.QtGui import QPainter, QCursor
 from PyQt6.QtWidgets import QGraphicsView
 from PyQt6.QtWidgets import QSizePolicy
 
@@ -15,8 +15,8 @@ class Starmap(QGraphicsView):
 
     """ This class implements the QGraphicsView for the star map """
 
-    def __init__(self, people, rules):
-        super().__init__()
+    def __init__(self, parent, people, rules):
+        super().__init__(parent)
         self.universe = Universe(people, rules)
         self.setScene(self.universe)
         self.setMouseTracking(True)
@@ -40,3 +40,13 @@ class Starmap(QGraphicsView):
                 self.scale(ratio, ratio)
             self.universe.resize_flight_paths(GP.FP_WIDTH[level])
             self.current_scaling = level
+
+
+    def process_key_event(self, key):
+        """ This method maps the mouse cursor into the star map before
+            keyboard events are forwarded to the proper event handler """
+        if self.underMouse():
+            p0 = self.mapToScene(self.mapFromGlobal(QCursor.pos()))
+            xo = round(p0.x() / GP.XSCALE)
+            yo = round(p0.y() / GP.XSCALE)
+            self.universe.process_key_event(key, xo, yo)

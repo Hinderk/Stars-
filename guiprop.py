@@ -36,9 +36,9 @@ POINTER_SIZE = 20
 
 MAP_FRAME = 200
 PLANET_DISTANCE = 100
-FLEET_HALO = 15.0
+FLEET_HALO = 18.0
 TIME_HORIZON = 5    # Applies to enemy fleets only ...
 
-P_SNAP = 16
+P_SNAP = 36         #  The old value (16) might be a bit too small ...
 
 FP_WIDTH = {25: 2.8, 50: 2.0, 75: 1.8, 100: 1.8, 125: 1.4, 150: 1.4, 200: 1.2, 400: 1.0}

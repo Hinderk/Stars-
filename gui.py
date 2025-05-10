@@ -22,6 +22,8 @@ from gamesetup import GameSetup
 from newsreader import NewsReader
 from factionwizard import FactionWizard
 
+# import guiprop as GP
+
 
 
 def _create_button(name):
@@ -83,7 +85,7 @@ class Gui(QMainWindow):
         self.mine_info = Minedata()
         self.info_box = QGroupBox()
         self.news_reader = NewsReader()
-        self.map = Starmap(people, rules)
+        self.map = Starmap(self, people, rules)
         self.selected_object = QLabel(self)
         self.previous_field = _create_button(":/Icons/Previous")
         self.next_field = _create_button(":/Icons/Next")
@@ -657,3 +659,20 @@ class Gui(QMainWindow):
         self.new_faction.hide()
         self.game_setup.setVisible(self.new_faction.restart_game_wizard)
         self.new_game.setVisible(self.new_faction.restart_new_game)
+
+
+# The following methods are overloaded event handlers whence their names must follow Qt
+# coding conventions. Until further notice, camel case will be used ...
+
+# pylint: disable=invalid-name
+
+    def keyPressEvent(self, key_press):
+        """ Ensure keyboard events reach the star map by handling them here """
+        self.map.process_key_event(key_press.key())
+
+
+    def keyReleaseEvent(self, key_press):
+        """ Prevent waypoint movement if the shift key is released """
+        key = key_press.key()
+        if key == Qt.Key.Key_Shift:
+            self.map.universe.movement_approved = False

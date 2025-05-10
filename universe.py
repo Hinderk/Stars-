@@ -17,7 +17,6 @@ from scanner import Scanner
 from planet import Planet
 from colours import Pen, Brush
 from defines import Stance, Task
-from waypoint import Waypoint
 
 import guiprop as GP
 
@@ -94,7 +93,6 @@ class Universe(QGraphicsScene):
         self.waypoint_selected = False
         self.names_visible = False
         self.waypoint_mode = False
-        self.mouse_button_engaged = False
 
         self.show_field = _setup_mine_filter()
         self.population_ceiling = rules.get_population_ceiling(people.my_faction())
@@ -121,44 +119,6 @@ class Universe(QGraphicsScene):
     def focusOutEvent(self, _):
         """ Event handler: Prevent waypoint relocation if the game looses focus """
         self.movement_approved = False
-
-
-    def keyPressEvent(self, key_press):
-        """ Event handler: Process keyboard interactions with the star map """
-        key = key_press.key()
-        if key == Qt.Key.Key_Shift:
-            self.movement_approved = True
-        elif key == Qt.Key.Key_Delete:
-            if self.waypoint_selected:
-                wp = self.selected_fleet.delete_waypoint(self.selected_waypoint[1])
-                if wp:
-                    dx = wp.xo - self.selected_fleet.xc
-                    dy = wp.yo - self.selected_fleet.yc
-                    self.selected_fleet.heading = math.atan2(dy, dx)
-                    self.selected_fleet.update_schedule()
-                else:
-                    self.selected_fleet.warp_speed = 0
-                    self.removeItem(self.selected_fleet.moving_fleet)
-                    self.selected_fleet.MovingFleet = None
-                self.plot_course(self.selected_fleet)
-                self.selected_fleet.colour_course(True)
-                self.waypoint_selected = False
-                self.wpselect.setVisible(False)
-        elif key == Qt.Key.Key_Insert:
-            f0 = self.selected_fleet
-            if f0 and self.waypoint_selected:
-                self.add_waypoint(f0, self.xo, self.yo)
-                w0 = f0.active_waypoint[0]
-                f0.update_course(w0, self.planets)
-                if f0.next_waypoint == w0:
-                    f0.Heading = math.atan2(w0.yo - f0.yc, w0.xo - f0.xc)
-                    f0.update_ship_count()
-                    self.update_route.emit(f0.warp_speed, w0)
-                else:
-                    self.update_route.emit(f0.warp_speed, None)
-                self.plot_course(f0)
-                f0.colour_course(True)
-                self.wpselect.setPos(QPointF(GP.XSCALE * w0.xo, GP.XSCALE * w0.yo))
 
 
     def keyReleaseEvent(self, key_press):
@@ -215,7 +175,7 @@ class Universe(QGraphicsScene):
                 select.addSeparator()
             n = 0
             for w in self.context[3]:
-                name = w[0].Name + ' #' + str(w[0].id)
+                name = w[0].name + ' #' + str(w[0].id)
                 a = select.addAction(name + ' - WP ' + str(w[2]))
                 a.setData((6, n))
                 n += 1
@@ -235,7 +195,6 @@ class Universe(QGraphicsScene):
         self.yo = round(0.5 + p0.y() / GP.XSCALE)
         self.context = self._identify_context(self.xo, self.yo)
         if mouse_click.buttons() == Qt.MouseButton.LeftButton:
-            self.mouse_button_engaged = True
             if self.context[1]:
                 self.waypoint_offset = 0
                 self.fleet_offset = 0
@@ -273,7 +232,51 @@ class Universe(QGraphicsScene):
             self.wpselect.setPos(QPointF(GP.XSCALE * w0.xo, GP.XSCALE * w0.yo))
 
 
+
 # pylint: enable=invalid-name
+
+
+    def process_key_event(self, key, xo, yo):
+        """ Event handler: Process keyboard interactions with the star map """
+        if key == Qt.Key.Key_Shift:
+            self.movement_approved = True
+        elif key == Qt.Key.Key_Delete:
+            if self.waypoint_selected:
+                wp = self.selected_fleet.delete_waypoint(self.selected_waypoint[1])
+                if wp:
+                    dx = wp.xo - self.selected_fleet.xc
+                    dy = wp.yo - self.selected_fleet.yc
+                    self.selected_fleet.heading = math.atan2(dy, dx)
+                    self.selected_fleet.update_schedule()
+                    self.update_route.emit(self.selected_fleet.warp_speed, wp)
+                else:
+                    self.selected_fleet.warp_speed = 0
+                    self.removeItem(self.selected_fleet.moving_fleet)
+                    self.selected_fleet.moving_fleet = None
+                    self.selected_fleet.task = Task.IDLE
+                    self.selected_fleet.heading = math.pi
+                    self.update_route.emit(0, None)
+                self.selected_fleet.active_waypoint = []
+                self.selected_fleet.update_ship_count()
+                self.plot_course(self.selected_fleet)
+                self.selected_fleet.colour_course(True)
+                self.waypoint_selected = False
+                self.wpselect.setVisible(False)
+        elif key == Qt.Key.Key_Insert:
+            if self.selected_fleet and self.selected_fleet.friend_or_foe == Stance.ALLIED:
+                w0 = self.selected_fleet.add_waypoint(xo, yo)
+                self.selected_fleet.update_course(w0, self.planets)
+                self.selected_fleet.update_schedule()
+                if self.selected_fleet.next_waypoint == w0:
+                    dx = w0.xo - self.selected_fleet.xc
+                    dy = w0.yo - self.selected_fleet.yc
+                    self.selected_fleet.heading = math.atan2(dy, dx)
+                    self.selected_fleet.update_ship_count()
+                    self.update_route.emit(self.selected_fleet.warp_speed, w0)
+                self.plot_course(self.selected_fleet)
+                self.selected_fleet.colour_course(True)
+                self.context = self._identify_context(w0.xo, w0.yo)
+                self._highlight_waypoint()
 
 
     def _process_context_menu(self, selected):
@@ -315,7 +318,8 @@ class Universe(QGraphicsScene):
         f_list = []
         w_list = []
         for f in self.fleets:
-            if f.discovered and f.ship_counter > 0 and not f.orbiting:
+            f.active_waypoint = []
+            if f.discovered and f.ship_counter > 0:
                 d = (f.xc - xo) * (f.xc - xo) + (f.yc - yo) * (f.yc - yo)
                 if d < dist:
                     dist = d
@@ -458,7 +462,7 @@ class Universe(QGraphicsScene):
         self.wpselect.setPos(GP.XSCALE * w0.xo, GP.XSCALE * w0.yo)
         self.select.setPos(GP.XSCALE * f0.xc, GP.XSCALE * f0.yc)
         self.wpselect.setVisible(True)
-        self.select.setVisible(True)
+        self.select.setVisible(not f0.orbiting)
         self.selected_waypoint = (w0, n0)
         self.selected_fleet = f0
         self.waypoint_index = index
@@ -478,7 +482,7 @@ class Universe(QGraphicsScene):
             sval = [(0.0, -1), (1.0, 1)]
             r2 = GP.FLEET_HALO * GP.FLEET_HALO / d2
             for f in self.fleets:
-                if f.discovered and f.ship_counter > 0 and not f.orbiting:
+                if f.discovered and f.ship_counter > 0:
                     fx = GP.XSCALE * (xa - f.xc)
                     fy = GP.XSCALE * (ya - f.yc)
                     p = (fx * dx + fy * dy) / d2
@@ -528,7 +532,7 @@ class Universe(QGraphicsScene):
     def show_movements(self, show):
         """ Enable or disable the display of flight paths """
         for f in self.fleets:
-            if f.ship_counter > 0 and f.discovered and not f.orbiting:
+            if f.ship_counter > 0 and f.discovered:
                 f.show_course(show)
         if self.selected_fleet:
             self.selected_fleet.show_course(self.selected_fleet.ship_counter > 0)
@@ -754,6 +758,7 @@ class Universe(QGraphicsScene):
 
 
     def register_fleet(self, fleet, p, y=None):
+        """ Create the visual elements for a new fleet on the star map """
         w = GP.F_RADIUS + GP.F_RADIUS
         fleet.resting_fleet = self.addEllipse(-GP.F_RADIUS, -GP.F_RADIUS, w, w)
         fleet.resting_fleet.setVisible(False)
@@ -789,30 +794,6 @@ class Universe(QGraphicsScene):
     def set_waypoint_mode(self, event):
         """ Enable or disable the waypoint insertion mode """
         self.waypoint_mode = event
-
-
-    def add_waypoint(self, fleet, x, y, index=0):   # FIX ME!
-        """ Add a new waypoint to the flight path of a fleet """
-        wa = Waypoint(x, y)
-        if fleet.first_waypoint:
-            w0 = fleet.active_waypoint[index]
-            wa.warp = w0.warp
-            if w0.next:
-                wa.task = Task.MOVE
-                w1 = w0.next
-                w1.previous = wa
-                wa.next = w1
-                if w1 == fleet.next_waypoint:
-                    fleet.next_waypoint = wa
-            else:
-                fleet.last_waypoint = wa
-            w0.next = wa
-            wa.previous = w0
-        else:
-            fleet.first_waypoint = wa
-            fleet.last_waypoint = wa
-            fleet.next_waypoint = wa
-        fleet.active_waypoint = [wa]
 
 
     def _create_orbit_label(self, x, y):
@@ -900,6 +881,7 @@ class Universe(QGraphicsScene):
 
 
     def show_ship_count(self, event):
+        """ Display the number of ships in detected fleets outside orbit """
         if self.default_view:
             for p in self.planets:
                 p.show_default_view(event)
@@ -911,21 +893,16 @@ class Universe(QGraphicsScene):
 
 
     def apply_fleet_filter(self):
+        """ Update ship counts based on the current filter settings """
         for f in self.fleets:
             if f.discovered and not f.orbiting:
-                if f.ship_counter > 0:
-                    if f.warp_speed > 0:
-                        f.moving_fleet.setVisible(True)
-                    else:
-                        f.resting_fleet.setVisible(True)
-                    f.ship_count.setVisible(self.show_fleet_strength)
-                    f.show_course(self.show_fleet_movements)
+                show_count = self.show_fleet_strength and f.ship_counter > 0
+                if f.warp_speed > 0:
+                    f.moving_fleet.setVisible(f.ship_counter > 0)
                 else:
-                    if f.warp_speed > 0:
-                        f.moving_fleet.setVisible(False)
-                    f.ship_count.setVisible(False)
-                    f.show_course(False)
-                    f.resting_fleet.setVisible(False)
+                    f.resting_fleet.setVisible(f.ship_counter > 0)
+                f.ship_count.setVisible(show_count and not f.orbiting)
+                f.show_course(self.show_fleet_movements and f.ship_counter > 0)
         if self.selected_fleets:
             if self.selected_fleet.ship_counter == 0:
                 self.fleet_index += 1
@@ -945,6 +922,7 @@ class Universe(QGraphicsScene):
 
 
     def filter_foes(self, enabled, select):
+        """ Apply the current ship filter settings to enemy fleets """
         self.foe_filter_enabled = enabled
         if select:
             self.active_foe_filter = select
@@ -981,6 +959,7 @@ class Universe(QGraphicsScene):
 
 
     def filter_fleets(self, enabled, select):
+        """ Apply the current ship filter settings to allied fleets """
         self.friend_filter_enabled = enabled
         if select:
             self.active_friend_filter = select
@@ -1017,6 +996,7 @@ class Universe(QGraphicsScene):
 
 
     def enable_foe_filter(self, event):
+        """ Engage or disengage the filter for hostile fleets """
         if event and self.active_foe_filter:
             self.filter_foes(True, self.active_foe_filter)
         else:
@@ -1024,6 +1004,7 @@ class Universe(QGraphicsScene):
 
 
     def enable_friend_filter(self, event):
+        """ Engage or disengage the filter for friendly fleets """
         if event and self.active_friend_filter:
             self.filter_fleets(True, self.active_friend_filter)
         else:
@@ -1031,12 +1012,14 @@ class Universe(QGraphicsScene):
 
 
     def filter_idle_fleets(self, event):
+        """ Apply a ship filter to show only idle fleets on the star map """
         self.show_idle_fleets_only = event
         self.filter_foes(self.foe_filter_enabled, self.active_foe_filter)
         self.filter_fleets(self.friend_filter_enabled, self.active_friend_filter)
 
 
     def resize_flight_paths(self, width):
+        """ Adjust the thickness of the flight paths """
         for f in self.fleets:
             if f.course:
                 pen = f.course.pen()
@@ -1046,11 +1029,12 @@ class Universe(QGraphicsScene):
 
 
     def plot_course(self, f):
+        """ Render the flight path of the specified fleet """
         x0 = GP.XSCALE * f.xc
         y0 = GP.XSCALE * f.yc
         if f.course:
             self.removeItem(f.course)
-        if f.warp_speed > 0:
+        if f.warp_speed > 0 and not f.orbiting:
             if f.moving_fleet:
                 self.removeItem(f.moving_fleet)
             q0 = QTransform()
@@ -1059,7 +1043,7 @@ class Universe(QGraphicsScene):
             f.moving_fleet = self.addPolygon(q0.map(_arrow))
         else:
             f.resting_fleet.setPos(x0, y0)
-            f.resting_fleet.setVisible(True)
+            f.resting_fleet.setVisible(not f.orbiting)
         f.course = None
         if f.friend_or_foe == Stance.ALLIED:
             path = QPainterPath()
@@ -1076,7 +1060,7 @@ class Universe(QGraphicsScene):
                 f.course = self.addPath(path)
         elif f.warp_speed > 0:
             path = QPainterPath()
-            length = f.warp_speed * f.warp_speed * GP.TIME_HORIZON
+            length = max(50, f.warp_speed * f.warp_speed * GP.TIME_HORIZON)
             dx = length * math.cos(f.heading)
             dy = length * math.sin(f.heading)
             self._segment_path(path, f.xc, f.yc, f.xc + dx, f.yc + dy)
@@ -1105,7 +1089,7 @@ class Universe(QGraphicsScene):
                 f.course = None
             f.resting_fleet.setVisible(False)
             f.ship_count.setVisible(False)
-            if f.ship_counter > 0 and f.discovered and not f.orbiting:
+            if f.ship_counter > 0 and f.discovered:
                 f.heading = math.pi
                 if f.next_waypoint:
                     x1 = f.next_waypoint.xo
@@ -1114,7 +1098,7 @@ class Universe(QGraphicsScene):
                 self.plot_course(f)
                 f.colour_course()
                 f.update_ship_count()
-                f.ship_count.setVisible(self.show_fleet_strength)
+                f.ship_count.setVisible(self.show_fleet_strength and not f.orbiting)
                 f.show_course(self.show_fleet_movements)
         for p in self.planets:
             p.update_ship_tracking(self.year)

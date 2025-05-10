@@ -10,6 +10,7 @@ from design import Design
 from defines import Stance, Task, Feature
 from colours import Pen, Brush
 from system import SystemType
+from waypoint import Waypoint
 
 import guiprop as GP
 import ruleset
@@ -50,7 +51,7 @@ class Fleet:
         self.repeat_schedule = False
         self.idle = True
         self.task = Task.IDLE
-        self.discovered = True           # TODO: Depends on scanners!
+        self.discovered = True           # False  --  TODO: Depends on scanners!
         self.orbiting = None
         self.total_weight = 0
         self.total_fuel = 0
@@ -305,3 +306,38 @@ class Fleet:
             self.last_waypoint = None
         self.first_waypoint = wp
         return self.next_waypoint
+
+
+    def add_waypoint(self, x, y, index=-1):
+        """ Add a new waypoint to the flight path of a fleet """
+        wa = Waypoint(x, y)
+        if self.first_waypoint:
+            if self.active_waypoint:
+                w0 = self.active_waypoint[index]
+                wa.warp = w0.warp
+                if w0.next:
+                    w1 = w0.next
+                    w1.previous = wa
+                    wa.next = w1
+                    if w1 == self.next_waypoint:
+                        self.next_waypoint = wa
+                else:
+                    self.last_waypoint = wa
+                w0.next = wa
+                wa.previous = w0
+            else:
+                wa.warp = self.warp_speed
+                wa.next = self.next_waypoint
+                wa.previous = self.next_waypoint.previous
+                if wa.previous:
+                    wa.previous.next = wa
+                else:
+                    self.first_waypoint = wa
+                self.next_waypoint.previous = wa
+                self.next_waypoint = wa
+        else:
+            self.first_waypoint = wa
+            self.last_waypoint = wa
+            self.next_waypoint = wa
+        self.active_waypoint = [wa]
+        return wa

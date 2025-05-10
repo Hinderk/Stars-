@@ -93,25 +93,25 @@ def main():
     form.map.universe.register_fleet(fleet_5, p)
 
     form.map.universe.register_fleet(fleet_6, 40, -50)
-    form.map.universe.add_waypoint(fleet_6, 240, 420)
-    form.map.universe.add_waypoint(fleet_6, 120, 550)
-    form.map.universe.add_waypoint(fleet_6, 480, 500)
-    form.map.universe.add_waypoint(fleet_6, 550, 300)
+    fleet_6.add_waypoint(240, 420)
+    fleet_6.add_waypoint(120, 550)
+    fleet_6.add_waypoint(480, 500)
+    fleet_6.add_waypoint(550, 300)
 
     form.map.universe.register_fleet(fleet_7, 40, -50)
-    form.map.universe.add_waypoint(fleet_7, -20, 500)
-    form.map.universe.add_waypoint(fleet_7, 180, 350)
-    form.map.universe.add_waypoint(fleet_7, 280, 600)
-    form.map.universe.add_waypoint(fleet_7, 500, 400)
+    fleet_7.add_waypoint(-20, 500)
+    fleet_7.add_waypoint(180, 350)
+    fleet_7.add_waypoint(280, 600)
+    fleet_7.add_waypoint(500, 400)
 
     form.map.universe.register_fleet(fleet_8, 140, -150)
-    form.map.universe.add_waypoint(fleet_8, -120, 600)
-    form.map.universe.add_waypoint(fleet_8, 280, 450)
-    form.map.universe.add_waypoint(fleet_8, 280, 600)
-    form.map.universe.add_waypoint(fleet_8, 600, 600)
-    form.map.universe.add_waypoint(fleet_8, 500, 550)
-    form.map.universe.add_waypoint(fleet_8, 140, -150)
-    form.map.universe.add_waypoint(fleet_8, -120, 600)
+    fleet_8.add_waypoint(-120, 600)
+    fleet_8.add_waypoint(280, 450)
+    fleet_8.add_waypoint(280, 600)
+    fleet_8.add_waypoint(600, 600)
+    fleet_8.add_waypoint(500, 550)
+    fleet_8.add_waypoint(140, -150)
+    fleet_8.add_waypoint(-120, 600)
 
     form.map.universe.planets[0].build_starbase()
     form.map.universe.planets[0].relation = Stance.NEUTRAL
@@ -142,7 +142,7 @@ def main():
     form.map.universe.minefields.append(Minefield(form.map.universe, x + 10, y + 50, 25000, M.Normal, 0, people))
     form.map.universe.minefields.append(Minefield(form.map.universe, x + 50, y - 10, 64000, M.Normal, -1, people))
 
-    fleet_7.warp_speed = 10
+    fleet_7.warp_speed = 2
     fleet_8.repeat_tasks(True)
     form.map.universe.compute_turn()
 

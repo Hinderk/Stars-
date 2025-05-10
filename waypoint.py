@@ -1,11 +1,15 @@
 
+""" This module implements waypoints for travelling star fleets """
+
 from defines import Task
 
 
 class Waypoint:
 
+    """ This class implements waypoints for travelling star fleets """
+
     def __init__(self, x, y, p=None):
-        self.task = Task.IDLE
+        self.task = Task.MOVE
         self.warp = 0
         self.planet = p
         self.xo = x

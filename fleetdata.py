@@ -178,7 +178,7 @@ class Fleetdata(QGraphicsView):
             self.sweeps.setText('')
         if fleet.next_waypoint:
             if fleet.next_waypoint.planet:
-                self.waypoint.setText(fleet.next_waypoint.planet.Name)
+                self.waypoint.setText(fleet.next_waypoint.planet.name)
             else:
                 x = str(fleet.next_waypoint.xo)
                 y = str(fleet.next_waypoint.yo)
@@ -194,11 +194,11 @@ class Fleetdata(QGraphicsView):
         self.ship_count.setText(str(len(fleet.ship_list)))
 
 
-    def update_waypoint_info(self, speed, wp):
+    def update_waypoint_info(self, speed, wp):   # TODO: Fix me! - Tasks missing ...
         """ Update the fleet inspector panel if a waypoint has changed """
         if wp:
             if wp.planet:
-                self.waypoint.setText(wp.planet.Name)
+                self.waypoint.setText(wp.planet.name)
             else:
                 self.waypoint.setText('(' + str(wp.xo) + ',' + str(wp.yo) + ')')
         if speed > 0:
