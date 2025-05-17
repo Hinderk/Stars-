@@ -48,6 +48,7 @@ def _setup_mine_filter():
     return fields
 
 
+
 class Universe(QGraphicsScene):
 
     """ This class is responsible for rendering the star map """
@@ -55,7 +56,7 @@ class Universe(QGraphicsScene):
     select_planet = QSignal(Planet)
     update_planet = QSignal(Planet)
     update_filter = QSignal(dict)
-    update_route = QSignal(int, object)
+    update_route = QSignal(object)
     select_fleet = QSignal(object, int, list, list)
     select_field = QSignal(object, int, list, list)
 
@@ -224,9 +225,7 @@ class Universe(QGraphicsScene):
             if f0.next_waypoint == w0:
                 f0.Heading = math.atan2(w0.yo - f0.yc, w0.xo - f0.xc)
                 f0.update_ship_count()
-                self.update_route.emit(f0.warp_speed, w0)
-            else:
-                self.update_route.emit(f0.warp_speed, None)
+                self.update_route.emit(f0)
             self.plot_course(f0)
             f0.colour_course(True)
             self.wpselect.setPos(QPointF(GP.XSCALE * w0.xo, GP.XSCALE * w0.yo))
@@ -248,20 +247,19 @@ class Universe(QGraphicsScene):
                     dy = wp.yo - self.selected_fleet.yc
                     self.selected_fleet.heading = math.atan2(dy, dx)
                     self.selected_fleet.update_schedule()
-                    self.update_route.emit(self.selected_fleet.warp_speed, wp)
                 else:
                     self.selected_fleet.warp_speed = 0
                     self.removeItem(self.selected_fleet.moving_fleet)
                     self.selected_fleet.moving_fleet = None
                     self.selected_fleet.task = Task.IDLE
                     self.selected_fleet.heading = math.pi
-                    self.update_route.emit(0, None)
                 self.selected_fleet.active_waypoint = []
                 self.selected_fleet.update_ship_count()
                 self.plot_course(self.selected_fleet)
                 self.selected_fleet.colour_course(True)
                 self.waypoint_selected = False
                 self.wpselect.setVisible(False)
+                self.update_route.emit(self.selected_fleet)
         elif key == Qt.Key.Key_Insert:
             if self.selected_fleet and self.selected_fleet.friend_or_foe == Stance.ALLIED:
                 w0 = self.selected_fleet.add_waypoint(xo, yo)
@@ -272,11 +270,11 @@ class Universe(QGraphicsScene):
                     dy = w0.yo - self.selected_fleet.yc
                     self.selected_fleet.heading = math.atan2(dy, dx)
                     self.selected_fleet.update_ship_count()
-                    self.update_route.emit(self.selected_fleet.warp_speed, w0)
                 self.plot_course(self.selected_fleet)
                 self.selected_fleet.colour_course(True)
-                self.context = self._identify_context(w0.xo, w0.yo)
-                self._highlight_waypoint()
+                self.update_route.emit(self.selected_fleet)
+#                self.context = self._identify_context(w0.xo, w0.yo)
+#                self._highlight_waypoint()
 
 
     def _process_context_menu(self, selected):
@@ -470,7 +468,7 @@ class Universe(QGraphicsScene):
         self.waypoint_offset = 1
         self.selected_fleets = [w[0] for w in self.context[3]]
         self.waypoint_selected = True
-        self.select_fleet.emit(None, index, self.selected_fleets, [])
+        self.select_fleet.emit(None, index, self.selected_fleets, [])  # TODO: Chheck the handler! - New signal required?
 
 
     def _segment_path(self, path, xa, ya, xb, yb):
@@ -479,32 +477,43 @@ class Universe(QGraphicsScene):
         dy = GP.XSCALE * (yb - ya)
         d2 = float(dx * dx + dy * dy)
         if d2 > 0.0:
-            sval = [(0.0, -1), (1.0, 1)]
             r2 = GP.FLEET_HALO * GP.FLEET_HALO / d2
+            sval = [(0.0, -1), (1.0, 1)]
+
+            def process_object(xo, yo):
+                """ Find intersections of halos & flight paths """
+                fx = GP.XSCALE * (xa - xo)
+                fy = GP.XSCALE * (ya - yo)
+                p = (fx * dx + fy * dy) / d2
+                q2 = (fx * fx + fy * fy) / d2
+                s2 = r2 + p * p - q2
+                if s2 > 0.0:
+                    s = math.sqrt(s2)
+                    sm = -s - p
+                    sp = s - p
+                    if 0.0 < sp or sm < 1.0:
+                        sval.append((sm, 1))
+                        sval.append((sp, -1))
+
+            def draw_segment():
+                """ Sort intervals to locate visible segments """
+                sval.sort(key=lambda p: p[0])
+                s = 1
+                x = GP.XSCALE * xa
+                y = GP.XSCALE * ya
+                for (so, ds) in sval:
+                    s += ds
+                    if s < 1:
+                        path.moveTo(x + so * dx, y + so * dy)
+                    elif s < 2 and ds > 0:
+                        path.lineTo(x + so * dx, y + so * dy)
+
+            for p in self.planets:
+                process_object(p.x, p.y)
             for f in self.fleets:
                 if f.discovered and f.ship_counter > 0:
-                    fx = GP.XSCALE * (xa - f.xc)
-                    fy = GP.XSCALE * (ya - f.yc)
-                    p = (fx * dx + fy * dy) / d2
-                    q2 = (fx * fx + fy * fy) / d2
-                    s2 = r2 + p * p - q2
-                    if s2 > 0.0:
-                        s = math.sqrt(s2)
-                        sm = -s - p
-                        sp = s - p
-                        if 0.0 < sp or sm < 1.0:
-                            sval.append((sm, 1))
-                            sval.append((sp, -1))
-            sval.sort(key=lambda p: p[0])
-            s = 1
-            x = GP.XSCALE * xa
-            y = GP.XSCALE * ya
-            for (so, ds) in sval:
-                s += ds
-                if s < 1:
-                    path.moveTo(x + so * dx, y + so * dy)
-                elif s < 2 and ds > 0:
-                    path.lineTo(x + so * dx, y + so * dy)
+                    process_object(f.xc, f.yc)
+            draw_segment()
 
 
     def show_mines(self, switch, fof):

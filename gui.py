@@ -130,7 +130,7 @@ class Gui(QMainWindow):
         self.map.universe.select_planet.connect(self._inspect_planet)
         self.map.universe.update_planet.connect(self.update_planet_view)
         self.map.universe.update_filter.connect(self._update_fields)
-        self.map.universe.update_route.connect(self.fleet_info.update_waypoint_info)
+        self.map.universe.update_route.connect(self.fleet_info.update_flight_path)
         self.show_planet.clicked.connect(self._inspect_planets)
         self.select_next_enemy.clicked.connect(self._inspect_hostile_fleet)
         self.select_next_neutral.clicked.connect(self._inspect_neutral_fleet)
@@ -659,6 +659,12 @@ class Gui(QMainWindow):
         self.new_faction.hide()
         self.game_setup.setVisible(self.new_faction.restart_game_wizard)
         self.new_game.setVisible(self.new_faction.restart_new_game)
+
+
+    def _update_waypoint_info(self, f, wp):  # TODO: This must be replaced ...
+        """ Update the fleet inspector panel if a waypoint has changed """
+        self.selected_object.setText(f.name + ' #' + str(f.id) + '  --  WP 2')
+        self.fleet_info.update_fleet_data(f)
 
 
 # The following methods are overloaded event handlers whence their names must follow Qt

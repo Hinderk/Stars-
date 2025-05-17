@@ -1,5 +1,5 @@
 
-""" This module implements the data viewer for fleets of star ships """
+""" This module implements an inspector panel for fleet waypoints """
 
 from PyQt6.QtCore import QRectF
 
@@ -10,9 +10,9 @@ import guiprop as GP
 
 
 
-class Fleetdata(DataViewer):
+class WPData(DataViewer):
 
-    """ This class is used to display information about fleets of star ships """
+    """ This class is used to display information about fleet waypoints """
 
     def __init__(self):
         super().__init__()
@@ -158,3 +158,4 @@ class Fleetdata(DataViewer):
             self.speed.setText(str(fleet.warp_speed))
         else:
             self.speed.setText('Stopped')
+
