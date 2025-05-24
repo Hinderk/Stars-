@@ -1,15 +1,15 @@
 
-from hull import Hull
+""" This module implements a class to encode ship designs """
+
 
 
 class Design:
 
-    hull_design = dict()
-    design_counter = dict()
-    latest_index = 0
+    """ This class is used to specicfy ship designs & properties """
 
-    def get_design(index):
-        return Design.hull_design.get(index)
+    hull_design = {}
+    design_counter = {}
+    latest_index = 0
 
     # fID : foe identifier ...
 
@@ -32,10 +32,15 @@ class Design:
 
 
     def get_design_name(self):
+        """ Return the name of the ship design """
         return self.hull.value[1]
 
+
     def get_picture_index(self):
+        """ The returned index may be used to visualize the ship """
         return self.picture_index
 
+
     def compute_battle_rating(self):
+        """ Compute the battle rating of the ship design """
         return 1

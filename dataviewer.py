@@ -6,7 +6,8 @@ from PyQt6.QtWidgets import QGraphicsView
 from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
-from colours import Brush, Pen
+import brush as Brush
+import pen as Pen
 from defines import Stance
 
 
@@ -42,23 +43,23 @@ class DataViewer(QGraphicsView):
     def update_fleet_backdrop(self, friend_or_foe):
         """ Display the proper backdrop color for fleets """
         if friend_or_foe == Stance.ALLIED:
-            self.backdrop.setBrush(Brush.blue_p)
+            self.backdrop.setBrush(Brush.BLUE_P)
         elif friend_or_foe == Stance.FRIENDLY:
-            self.backdrop.setBrush(Brush.green_p)
+            self.backdrop.setBrush(Brush.GREEN_P)
         elif friend_or_foe == Stance.NEUTRAL:
-            self.backdrop.setBrush(Brush.yellow_p)
+            self.backdrop.setBrush(Brush.YELLOW_P)
         else:
-            self.backdrop.setBrush(Brush.red_p)
+            self.backdrop.setBrush(Brush.RED_P)
 
 
     def update_mines_backdrop(self, friend_or_foe):
         """ Display the proper backdrop color for mine fields """
         if friend_or_foe == Stance.ALLIED:
-            self.backdrop.setBrush(Brush.blue_p)
+            self.backdrop.setBrush(Brush.BLUE_P)
         elif friend_or_foe == Stance.FRIENDLY:
-            self.backdrop.setBrush(Brush.yellow_p)
+            self.backdrop.setBrush(Brush.YELLOW_P)
         else:
-            self.backdrop.setBrush(Brush.red_p)
+            self.backdrop.setBrush(Brush.RED_P)
 
 
     def update_fleet_banner(self, fleet):
@@ -106,4 +107,4 @@ class DataViewer(QGraphicsView):
             banner.setVisible(False)
             self.scene.addItem(banner)
             self.faction_banner.append(banner)
-        self.scene.addRect(QRectF(800, 315, 5, 5), Pen.noshow)
+        self.scene.addRect(QRectF(800, 315, 5, 5), Pen.NOSHOW)

@@ -76,8 +76,8 @@ def main():
     fleet_4 = Fleet([ship], 3, people)
     fleet_5 = Fleet([ship], 9, people)
     fleet_6 = Fleet([freighter, freighter], 0, people)
-    fleet_7 = Fleet([freighter, freighter, freighter], 9, people)
-    fleet_8 = Fleet([ship, ship, ship, ship], 9, people)
+    fleet_7 = Fleet([freighter, ship, freighter], 9, people)
+    fleet_8 = Fleet([ship, ship, freighter, freighter], 9, people)
 
     fleet_3.idle = False
     fleet_7.idle = False
@@ -130,17 +130,42 @@ def main():
     x = -30
     y = -30
 
-    m0 = Minefield(form.map.universe, p.x, p.y, 2500, M.Normal, 0, people)
+    m0 = Minefield(form.map.universe, M.NORMAL, 0)
+    m0.move_field(p.x, p.y)
+    m0.update_stance(Stance.ALLIED)
+    m0.resize_field(2500)
     m0.detected = True
     form.map.universe.minefields.append(m0)
-    m0 = Minefield(form.map.universe, p.x, p.y, 25000, M.SpeedTrap, 11, people)
+    m0 = Minefield(form.map.universe, M.SPEED_TRAP, 11)
+    m0.move_field(p.x, p.y)
+    m0.update_stance(Stance.HOSTILE)
+    m0.resize_field(25000)
     m0.detected = True
     form.map.universe.minefields.append(m0)
 
-    form.map.universe.minefields.append(Minefield(form.map.universe, x, y, 400, M.Normal, 4, people))
-    form.map.universe.minefields.append(Minefield(form.map.universe, x, y, 1400, M.SpeedTrap, 4, people))
-    form.map.universe.minefields.append(Minefield(form.map.universe, x + 10, y + 50, 25000, M.Normal, 0, people))
-    form.map.universe.minefields.append(Minefield(form.map.universe, x + 50, y - 10, 64000, M.Normal, -1, people))
+    m0 = Minefield(form.map.universe, M.NORMAL, 4)
+    m0.move_field(x, y)
+    m0.update_stance(Stance.NEUTRAL)
+    m0.resize_field(400)
+    form.map.universe.minefields.append(m0)
+
+    m0 = Minefield(form.map.universe, M.SPEED_TRAP, 4)
+    m0.move_field(x, y)
+    m0.update_stance(Stance.NEUTRAL)
+    m0.resize_field(1400)
+    form.map.universe.minefields.append(m0)
+
+    m0 = Minefield(form.map.universe, M.NORMAL, 0)
+    m0.move_field(x + 10, y + 50)
+    m0.update_stance(Stance.ALLIED)
+    m0.resize_field(25000)
+    form.map.universe.minefields.append(m0)
+
+    m0 = Minefield(form.map.universe, M.NORMAL, -1)
+    m0.move_field(x + 50, y - 10)
+    m0.update_stance(Stance.FRIENDLY)
+    m0.resize_field(64000)
+    form.map.universe.minefields.append(m0)
 
     fleet_7.warp_speed = 2
     fleet_8.repeat_tasks(True)

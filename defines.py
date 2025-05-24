@@ -15,6 +15,13 @@ class MapView(Enum):
     MINIMAL = 5
 
 
+class Model(Enum):
+    """ These types of mine fields may be deployed """
+    NORMAL = 'Standard'
+    HEAVY = 'Heavy'
+    SPEED_TRAP = 'Speed Trap'
+
+
 class Stance(Enum):
     """ Possible attitudes of factions towards each other """
     IGNORE = 0

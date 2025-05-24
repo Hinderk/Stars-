@@ -2,23 +2,17 @@
 """ This module implements the game mechanics for mine fields """
 
 import math
-from enum import Enum
 
 from PyQt6.QtCore import QRectF, QPointF
 from PyQt6.QtGui import QPolygonF
 
-from colours import Pen, Brush
-from defines import Stance
+import pen as PEN
+import brush as BRUSH
+from defines import Model, Stance
 
 import guiprop as GP
 import ruleset
 
-
-class Model(Enum):
-    """ These types of mine fields may be deployed """
-    Normal = 'Standard'
-    Heavy = 'Heavy'
-    SpeedTrap = 'Speed Trap'
 
 
 _caret = QPolygonF()
@@ -36,9 +30,8 @@ class Minefield:
     for m in Model:
         counter[m] = 0
 
-    def __init__(self, scene, x, y, m, model, f_id, people):
+    def __init__(self, scene, model, f_id):
 
-        r = math.sqrt(m) * GP.XSCALE
         Minefield.counter[model] += 1
 
         self.id = Minefield.counter[model]
@@ -48,31 +41,60 @@ class Minefield:
         self.total_others = 0
         self.detected = True # False    -- FIXME: Test feature
         self.ship_tracking = False
-        self.fof = people.get_stance(ruleset.F_ID0, f_id)
+        self.fof = Stance.NEUTRAL
         self.faction = f_id
-        self.x = x
-        self.y = y
-        self.mines = m
+        self.xc = 0
+        self.yc = 0
+        self.mines = 0
         self.model = model
         self.rate_of_decay = ruleset.minefield_decay(f_id)
         self.countdown = 0
 
-        x *= GP.XSCALE
-        y *= GP.XSCALE
-        box = QRectF(x - r, y - r, r + r, r + r)
-        if self.fof == Stance.ALLIED:
-            self.area = scene.addEllipse(box, Pen.blue_m, Brush.blue_m)
-            self.area.setZValue(-6)
-            self.center = scene.addPolygon(_caret, Pen.blue_l, Brush.blue)
-        elif self.fof == Stance.FRIENDLY:
-            self.area = scene.addEllipse(box, Pen.yellow_m, Brush.yellow_m)
-            self.area.setZValue(-5)
-            self.center = scene.addPolygon(_caret, Pen.noshow, Brush.yellow)
-        else:
-            self.area = scene.addEllipse(box, Pen.red_m, Brush.red_m)
-            self.area.setZValue(-4)
-            self.center = scene.addPolygon(_caret, Pen.noshow, Brush.red)
+        self.area = scene.addEllipse(QRectF(0, 0, 10, 10))
+        self.center = scene.addPolygon(_caret)
         self.center.setZValue(4)
-        self.center.setPos(x, y)
         self.area.setVisible(False)
         self.center.setVisible(False)
+
+
+    def move_field(self, x, y):
+        """ Place the mine field on the star map """
+        self.xc = x
+        self.yc = y
+        xs = x * GP.XSCALE
+        ys = y * GP.XSCALE
+        r = math.sqrt(self.mines) * GP.XSCALE
+        self.center.setPos(xs, ys)
+        self.area.setRect(QRectF(xs - r, ys - r, r + r, r + r))
+
+
+    def resize_field(self, m):
+        """ Update the number of mines in the field """
+        self.mines = m
+        x = self.xc * GP.XSCALE
+        y = self.yc * GP.XSCALE
+        r = math.sqrt(m) * GP.XSCALE
+        self.area.setRect(QRectF(x - r, y - r, r + r, r + r))
+
+
+    def update_stance(self, fof):
+        """ Update the colours if a faction changes allegiances """
+        self.fof = fof
+        if fof == Stance.ALLIED:
+            self.area.setPen(PEN.BLUE_M)
+            self.area.setBrush(BRUSH.BLUE_M)
+            self.area.setZValue(-6)
+            self.center.setPen(PEN.BLUE_L)
+            self.center.setBrush(BRUSH.BLUE)
+        elif fof == Stance.FRIENDLY:
+            self.area.setPen(PEN.YELLOW_M)
+            self.area.setBrush(BRUSH.YELLOW_M)
+            self.area.setZValue(-5)
+            self.center.setPen(PEN.NOSHOW)
+            self.center.setBrush(BRUSH.YELLOW)
+        else:
+            self.area.setPen(PEN.RED_M)
+            self.area.setBrush(BRUSH.RED_M)
+            self.area.setZValue(-4)
+            self.center.setPen(PEN.NOSHOW)
+            self.center.setBrush(BRUSH.RED)

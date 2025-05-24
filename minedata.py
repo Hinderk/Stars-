@@ -71,7 +71,7 @@ class Minedata(DataViewer):
         self.faction_banner[self.current_faction].setVisible(False)
         self.current_faction = field.faction
         self.faction_banner[field.faction].setVisible(True)
-        text = '(' + str(field.x) + ',' + str(field.y) + ')'
+        text = '(' + str(field.xc) + ',' + str(field.yc) + ')'
         self.location.setText(text)
         self.field_type.setText(field.model.value)
         radius = round(10 * math.sqrt(field.mines) + 0.5) / 10

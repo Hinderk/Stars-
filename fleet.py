@@ -8,7 +8,8 @@ from PyQt6.QtGui import QPen
 from universe import Universe
 from design import Design
 from defines import Stance, Task, Feature
-from colours import Pen, Brush
+import pen as Pen
+import brush as Brush
 from system import SystemType
 from waypoint import Waypoint
 
@@ -137,15 +138,14 @@ class Fleet:
 
     def set_fleet_name_and_index(self):
         """ Select a fleet's name & icon based on the highest battle rating """
-        designs = [s.design.index for s in self.ship_list]
+        designs = [s.design for s in self.ship_list]
         val = -1
         for d in set(designs):
             n = designs.count(d)
-            sd = Design.get_design(d)
-            r = sd.compute_battle_rating()
+            r = d.compute_battle_rating()
             if val < n * r:
-                self.picture = sd.get_picture_index()
-                self.name = sd.get_design_name()
+                self.picture = d.get_picture_index()
+                self.name = d.get_design_name()
                 val = n * r
 
 
@@ -170,15 +170,15 @@ class Fleet:
         """ Retrieve pens & brushes for fleets on the star map """
         if selected:
             if self.friend_or_foe == Stance.ALLIED:
-                return (QPen(Pen.blue_h), Brush.blue)
+                return (QPen(Pen.BLUE_H), Brush.BLUE)
             if self.friend_or_foe == Stance.HOSTILE:
-                return (QPen(Pen.red_l), Brush.red_d)
-            return (QPen(Pen.green), Brush.green)
+                return (QPen(Pen.RED_L), Brush.RED_D)
+            return (QPen(Pen.GREEN), Brush.GREEN)
         if self.friend_or_foe == Stance.ALLIED:
-            return (QPen(Pen.blue_l), Brush.blue)
+            return (QPen(Pen.BLUE_L), Brush.BLUE)
         if self.friend_or_foe == Stance.HOSTILE:
-            return (QPen(Pen.red), Brush.red_d)
-        return (QPen(Pen.green), Brush.green)
+            return (QPen(Pen.RED), Brush.RED_D)
+        return (QPen(Pen.GREEN), Brush.GREEN)
 
 
     def update_ship_count(self):

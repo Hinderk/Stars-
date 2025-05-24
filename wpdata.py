@@ -3,7 +3,8 @@
 
 from PyQt6.QtCore import QRectF
 
-from colours import Brush, Pen
+import brush as BRUSH
+import pen as PEN
 from dataviewer import DataViewer
 
 import guiprop as GP
@@ -75,20 +76,20 @@ class WPData(DataViewer):
 
     def _init_cargo(self):
         """ Create the bar diagrams for cargo loadout & fuel reserves """
-        brush = [Brush.white, Brush.yellow, Brush.green, Brush.blue_f, Brush.red]
+        brush = [BRUSH.WHITE, BRUSH.YELLOW, BRUSH.GREEN, BRUSH.BLUE_F, BRUSH.RED]
         xp = self.x_offset + self.x_text
         yp = self.y_delta + 5
         box = QRectF(xp, yp, self.x_width, self.y_size)
-        self.scene.addRect(box, Pen.black_2, Brush.grey)
+        self.scene.addRect(box, PEN.BLACK_2, BRUSH.GREY)
         box = QRectF(xp, yp, self.x_width / 2, self.y_size)
-        self.fuel = self.scene.addRect(box, Pen.black_2, brush[4])
+        self.fuel = self.scene.addRect(box, PEN.BLACK_2, brush[4])
         self.fuel_weight = self.scene.addSimpleText("", GP.CARGO_FONT)
         yp += self.y_delta + 2
         box = QRectF(xp, yp, self.x_width, self.y_size)
-        self.scene.addRect(box, Pen.black_2, Brush.grey)
+        self.scene.addRect(box, PEN.BLACK_2, BRUSH.GREY)
         for n in (0, 1, 2, 3):
             box = QRectF(xp, yp, self.x_width, self.y_size)
-            self.freight.append(self.scene.addRect(box, Pen.black_2, brush[n]))
+            self.freight.append(self.scene.addRect(box, PEN.BLACK_2, brush[n]))
         self.cargo = self.scene.addSimpleText("", GP.CARGO_FONT)
 
 

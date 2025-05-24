@@ -7,20 +7,21 @@ from PyQt6.QtCore import QRectF, QPointF, QLineF
 from PyQt6.QtGui import QPolygonF, QFont
 from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene
 
-from colours import Pen, Brush
+import pen as PEN
+import brush as BRUSH
 
 
 def _setup_colors():
     """ Compile the colour scheme for the inspector panel """
-    pen = [Pen.blue_i, Pen.red_i, Pen.green_i,
-           Pen.blue_i, Pen.green_i, Pen.yellow_i,
-           Pen.blue, Pen.red, Pen.green,
-           Pen.blue, Pen.green, Pen.yellow,
-           Pen.blue_25, Pen.red_25, Pen.green_25]
-    brush = [Brush.blue_i, Brush.red_i, Brush.green_i,
-             Brush.blue_i, Brush.green_i, Brush.yellow_i,
-             Brush.blue, Brush.red, Brush.green,
-             Brush.blue, Brush.green, Brush.yellow]
+    pen = [PEN.BLUE_I, PEN.RED_I, PEN.GREEN_I,
+           PEN.BLUE_I, PEN.GREEN_I, PEN.YELLOW_I,
+           PEN.BLUE, PEN.RED, PEN.GREEN,
+           PEN.BLUE, PEN.GREEN, PEN.YELLOW,
+           PEN.BLUE_25, PEN.RED_25, PEN.GREEN_25]
+    brush = [BRUSH.BLUE_I, BRUSH.RED_I, BRUSH.GREEN_I,
+             BRUSH.BLUE_I, BRUSH.GREEN_I, BRUSH.YELLOW_I,
+             BRUSH.BLUE, BRUSH.RED, BRUSH.GREEN,
+             BRUSH.BLUE, BRUSH.GREEN, BRUSH.YELLOW]
     return pen, brush
 
 
@@ -164,7 +165,7 @@ class Inspector(QGraphicsView):
             self.m_conc.append(self.scene.addPolygon(mark, pen[n + 9], brush[n + 9]))
             label = self.scene.addSimpleText(str(1000))
             label.setPos(self.x_minerals + self.x_offset, yp + self.text_offset)
-            label.setPen(Pen.white)
+            label.setPen(PEN.WHITE)
             label.setVisible(show)
             self.s_text.append(label)
             yp += 5 * delta_y
@@ -250,19 +251,19 @@ class Inspector(QGraphicsView):
         delta_x = self.x_width / 10
         delta_y = self.y_width / 3
         info = QRectF(self.x_info, self.y_info, self.x_width, self.y_width)
-        self.scene.addRect(info, Pen.black, Brush.black)
+        self.scene.addRect(info, PEN.BLACK, BRUSH.BLACK)
         xp = self.x_info + self.x_width
         yp = self.y_info + delta_y
-        self.scene.addLine(self.x_info, yp, xp, yp, Pen.white_o)
+        self.scene.addLine(self.x_info, yp, xp, yp, PEN.WHITE_O)
         yp += delta_y
-        self.scene.addLine(self.x_info, yp, xp, yp, Pen.white_o)
+        self.scene.addLine(self.x_info, yp, xp, yp, PEN.WHITE_O)
         minerals = QRectF(self.x_minerals, self.y_minerals, self.x_width, self.y_width)
-        self.scene.addRect(minerals, Pen.black, Brush.black)
+        self.scene.addRect(minerals, PEN.BLACK, BRUSH.BLACK)
         xp = self.x_minerals
         yp = self.y_minerals + self.y_width
         for n in range(0, 10):
             xp += delta_x
-            self.scene.addLine(xp, self.y_minerals, xp, yp, Pen.white_o)
+            self.scene.addLine(xp, self.y_minerals, xp, yp, PEN.WHITE_O)
         min_val = []
         max_val = []
         min_val.append(0.5 + math.log2(faction.min_gravity) / 6.0)
