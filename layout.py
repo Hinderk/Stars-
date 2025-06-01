@@ -1,8 +1,11 @@
 
+""" This module implements the available hull layouts """
+
 from enum import Enum
 
 
 class Layout(Enum):
+    """ Hull layouts available for ship construction """
     MCS = 'Mini Colony-Ship'
     COS = 'Colony-Ship'
     MDM = 'Midget Miner'

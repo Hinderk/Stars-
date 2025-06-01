@@ -1,4 +1,6 @@
 
+""" The menu bar of the user interface is defined in this module. """
+
 from PyQt6.QtWidgets import QMenu
 from PyQt6.QtWidgets import QMenuBar
 from PyQt6.QtGui import QAction
@@ -7,256 +9,190 @@ from PyQt6.QtCore import pyqtSignal as QSignal
 
 
 
+def _new_menu(top, name, tip):
+    menu = QMenu(top)
+    action = menu.menuAction()
+    action.setStatusTip(tip)
+    menu.setTitle(name)
+    return menu
+
+
+
 class Menu(QMenuBar):
 
-    ChangeZoom = QSignal(bool, int)
+    """ This class implements the menu bar of the graphical user interface """
+
+    change_zoom = QSignal(bool, int)
 
 
     def __init__(self, form):
 
-        super(self.__class__, self).__init__(form)
+        super().__init__(form)
 
-        MenuFile = QMenu(self)
-        MenuView = QMenu(self)
-        MenuToolbar = QMenu(MenuView)
-        MenuLayout = QMenu(MenuView)
-        self.MenuZoom = QMenu(MenuView)
-        MenuTurn = QMenu(self)
-        MenuCommands = QMenu(self)
-        MenuReport = QMenu(self)
-        MenuDumpTextFile = QMenu(MenuReport)
-        MenuHelp = QMenu(self)
+        self.action_generate = self._new_action(
+            'Generate', 'Advance the game time by one year ...', 'F9')
 
-        self.actionNewGame = QAction(self)
-        self.actionNewGame.setText("New")
-        self.actionNewGame.setStatusTip("Start a new game ...")
-        self.actionNewGame.setShortcut("Ctrl+N")
-        self.actionNewGame.setAutoRepeat(False)
+        menu_turn = _new_menu(self, 'Turn', 'Generate a new turn ...')
+        menu_turn.addAction(self.action_generate)
+        menu_help = _new_menu(self, 'Help', 'Instructions & information ...')
 
-        self.actionWizard = QAction(self)
-        self.actionWizard.setAutoRepeat(False)
-        self.actionWizard.setText("Custom Faction Wizard ...")
-        self.actionWizard.setStatusTip("Launch the custom faction wizard ...")
-
-        self.actionOpenGame = QAction(self)
-        self.actionOpenGame.setAutoRepeat(False)
-        self.actionOpenGame.setText("Open")
-        self.actionOpenGame.setStatusTip("Open a set of game files ...")
-        self.actionOpenGame.setShortcut("Ctrl+O")
-
-        self.actionCloseGame = QAction(self)
-        self.actionCloseGame.setText("Close")
-        self.actionCloseGame.setStatusTip("Close the current game ...")
-        self.actionCloseGame.setAutoRepeat(False)
-
-        self.actionSaveGame = QAction(self)
-        self.actionSaveGame.setText("Save")
-        self.actionSaveGame.setStatusTip("Save the current turn to a set of game files ...")
-        self.actionSaveGame.setShortcut("Ctrl+S")
-        self.actionSaveGame.setAutoRepeat(False)
-
-        self.actionExportMap = QAction(self)
-        self.actionExportMap.setText("Export Map")
-        self.actionExportMap.setStatusTip("Print the current star map to a file ...")
-        self.actionExportMap.setAutoRepeat(False)
-
-        self.actionSaveGameAs = QAction(self)
-        self.actionSaveGameAs.setText("Save Game as ...")
-        self.actionSaveGameAs.setStatusTip("Save the current game under a new name ...")
-        self.actionSaveGameAs.setAutoRepeat(False)
-
-        self.actionExit = QAction(self)
-        self.actionExit.setText("Exit")
-        self.actionExit.setToolTip("Exit the current game ...")
-        self.actionExit.setStatusTip("Leave the current turn behind & close the game client ...")
-        self.actionExit.setShortcut("Ctrl+X")
-        self.actionExit.setAutoRepeat(False)
-
-        self.actionGameParameters = QAction(self)
-        self.actionGameParameters.setText("Game Parameters ...")
-        self.actionGameParameters.setAutoRepeat(False)
-
-        self.actionGenerate = QAction(self)
-        self.actionGenerate.setText("Generate")
-        self.actionGenerate.setToolTip("Generate a new turn ...")
-        self.actionGenerate.setStatusTip("Generate a new turn ...")
-        self.actionGenerate.setShortcut("F9")
-        self.actionGenerate.setAutoRepeat(False)
-
-        self.actionToolbarOn = QAction(self)
-        self.actionToolbarOn.setText("On")
-        self.actionToolbarOn.setToolTip("Show the toolbar ...")
-        self.actionToolbarOn.setStatusTip("Show the toolbar ...")
-        self.actionToolbarOn.setCheckable(True)
-        self.actionToolbarOn.setChecked(True)
-
-        self.actionToolbarOff = QAction(self)
-        self.actionToolbarOff.setText("Off")
-        self.actionToolbarOff.setToolTip("Hide the toolbar ...")
-        self.actionToolbarOff.setStatusTip("Hide the toolbar ...")
-        self.actionToolbarOff.setCheckable(True)
-
-        MenuToolbar.setTitle("Toolbar")
-        MenuToolbar.setStatusTip("Modify the tool bar of the game ...")
-        MenuToolbar.setStyleSheet("QMenu::item{padding: 5px 20px 5px 0px}")
-
-        MenuToolbar.addAction(self.actionToolbarOn)
-        MenuToolbar.addAction(self.actionToolbarOff)
-        ToolbarActions = QActionGroup(self)
-        ToolbarActions.addAction(self.actionToolbarOn)
-        ToolbarActions.addAction(self.actionToolbarOff)
-
-        self.actionDefault = QAction(self)
-        self.actionDefault.setText("Default")
-        self.actionDefault.setCheckable(True)
-        self.actionDefault.setChecked(True)
-
-        self.actionFaction = QAction(self)
-        self.actionFaction.setText("Faction ...")
-        self.actionFaction.setShortcut("F8")
-        self.actionFaction.setAutoRepeat(False)
-
-        self.actionSaveSubmit = QAction(self)
-        self.actionSaveSubmit.setText("Save and Submit")
-        self.actionSaveSubmit.setStatusTip("Save Game & submit Your turn ...")
-        self.actionSaveSubmit.setShortcut("Ctrl+A")
-        self.actionSaveSubmit.setAutoRepeat(False)
-
-        self.actionShipDesign = QAction(self)
-        self.actionShipDesign.setText("Ship Design ...")
-        self.actionShipDesign.setShortcut("F4")
-
-        self.actionBattlePlans = QAction(self)
-        self.actionBattlePlans.setText("Battle Plans ...")
-        self.actionBattlePlans.setShortcut("F6")
-
-        self.actionPlayerRelations = QAction(self)
-        self.actionPlayerRelations.setText("Player Relations ...")
-        self.actionPlayerRelations.setShortcut("F7")
-        self.actionPlayerRelations.setIconVisibleInMenu(False)
-
-        self.actionResearch = QAction(self)
-        self.actionResearch.setText("Research ...")
-        self.actionResearch.setShortcut("F5")
-
-        self.actionChangePassword = QAction(self)
-        self.actionChangePassword.setText("Change Password ...")
-
-        self.actionPlanets = QAction(self)
-        self.actionPlanets.setShortcut("F3")
-        self.actionPlanets.setAutoRepeat(False)
-        self.actionPlanets.setIconVisibleInMenu(False)
-        self.actionPlanets.setText("Planets ...")
-
-        self.actionFleets = QAction(self)
-        self.actionFleets.setAutoRepeat(False)
-        self.actionFleets.setIconVisibleInMenu(False)
-        self.actionFleets.setText("Fleets ...")
-        self.actionFleets.setShortcut("F3")
-
-        self.actionOtherFleets = QAction(self)
-        self.actionOtherFleets.setShortcut("F3")
-        self.actionOtherFleets.setAutoRepeat(False)
-        self.actionOtherFleets.setIconVisibleInMenu(False)
-        self.actionOtherFleets.setText("Others\' Fleets ...")
-
-        self.actionBattles = QAction(self)
-        self.actionBattles.setShortcut("F3")
-        self.actionBattles.setAutoRepeat(False)
-        self.actionBattles.setIconVisibleInMenu(False)
-        self.actionBattles.setText("Battles ...")
-
-        self.actionScore = QAction(self)
-        self.actionScore.setShortcut("F10")
-        self.actionScore.setAutoRepeat(False)
-        self.actionScore.setIconVisibleInMenu(False)
-        self.actionScore.setText("Score ...")
-
-        MenuDumpTextFile.setTitle("Dump to Text File")
-        self.actionPlanetInformation = QAction(self)
-        self.actionPlanetInformation.setText("Planet Information")
-        MenuDumpTextFile.addAction(self.actionPlanetInformation)
-        self.actionFleetInformation = QAction(self)
-        self.actionFleetInformation.setText("Fleet Information")
-        MenuDumpTextFile.addAction(self.actionFleetInformation)
-        self.actionUniverseDefinition = QAction(self)
-        self.actionUniverseDefinition.setText("Universe Definition")
-        MenuDumpTextFile.addAction(self.actionUniverseDefinition)
-
-        MenuFile.addAction(self.actionNewGame)
-        MenuFile.addAction(self.actionWizard)
-        MenuFile.addAction(self.actionOpenGame)
-        MenuFile.addAction(self.actionCloseGame)
-        MenuFile.addAction(self.actionSaveGameAs)
-        MenuFile.addAction(self.actionSaveGame)
-        MenuFile.addAction(self.actionSaveSubmit)
-        MenuFile.addSeparator()
-        MenuFile.addAction(self.actionExportMap)
-        MenuFile.addSeparator()
-        MenuFile.addAction(self.actionExit)
-        MenuFile.setTitle("File")
-        self.DefineZoomLevel(self.MenuZoom, [25, 50, 75, 100, 125, 150, 200, 400])
-        self.MenuZoom.setStyleSheet("QMenu::item { padding: 5px 30px 5px 0px }")
-        self.MenuZoom.setTitle("Zoom")
-        MenuLayout.addAction(self.actionDefault)
-        MenuLayout.setTitle("Layout")
-        MenuLayout.setStyleSheet("QMenu::item { padding: 5px 30px 5px 0px }")
-        MenuView.addAction(MenuToolbar.menuAction())
-        MenuView.addAction(self.MenuZoom.menuAction())
-        MenuView.addAction(MenuLayout.menuAction())
-        MenuView.addSeparator()
-        MenuView.addAction(self.actionFaction)
-        MenuView.addAction(self.actionGameParameters)
-        MenuView.setTitle("View")
-        MenuTurn.addAction(self.actionGenerate)
-        MenuTurn.setTitle("Turn")
-        MenuCommands.addAction(self.actionShipDesign)
-        MenuCommands.addAction(self.actionResearch)
-        MenuCommands.addAction(self.actionBattlePlans)
-        MenuCommands.addAction(self.actionPlayerRelations)
-        MenuCommands.addSeparator()
-        MenuCommands.addAction(self.actionChangePassword)
-        MenuCommands.setTitle("Commands")
-        MenuReport.addAction(self.actionPlanets)
-        MenuReport.addAction(self.actionFleets)
-        MenuReport.addAction(self.actionOtherFleets)
-        MenuReport.addAction(self.actionBattles)
-        MenuReport.addSeparator()
-        MenuReport.addAction(self.actionScore)
-        MenuReport.addSeparator()
-        MenuReport.addAction(MenuDumpTextFile.menuAction())
-        MenuReport.setTitle("Report")
-        MenuHelp.setTitle("Help")
-
-        self.addAction(MenuFile.menuAction())
-        self.addAction(MenuView.menuAction())
-        self.addAction(MenuTurn.menuAction())
-        self.addAction(MenuCommands.menuAction())
-        self.addAction(MenuReport.menuAction())
-        self.addAction(MenuHelp.menuAction())
+        self._create_file_menu()
+        self._create_view_menu()
+        self.addAction(menu_turn.menuAction())
+        self._create_commands_menu()
+        self._create_report_menu()
+        self.addAction(menu_help.menuAction())
 
 
-    def DefineZoomLevel(self, Menu, LevelSet):
+    def _new_action(self, name, tip, hotkey=None):
+        """ Create a non-repeating menu entry & action """
+        action = QAction(self)
+        action.setText(name)
+        action.setStatusTip(tip)
+        if hotkey:
+            action.setShortcut(hotkey)
+        action.setAutoRepeat(False)
+        action.setIconVisibleInMenu(False)
+        return action
 
-        class ZoomAction(QAction):
 
-            def __init__(self, level):
-                super(self.__class__, self).__init__()
-                self.ZoomLevel = level
+    def _create_file_menu(self):
+        """ Create a submenu for saving, loading or creating games """
+        menu_file = _new_menu(
+            self, 'File', 'Create new games, save games in progress, '
+            'open saved games & submit Your turns ...')
+        self.action_new_game = self._new_action('New', 'Start a new game ...', 'Ctrl+N')
+        self.action_wizard = self._new_action(
+            'Custom Faction Wizard ...', 'Launch the custom faction wizard ...')
+        self.action_open_game = self._new_action(
+            'Open', 'Open a set of game files ...', 'Ctrl+O')
+        self.action_close_game = self._new_action('Close', 'Close the current game ...')
+        self.action_save_game = self._new_action(
+            'Save', 'Save the current turn to a set of game files ...', 'Ctrl+S')
+        self.action_save_game_as = self._new_action(
+            'Save Game as ...', 'Save the current game under a new name ...')
+        self.action_exit = self._new_action(
+            'Exit', 'Leave the current turn behind & close the game ...', 'Ctrl+X')
+        self.action_exit.setToolTip("Exit the current game ...")
+        self.action_save_submit = self._new_action(
+            'Save and Submit', 'Save Game & submit Your turn ...', 'Ctrl+A')
+        menu_file.addAction(self.action_new_game)
+        menu_file.addAction(self.action_wizard)
+        menu_file.addAction(self.action_open_game)
+        menu_file.addAction(self.action_close_game)
+        menu_file.addAction(self.action_save_game_as)
+        menu_file.addAction(self.action_save_game)
+        menu_file.addAction(self.action_save_submit)
+        menu_file.addSeparator()
+        menu_file.addAction(self.action_exit)
+        self.addAction(menu_file.menuAction())
 
-        zoomActions = QActionGroup(Menu)
-        for level in LevelSet:
-            NewAction = ZoomAction(level)
-            Menu.addAction(NewAction)
-            NewAction.setCheckable( True )
+
+    def _create_view_menu(self):
+        """ Create a submenu for displaying game & faction parameters """
+        menu_view = _new_menu(
+            self, 'View', 'Review game & faction parameters, print the star map ...')
+        self.action_export_map = self._new_action(
+            'Export Map', 'Print the current star map to a file ...')
+        self.action_game_parameters = self._new_action(
+            'Game Parameters ...', 'Show victory conditions & other game settings ...')
+        self.action_faction = self._new_action(
+            'Faction ...', 'Show the traits & perks of Your faction ...', 'F8')
+        self.menu_zoom = QMenu(menu_view)
+        self.define_zoom_level(self.menu_zoom, [25, 50, 75, 100, 125, 150, 200, 400])
+        self.menu_zoom.setStyleSheet('QMenu::item { padding: 5px 30px 5px 0px }')
+        self.menu_zoom.setTitle('Zoom')
+        zoom = self.menu_zoom.menuAction()
+        zoom.setStatusTip('Specify a magnification level for the star map ...')
+        menu_view.addAction(self.action_export_map)
+        menu_view.addAction(self.action_faction)
+        menu_view.addAction(self.action_game_parameters)
+        menu_view.addSeparator()
+        menu_view.addAction(zoom)
+        self.addAction(menu_view.menuAction())
+
+
+    def _create_commands_menu(self):
+        """ Create a submenu for research, diplomacy, ship design & battle tactics """
+        menu_commands = _new_menu(
+            self, 'Commands',
+            'Allocate resources, engage in diplomacy & elaborate battle tactics ...')
+        self.action_ship_design = self._new_action(
+            'Ship Design ...', 'Create new blueprints for Your space ships ...', 'F4')
+        self.action_research = self._new_action(
+            'Research ...', 'Allocate resources to Your R&D programs ...','F5')
+        self.action_battle_plans = self._new_action(
+            'Battle Plans ...', 'Define the rules of engagement for Your fleets ...', 'F6')
+        self.action_player_relations = self._new_action(
+            'Player Relations ...', 'Declare war or sue for peace ...', 'F7')
+        self.action_change_password = self._new_action(
+            'Change Password ...', 'Protect Your game files with a password ...')
+        menu_commands.addAction(self.action_ship_design)
+        menu_commands.addAction(self.action_research)
+        menu_commands.addAction(self.action_battle_plans)
+        menu_commands.addAction(self.action_player_relations)
+        menu_commands.addSeparator()
+        menu_commands.addAction(self.action_change_password)
+        self.addAction(menu_commands.menuAction())
+
+
+    def _create_report_menu(self):
+        """ Create a submenu to track of items & events in the game world """
+        self.action_planets = self._new_action(
+            'Planets ...', 'Collect all currently available planetary data ...', 'F3')
+        self.action_fleets = self._new_action(
+            'Fleets ...', 'Show information about Your latest fleet movements ...', 'F3')
+        self.action_other_fleets = self._new_action(
+            'Others\' Fleets ...',
+            'Show information about the latest hostile fleet movements ...', 'F3')
+        self.action_battles = self._new_action(
+            'Battles ...', 'Collect statistics on the latest fleet battles ...', 'F3')
+        self.action_score = self._new_action(
+            'Score ...',
+            'Evaluate the players\' progress towards meeting the victory conditions ...',
+            'F10')
+        self.action_planet_information = self._new_action(
+            'Planet Information',
+            'Export a list of all planetary data gathered by the player ...')
+        self.action_fleet_information = self._new_action(
+            'Fleet Information',
+            'Export a list of all fleets within the player\'s scanner range ...')
+        self.action_universe_definition = self._new_action(
+            'Universe Definition', 'Export a list of all star systems in the galaxy ...')
+        menu_report = _new_menu(self, 'Report', 'Inquire into the state of the galaxy ...')
+        menu_dump_text_file = _new_menu(
+            menu_report, 'Dump to Text File', 'Export game data in the CSV format ...')
+        menu_dump_text_file.addAction(self.action_planet_information)
+        menu_dump_text_file.addAction(self.action_fleet_information)
+        menu_dump_text_file.addAction(self.action_universe_definition)
+        menu_report.addAction(self.action_planets)
+        menu_report.addAction(self.action_fleets)
+        menu_report.addAction(self.action_other_fleets)
+        menu_report.addAction(self.action_battles)
+        menu_report.addSeparator()
+        menu_report.addAction(self.action_score)
+        menu_report.addSeparator()
+        menu_report.addAction(menu_dump_text_file.menuAction())
+        self.addAction(menu_report.menuAction())
+
+
+    def define_zoom_level(self, menu, level_set):
+        """ Create the submenu containing the available zoom levels """
+        zoom_actions = QActionGroup(menu)
+        for level in level_set:
+            new_action = QAction()
+            new_action.setData(level)
+            menu.addAction(new_action)
+            new_action.setCheckable( True )
             label = str(level) + '%'
-            NewAction.setText(label)
-            NewAction.setToolTip('Set magnification level: ' + label)
-            NewAction.setStatusTip('Set magnification level: ' + label)
-            zoomActions.addAction(NewAction)
-            NewAction.setChecked(level == 100)
-            NewAction.toggled.connect(self.ResizeStarmap)
+            new_action.setText(label)
+            new_action.setToolTip('Set magnification level: ' + label)
+            new_action.setStatusTip('Set magnification level: ' + label)
+            zoom_actions.addAction(new_action)
+            new_action.setChecked(level == 100)
+            new_action.toggled.connect(self.resize_starmap)
 
 
-    def ResizeStarmap(self, event):
-        self.ChangeZoom.emit(event, self.sender().ZoomLevel)
+    def resize_starmap(self, event):
+        """ Change the zoom level of the star map """
+        self.change_zoom.emit(event, self.sender().data())

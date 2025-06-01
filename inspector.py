@@ -1,288 +1,282 @@
 
-from PyQt6.QtCore import QRectF, QPointF, QLineF
-from PyQt6.QtGui import QPen, QBrush, QColor, QPolygonF, QFont
-from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene
+""" This module implements the inspector panel """
 
 import math
+
+from PyQt6.QtCore import QRectF, QPointF, QLineF
+from PyQt6.QtGui import QPolygonF, QFont
+from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene
+
+import pen as PEN
+import brush as BRUSH
+
+
+def _setup_colors():
+    """ Compile the colour scheme for the inspector panel """
+    pen = [PEN.BLUE_I, PEN.RED_I, PEN.GREEN_I,
+           PEN.BLUE_I, PEN.GREEN_I, PEN.YELLOW_I,
+           PEN.BLUE, PEN.RED, PEN.GREEN,
+           PEN.BLUE, PEN.GREEN, PEN.YELLOW,
+           PEN.BLUE_25, PEN.RED_25, PEN.GREEN_25]
+    brush = [BRUSH.BLUE_I, BRUSH.RED_I, BRUSH.GREEN_I,
+             BRUSH.BLUE_I, BRUSH.GREEN_I, BRUSH.YELLOW_I,
+             BRUSH.BLUE, BRUSH.RED, BRUSH.GREEN,
+             BRUSH.BLUE, BRUSH.GREEN, BRUSH.YELLOW]
+    return pen, brush
 
 
 
 class Inspector(QGraphicsView):
 
-  xInfo = 110
-  yInfo = 60
-  xMinerals = 110
-  yMinerals = 180
-  xWidth = 610
-  yWidth = 100
-  xOffset = 40
-  TextOffset = 1
-  LeftOffset = 15
-  BottomOffset = 5
-  RightOffset = 10
-  TopOffset = 5
+    """ This class is responsible for rendering the contents of the inspector panel """
 
-
-  def __init__(self, faction):
-    super(self.__class__, self).__init__()
-
-    self.mConc = []
-    self.sConc = []
-    self.sText = []
-    self.Biome = []
-    self.Rates = []
-
-    self.Scene = QGraphicsScene(self)
-
-    self.AddStaticText()
-    self.SetupColors()
-    self.PaintBackdrop(faction)
-    self.InitBiome()
-    self.InitMinerals()
-    self.setScene(self.Scene)
-    self.setMaximumHeight(325)
-
-
-  def AddStaticText(self):
     font = QFont('Segoe', pointSize=16, weight=400)
-    self.ReportAge = self.Scene.addSimpleText("Report is current.", font)
-    self.ReportAge.moveBy(self.xInfo, (self.yInfo-self.TopOffset) / 2 )
-    self.PlanetValue = self.Scene.addSimpleText("Value: 100%", font)
-    self.PlanetValue.moveBy(self.xInfo, 0)
-    self.Population = self.Scene.addSimpleText("Uninhabited", font)
-    width = self.xWidth - self.Population.boundingRect().width()
-    self.Population.moveBy(self.xInfo + width, 0)
-    xp = self.xInfo + self.xWidth + self.RightOffset
-    deltaY = self.yWidth / 3
-    Gravity = self.Scene.addSimpleText("Gravity", font)
-    width = Gravity.boundingRect().width() + self.LeftOffset
-    height = self.yWidth - 3 * Gravity.boundingRect().height()
-    yp = self.yInfo + height / 6.0
-    Gravity.moveBy(self.xInfo - width, yp)
-    self.Gravity = self.Scene.addSimpleText("8.00g", font)
-    self.Gravity.moveBy(xp, yp)
-    yp += deltaY
-    Temperature = self.Scene.addSimpleText(" Temperature", font)
-    width = Temperature.boundingRect().width() + self.LeftOffset
-    Temperature.moveBy(self.xInfo - width, yp)
-    self.Temperature = self.Scene.addSimpleText("-250\u00B0CC", font)
-    self.Temperature.moveBy(xp, yp)
-    yp += deltaY
-    Radiation = self.Scene.addSimpleText("Radiation", font)
-    width = Radiation.boundingRect().width() + self.LeftOffset
-    Radiation.moveBy(self.xInfo - width, yp)
-    self.Radiation = self.Scene.addSimpleText("100mR", font)
-    self.Radiation.moveBy(xp, yp)
-    deltaY = self.yWidth / 17
-    yp = self.yMinerals + deltaY
-    Ironium = self.Scene.addSimpleText("Ironium", font)
-    width = Ironium.boundingRect().width() + self.LeftOffset
-    Ironium.moveBy(self.xMinerals - width, yp)
-    yp += 5 * deltaY
-    Boranium = self.Scene.addSimpleText("Boranium", font)
-    width = Boranium.boundingRect().width() + self.LeftOffset
-    Boranium.moveBy(self.xMinerals - width, yp)
-    yp += 5 * deltaY
-    Germanium = self.Scene.addSimpleText("Germanium", font)
-    width = Germanium.boundingRect().width() + self.LeftOffset
-    Germanium.moveBy(self.xMinerals - width, yp)
-    kt = 0
-    xp = self.xMinerals
-    yp = self.yMinerals + self.yWidth + self.BottomOffset
-    for i in range(11):
-      label = self.Scene.addSimpleText(str(i * 500), font)
-      kt += 500
-      dx = label.boundingRect().width() / 2
-      label.moveBy(xp - dx, yp)
-      xp += self.xWidth / 10
-    label = self.Scene.addSimpleText("kt", font)
-    xp = label.boundingRect().width() + 3 * self.LeftOffset
-    label.moveBy(self.xMinerals - xp, yp)
+
+    x_info = 110
+    y_info = 60
+    x_minerals = 110
+    y_minerals = 180
+    x_width = 610
+    y_width = 100
+    x_offset = 40
+    text_offset = 1
+    left_offset = 15
+    bottom_offset = 5
+    right_offset = 10
+    top_offset = 5
 
 
-  def InitBiome(self):
-    caret = QPolygonF()
-    dy = self.yWidth / 12.0
-    caret << QPointF(0, 0) << QPointF(dy, dy)
-    caret << QPointF(0, dy + dy) << QPointF(-dy, dy)
-    line = QLineF(0, dy, 40, dy)
-    yp = self.yInfo + dy
-    for n in (0, 1, 2):
-      xp = self.xInfo + self.xWidth * 0.5
-      mark = caret.translated(xp, yp)
-      rate = line.translated(xp, yp)
-      self.Rates.append(self.Scene.addLine(rate, self.pen[n + 12]))
-      self.Biome.append(self.Scene.addPolygon(mark, self.pen[n + 6], self.brush[n + 6]))
-      yp += 4 * dy
+    def __init__(self, faction):
+        super().__init__()
+
+        self.m_conc = []
+        self.s_conc = []
+        self.s_text = []
+        self.biome = []
+        self.rates = []
+
+        self.pen = []
+        self.brush = []
+
+        self.scene = QGraphicsScene(self)
+        self.report_age = self.scene.addSimpleText('', Inspector.font)
+        self.planet_value = self.scene.addSimpleText('', Inspector.font)
+        self.gravity = self.scene.addSimpleText('', Inspector.font)
+        self.population = self.scene.addSimpleText('', Inspector.font)
+        self.temperature = self.scene.addSimpleText('', Inspector.font)
+        self.radiation = self.scene.addSimpleText('', Inspector.font)
+
+        self.add_static_text()
+        self.paint_backdrop(faction)
+        self.init_biome()
+        self.init_minerals()
+        self.setScene(self.scene)
+        self.setMaximumHeight(325)
 
 
-  def InitMinerals(self):
-    textPen = QPen(QColor(255, 255, 255))
-    caret = QPolygonF()
-    dy = self.yWidth / 12.0
-    caret << QPointF(0, 0) << QPointF(dy, dy)
-    caret << QPointF(0, dy + dy) << QPointF(-dy, dy)
-    deltaY = self.yWidth / 17
-    yp = self.yMinerals + 2 * deltaY
-    for n in (0, 1, 2):
-      xlen = self.xWidth / 2
-      xp = self.xWidth
-      show = False
-      if xlen > self.xWidth:
-        show = True
-        xlen = self.xWidth
-      box = QRectF(self.xMinerals, yp, xlen, 3 * deltaY)
-      mark = caret.translated(xp, yp)
-      self.sConc.append(self.Scene.addRect(box, self.pen[n + 3], self.brush[n + 3]))
-      self.mConc.append(self.Scene.addPolygon(mark, self.pen[n + 9], self.brush[n + 9]))
-      label = self.Scene.addSimpleText(str(1000))
-      label.setPos(self.xMinerals + self.xOffset, yp + self.TextOffset)
-      label.setPen(textPen)
-      label.setVisible(show)
-      self.sText.append(label)
-      yp += 5 * deltaY
+
+    def add_and_move_text_elements(self, label, text, n):
+        """ Create & position text labels on the inspector panel """
+        measurement = self.scene.addSimpleText(text, self.font)
+        width = measurement.boundingRect().width() + self.left_offset
+        height = self.y_width - 3 * measurement.boundingRect().height()
+        ypos = self.y_info + height / 6.0
+        if n > 0:
+            ypos += n * self.y_width / 3.0
+        measurement.setPos(self.x_info - width, ypos)
+        label.setPos(self.x_info + self.x_width + self.right_offset, ypos)
 
 
-  def UpdateMinerals(self, planet):
-    sConc = []
-    mConc = []
-    mConc.append(planet.Explored.Crust.Ironium / 100.0)
-    mConc.append(planet.Explored.Crust.Boranium / 100.0)
-    mConc.append(planet.Explored.Crust.Germanium / 100.0)
-    sConc.append(planet.Explored.Surface.Ironium)
-    sConc.append(planet.Explored.Surface.Boranium)
-    sConc.append(planet.Explored.Surface.Germanium)
-    deltaY = self.yWidth / 17
-    yp = self.yMinerals + 2 * deltaY
-    for n in (0, 1, 2):
-      caret = self.mConc[n].polygon()
-      dx = self.xWidth * mConc[n] - caret.first().x()
-      caret.translate(self.xMinerals + dx, 0)
-      self.mConc[n].setPolygon(caret)
-      show = False
-      xlen = self.xWidth * sConc[n] / 5000.0
-      if xlen > self.xWidth:
-        show = True
-        xlen = self.xWidth - 1
-      self.sConc[n].setRect(self.xMinerals, yp, xlen, 3 * deltaY)
-      self.sText[n].setVisible(show)
-      self.sText[n].setText(str(sConc[n]))
-      yp += 5 * deltaY
+    def add_static_text(self):
+        """ Initialise the immutable text elements of the inspector panel """
+        self.report_age.setPos(self.x_info, (self.y_info - self.top_offset) / 2)
+        self.planet_value.setPos(self.x_info, 0)
+        self.add_and_move_text_elements(self.gravity, 'Gravity', 0)
+        self.add_and_move_text_elements(self.temperature, ' Temperature', 1)
+        self.add_and_move_text_elements(self.radiation, 'Radiation', 2)
+        delta_y = self.y_width / 17
+        yp = self.y_minerals + delta_y
+        ironium = self.scene.addSimpleText("Ironium", self.font)
+        width = ironium.boundingRect().width() + self.left_offset
+        ironium.moveBy(self.x_minerals - width, yp)
+        yp += 5 * delta_y
+        boranium = self.scene.addSimpleText("Boranium", self.font)
+        width = boranium.boundingRect().width() + self.left_offset
+        boranium.moveBy(self.x_minerals - width, yp)
+        yp += 5 * delta_y
+        germanium = self.scene.addSimpleText("Germanium", self.font)
+        width = germanium.boundingRect().width() + self.left_offset
+        germanium.moveBy(self.x_minerals - width, yp)
+        kt = 0
+        xp = self.x_minerals
+        yp = self.y_minerals + self.y_width + self.bottom_offset
+        for i in range(11):
+            label = self.scene.addSimpleText(str(i * 500), self.font)
+            kt += 500
+            dx = label.boundingRect().width() / 2
+            label.moveBy(xp - dx, yp)
+            xp += self.x_width / 10
+        label = self.scene.addSimpleText("kt", self.font)
+        xp = label.boundingRect().width() + 3 * self.left_offset
+        label.moveBy(self.x_minerals - xp, yp)
 
 
-  def UpdateBiome(self, planet):
-    Data = []
-    Data.append(0.5 + math.log2(planet.Gravity) / 6.0)
-    Data.append(0.5 + planet.Temperature / 400.0)
-    Data.append(planet.Radioactivity / 100.0)
-    g = planet.Gravity + planet.GravityRate
-    t = planet.Temperature + planet.TemperatureRate
-    r = planet.Radioactivity + planet.RadioactivityRate
-    Data.append(0.5 + math.log2(g) / 6.0 - Data[0])
-    Data.append(0.5 + t / 400.0 - Data[1])
-    Data.append(r / 100.0 - Data[2])
-    for n in (0, 1, 2):
-      caret = self.Biome[n].polygon()
-      dx = self.xWidth * Data[n] - caret.first().x()
-      caret.translate(self.xInfo + dx, 0)
-      line = self.Rates[n].line()
-      line.translate(self.xInfo + dx, 0)
-      line.setLength(self.xWidth * Data[3 + n])
-      self.Biome[n].setPolygon(caret)
-      self.Rates[n].setLine(line)
-    g = int(planet.Gravity * 100 + 0.5) / 100
-    t = int(planet.Temperature + 300.5) - 300
-    r = int(planet.Radioactivity + 0.5)
-    self.Gravity.setText(str(g) + "g")
-    self.Temperature.setText(str(t) + "\u00B0C")
-    self.Radiation.setText(str(r) + "mR")
+    def init_biome(self):
+        """ Initialise the display of the planetary parameters """
+        pen, brush = _setup_colors()
+        dy = self.y_width / 12.0
+        caret = QPolygonF()
+        caret.append(QPointF(0, 0))
+        caret.append(QPointF(dy, dy))
+        caret.append(QPointF(0, dy + dy))
+        caret.append(QPointF(-dy, dy))
+        line = QLineF(0, dy, 40, dy)
+        yp = self.y_info + dy
+        for n in (0, 1, 2):
+            xp = self.x_info + self.x_width * 0.5
+            mark = caret.translated(xp, yp)
+            rate = line.translated(xp, yp)
+            self.rates.append(self.scene.addLine(rate, pen[n + 12]))
+            self.biome.append(self.scene.addPolygon(mark, pen[n + 6], brush[n + 6]))
+            yp += 4 * dy
 
 
-  def UpdateText(self, year, planet):
-    age = year - planet.LastVisit
-    self.ReportAge.setText('Report is ' + str(age) + ' years old.')
-    val = round(100 * planet.Value())
-    self.PlanetValue.setText('Value: ' + str(val))
-    pos = self.Population.pos()
-    if planet.Colonists > 0:
-      self.Population.setText('Population: ' + str(planet.Colonists))
-    else:
-      self.Population.setText('Uninhabited')
-    width = self.xWidth - self.Population.boundingRect().width()
-    pos.setX(self.xInfo + width)
-    self.Population.setPos(pos)
+    def init_minerals(self):
+        """ Initialise the display of mineral deposits on a planet """
+        pen, brush = _setup_colors()
+        dy = self.y_width / 12.0
+        caret = QPolygonF()
+        caret.append(QPointF(0, 0))
+        caret.append(QPointF(dy, dy))
+        caret.append(QPointF(0, dy + dy))
+        caret.append(QPointF(-dy, dy))
+        delta_y = self.y_width / 17
+        yp = self.y_minerals + 2 * delta_y
+        for n in (0, 1, 2):
+            xlen = self.x_width / 2
+            xp = self.x_width
+            show = False
+            if xlen > self.x_width:
+                show = True
+                xlen = self.x_width
+            box = QRectF(self.x_minerals, yp, xlen, 3 * delta_y)
+            mark = caret.translated(xp, yp)
+            self.s_conc.append(self.scene.addRect(box, pen[n + 3], brush[n + 3]))
+            self.m_conc.append(self.scene.addPolygon(mark, pen[n + 9], brush[n + 9]))
+            label = self.scene.addSimpleText(str(1000))
+            label.setPos(self.x_minerals + self.x_offset, yp + self.text_offset)
+            label.setPen(PEN.WHITE)
+            label.setVisible(show)
+            self.s_text.append(label)
+            yp += 5 * delta_y
 
 
-  def SetupColors(self):
-    blue = QColor(0, 0, 255, 120)
-    green = QColor(0, 255, 0, 140)
-    yellow = QColor(255, 255, 0, 160)
-    red = QColor(255, 0, 0, 180)
-    self.pen = [QPen(blue), QPen(red), QPen(green), QPen(blue), QPen(green), QPen(yellow)]
-    self.brush = [QBrush(blue), QBrush(red), QBrush(green), QBrush(blue), QBrush(green), QBrush(yellow)]
-    blue = QColor(0, 0, 255)
-    green = QColor(0, 255, 0)
-    yellow = QColor(255, 255, 0)
-    red = QColor(255, 0, 0)
-    self.pen.append(QPen(blue))
-    self.pen.append(QPen(red))
-    self.pen.append(QPen(green))
-    self.pen.append(QPen(blue))
-    self.pen.append(QPen(green))
-    self.pen.append(QPen(yellow))
-    self.brush.append(QBrush(blue))
-    self.brush.append(QBrush(red))
-    self.brush.append(QBrush(green))
-    self.brush.append(QBrush(blue))
-    self.brush.append(QBrush(green))
-    self.brush.append(QBrush(yellow))
-    WidePen = QPen(QColor(80, 80, 255))
-    WidePen.setWidthF(2.5)
-    self.pen.append(WidePen)
-    WidePen = QPen(QColor(255, 80, 80))
-    WidePen.setWidthF(2.5)
-    self.pen.append(WidePen)
-    WidePen = QPen(QColor(80, 200, 80))
-    WidePen.setWidthF(2.5)
-    self.pen.append(WidePen)
+    def update_minerals(self, planet):
+        """ Update the display of mineral deposits """
+        s_conc = []
+        m_conc = []
+        m_conc.append(planet.explored.crust.ironium / 100.0)
+        m_conc.append(planet.explored.crust.boranium / 100.0)
+        m_conc.append(planet.explored.crust.germanium / 100.0)
+        s_conc.append(planet.explored.surface.ironium)
+        s_conc.append(planet.explored.surface.boranium)
+        s_conc.append(planet.explored.surface.germanium)
+        delta_y = self.y_width / 17
+        yp = self.y_minerals + 2 * delta_y
+        for n in (0, 1, 2):
+            caret = self.m_conc[n].polygon()
+            dx = self.x_width * m_conc[n] - caret.first().x()
+            caret.translate(self.x_minerals + dx, 0)
+            self.m_conc[n].setPolygon(caret)
+            show = False
+            xlen = self.x_width * s_conc[n] / 5000.0
+            if xlen > self.x_width:
+                show = True
+                xlen = self.x_width - 1
+            self.s_conc[n].setRect(self.x_minerals, yp, xlen, 3 * delta_y)
+            self.s_text[n].setVisible(show)
+            self.s_text[n].setText(str(s_conc[n]))
+            yp += 5 * delta_y
 
 
-  def PaintBackdrop(self, faction):
-    black = QColor(0, 0, 0)
-    white = QColor(255, 255, 255, 150)
-    whitePen = QPen(white)
-    blackPen = QPen(black)
-    blackBrush = QBrush(black)
-    whitePen.setWidth(2)
-    deltaX = self.xWidth / 10
-    deltaY = self.yWidth / 3
-    Info = QRectF(self.xInfo, self.yInfo, self.xWidth, self.yWidth)
-    self.Scene.addRect(Info, blackPen, blackBrush)
-    xp = self.xInfo + self.xWidth
-    yp = self.yInfo + deltaY
-    self.Scene.addLine(self.xInfo, yp, xp, yp, whitePen)
-    yp += deltaY
-    self.Scene.addLine(self.xInfo, yp, xp, yp, whitePen)
-    Minerals = QRectF(self.xMinerals, self.yMinerals, self.xWidth, self.yWidth)
-    self.Scene.addRect(Minerals, blackPen, blackBrush)
-    xp = self.xMinerals
-    yp = self.yMinerals + self.yWidth
-    for n in range(0, 10):
-      xp += deltaX
-      self.Scene.addLine(xp, self.yMinerals, xp, yp, whitePen)
-    MinVal = []
-    MaxVal = []
-    MinVal.append(0.5 + math.log2(faction.MinGravity) / 6.0)
-    MinVal.append(0.5 + faction.MinTemperatur / 400.0)
-    MinVal.append(faction.MinRadioactivity / 100.0)
-    MaxVal.append(0.5 + math.log2(faction.MaxGravity) / 6.0)
-    MaxVal.append(0.5 + faction.MaxTemperatur / 400.0)
-    MaxVal.append(faction.MaxRadioactivity / 100.0)
-    deltaY = self.yWidth / 12
-    yp = self.yInfo + deltaY
-    for n in (0, 1, 2):
-      xp = self.xInfo + self.xWidth * MinVal[n]
-      xlen = self.xWidth * (MaxVal[n] - MinVal[n])
-      box = QRectF(xp, yp, xlen, 2 * deltaY)
-      self.Scene.addRect(box, self.pen[n], self.brush[n])
-      yp += 4 * deltaY
+    def update_biome(self, planet):
+        """ Update the display of the planetary parameters """
+        data = []
+        data.append(0.5 + math.log2(planet.gravity) / 6.0)
+        data.append(0.5 + planet.temperature / 400.0)
+        data.append(planet.radioactivity / 100.0)
+        g = planet.gravity + planet.gravity_rate
+        t = planet.temperature + planet.temperature_rate
+        r = planet.radioactivity + planet.radioactivity_rate
+        data.append(0.5 + math.log2(g) / 6.0 - data[0])
+        data.append(0.5 + t / 400.0 - data[1])
+        data.append(r / 100.0 - data[2])
+        for n in (0, 1, 2):
+            caret = self.biome[n].polygon()
+            dx = self.x_width * data[n] - caret.first().x()
+            caret.translate(self.x_info + dx, 0)
+            line = self.rates[n].line()
+            line.translate(self.x_info + dx, 0)
+            line.setLength(self.x_width * data[3 + n])
+            self.biome[n].setPolygon(caret)
+            self.rates[n].setLine(line)
+        g = int(planet.gravity * 100 + 0.5) / 100
+        t = int(planet.temperature + 300.5) - 300
+        r = int(planet.radioactivity + 0.5)
+        self.gravity.setText(str(g) + "g")
+        self.temperature.setText(str(t) + "\u00B0C")
+        self.radiation.setText(str(r) + "mR")
+
+
+    def update_text(self, year, planet):
+        """ Update text elements of the inspector panel """
+        age = year - planet.last_visit
+        if age > 0:
+            self.report_age.setText('Report is ' + str(age) + ' years old.')
+        else:
+            self.report_age.setText('Report is current.')
+        val = round(100 * planet.value())
+        self.planet_value.setText('Value: ' + str(val) + '%')
+        if planet.colonists > 0:
+            self.population.setText('Population: ' + str(planet.colonists))
+        else:
+            self.population.setText('Uninhabited')
+        width = self.x_width - self.population.boundingRect().width()
+        self.population.setPos(self.x_info + width, 0)
+
+
+    def paint_backdrop(self, faction):
+        """ Paint the background of the inspector panel """
+        pen, brush = _setup_colors()
+        delta_x = self.x_width / 10
+        delta_y = self.y_width / 3
+        info = QRectF(self.x_info, self.y_info, self.x_width, self.y_width)
+        self.scene.addRect(info, PEN.BLACK, BRUSH.BLACK)
+        xp = self.x_info + self.x_width
+        yp = self.y_info + delta_y
+        self.scene.addLine(self.x_info, yp, xp, yp, PEN.WHITE_O)
+        yp += delta_y
+        self.scene.addLine(self.x_info, yp, xp, yp, PEN.WHITE_O)
+        minerals = QRectF(self.x_minerals, self.y_minerals, self.x_width, self.y_width)
+        self.scene.addRect(minerals, PEN.BLACK, BRUSH.BLACK)
+        xp = self.x_minerals
+        yp = self.y_minerals + self.y_width
+        for n in range(0, 10):
+            xp += delta_x
+            self.scene.addLine(xp, self.y_minerals, xp, yp, PEN.WHITE_O)
+        min_val = []
+        max_val = []
+        min_val.append(0.5 + math.log2(faction.min_gravity) / 6.0)
+        min_val.append(0.5 + faction.min_temperatur / 400.0)
+        min_val.append(faction.min_radioactivity / 100.0)
+        max_val.append(0.5 + math.log2(faction.max_gravity) / 6.0)
+        max_val.append(0.5 + faction.max_temperatur / 400.0)
+        max_val.append(faction.max_radioactivity / 100.0)
+        delta_y = self.y_width / 12
+        yp = self.y_info + delta_y
+        for n in (0, 1, 2):
+            xp = self.x_info + self.x_width * min_val[n]
+            xlen = self.x_width * (max_val[n] - min_val[n])
+            box = QRectF(xp, yp, xlen, 2 * delta_y)
+            self.scene.addRect(box, pen[n], brush[n])
+            yp += 4 * delta_y

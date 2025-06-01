@@ -1,286 +1,343 @@
 
-from PyQt6.QtGui import QPen, QPolygonF
-# from PyQt6.QtCore import QPointF
+""" This file implements the handling of fleets of starships """
 
 import math
 
+from PyQt6.QtGui import QPen
+
 from universe import Universe
 from design import Design
-from defines import Stance, Task
-from colours import Pen, Brush
+from defines import Stance, Task, Feature
+import pen as Pen
+import brush as Brush
 from system import SystemType
-from defines import Perks
-from ruleset import Ruleset
-from guiprop import GuiProps as GP
+from waypoint import Waypoint
+
+import guiprop as GP
+import ruleset
+
+
+
+def get_delta(dx, dy):
+
+    """ Scale the ships's velocity to indicate warp 10 """
+
+    length = math.sqrt(dx * dx + dy * dy)
+    if length > 0:
+        scale = GP.XSCALE * 100.0 / length   # Warp 10
+        return scale * dx, scale * dy
+    return 0, 0
 
 
 
 class Fleet:
 
-  Counter = dict()
+    """ This class manages hetereogeneous collection of ships """
 
-  def getDelta(dx, dy):
-    length = math.sqrt(dx * dx + dy * dy)
-    if length > 0:
-      scale = GP.Xscale * 100.0 / length   # Warp 10
-      return scale * dx, scale * dy
-    return 0, 0
+    counter = {}
 
-
-  def __init__(self, ships, fID, people):
-    faction = people.getFaction(fID)
-    self.xc = 0
-    self.yc = 0
-    self.ShipList = []
-    self.ShipCounter = 0
-    self.WarpSpeed = 0
-    self.Heading = 0.0
-    self.FirstWaypoint = None
-    self.ActiveWaypoint = []
-    self.LastWaypoint = None
-    self.NextWaypoint = None
-    self.MineFields = []
-    self.RepeatSchedule = False
-    self.Idle = True
-    self.Task = Task.IDLE
-    self.Discovered = True           # TODO: Depends on scanners!
-    self.Orbiting = None
-    self.TotalWeight = 0
-    self.TotalFuel = 0
-    self.Fuel = 0
-    self.Germanium = 0
-    self.Boranium = 0
-    self.Ironium = 0
-    self.Settlers = 0
-    self.CargoSpace = 0
-    self.MineLaying = 0
-    self.MineSweeping = 0
-    self.MaxRange = 0
-    self.PenRange = 0
-    self.StealCargo = faction.CargoRobber
-    self.Name = None
-    self.Index = None
-    self.Picture = None
-    self.FriendOrFoe = people.getStance(Ruleset.fID0, fID)  # TODO : just a test
-    self.ShipCounter = len(ships)
-    for s in ships:
-      self.AddShip(s)
-    self.BannerIndex = faction.BannerIndex
-    self.scanner = None
-    self.MovingFleet = None
-    self.RestingFleet = None
-    self.ShipCount = None
-    self.Course = None
-    self.CloakingFactor = self.ComputeCloaking()
-    self.setFleetNameAndIndex()
-    if self.Name in Fleet.Counter:
-      Fleet.Counter[self.Name] += 1
-    else:
-      Fleet.Counter[self.Name] = 1
-    self.id = Fleet.Counter[self.Name]
+    def __init__(self, ships, f_id, people):
+        faction = people.get_faction(f_id)
+        self.xc = 0
+        self.yc = 0
+        self.ship_list = []
+        self.ship_counter = 0
+        self.warp_speed = 0
+        self.heading = 0.0
+        self.first_waypoint = None
+        self.active_waypoint = []
+        self.last_waypoint = None
+        self.next_waypoint = None
+        self.mine_fields = []
+        self.repeat_schedule = False
+        self.idle = True
+        self.task = Task.IDLE
+        self.discovered = True           # False  --  TODO: Depends on scanners!
+        self.orbiting = None
+        self.total_weight = 0
+        self.total_fuel = 0
+        self.fuel = 0
+        self.germanium = 0
+        self.boranium = 0
+        self.ironium = 0
+        self.settlers = 0
+        self.cargo_space = 0
+        self.mine_laying = 0
+        self.mine_sweeping = 0
+        self.max_range = 0
+        self.pen_range = 0
+        self.steal_cargo = faction.cargo_robber
+        self.name = None
+        self.index = None
+        self.picture = None
+        self.friend_or_foe = people.get_stance(ruleset.F_ID0, f_id)  # TODO: just a test
+        self.ship_counter = len(ships)
+        for s in ships:
+            self.add_ship(s)
+        self.banner_index = faction.banner_index
+        self.scanner = None
+        self.moving_fleet = None
+        self.resting_fleet = None
+        self.ship_count = None
+        self.course = None
+        self.cloaking_factor = self.compute_cloaking()
+        self.set_fleet_name_and_index()
+        if self.name in Fleet.counter:
+            Fleet.counter[self.name] += 1
+        else:
+            Fleet.counter[self.name] = 1
+        self.id = Fleet.counter[self.name]
 
 
-  def AddShip(self, ship):
-    self.ShipList.append(ship)
-    self.TotalWeight += ship.TotalWeight
-    self.TotalFuel += ship.TotalFuel
-    self.Fuel += ship.Fuel
-    self.Germanium += ship.Germanium
-    self.Boranium += ship.Boranium
-    self.Ironium += ship.Ironium
-    self.Settlers += ship.Settlers
-    self.CargoSpace += ship.CargoSpace
-    self.MineLaying += ship.MineLaying
-    self.MineSweeping += ship.MineSweeping
-    self.UpdateScannerData(ship)
+    def add_ship(self, ship):
+        """ Add a new ship to the fleet & update fleet properties """
+        self.ship_list.append(ship)
+        self.total_weight += ship.total_weight
+        self.total_fuel += ship.total_fuel
+        self.fuel += ship.fuel
+        self.germanium += ship.germanium
+        self.boranium += ship.boranium
+        self.ironium += ship.ironium
+        self.settlers += ship.settlers
+        self.cargo_space += ship.cargo_space
+        self.mine_laying += ship.mine_laying
+        self.mine_sweeping += ship.mine_sweeping
+#        self.update_scanner_data(ship)   # TODO: Update this information when advancing game time
 
 
-  def UpdateScannerData(self, ship):
-    maxrange = 0
-    penrange = 0
-    for s in ship.Design.System:
-      if s.domain == SystemType.SCANNER:
-        mr = s.itemType.value[0]
-        pr = s.itemType.value[1]
-        if s.itemType.value[15] == Perks.ROB:
-          self.StealCargo = True
-        maxrange += s.itemCount * mr * mr * mr * mr
-        penrange += s.itemCount * pr * pr * pr * pr
-    if maxrange > 0:
-      maxrange = math.sqrt(math.sqrt(maxrange))
-      if maxrange > self.MaxRange:
-        self.MaxRange = maxrange
-    if penrange > 0:
-      penrange = math.sqrt(math.sqrt(penrange))
-      if penrange > self.PenRange:
-        self.PenRange = penrange
+    def update_scanner_data(self, ship):
+        """ Recalculate scanner & penetration ranges, check for pickpocket scanners """
+        maxrange = 0
+        penrange = 0
+        for s in ship.design.system:
+            if s.domain == SystemType.SCANNER:
+                mr = s.item_type.value[0]
+                pr = s.item_type.value[1]
+                if s.item_type.value[15] == Feature.CROB:
+                    self.steal_cargo = True
+                maxrange += s.item_count * mr * mr * mr * mr
+                penrange += s.item_count * pr * pr * pr * pr
+        if maxrange > 0:
+            maxrange = math.sqrt(math.sqrt(maxrange))
+            self.max_range = max(maxrange, self.max_range)
+        if penrange > 0:
+            penrange = math.sqrt(math.sqrt(penrange))
+            self.pen_range = max(penrange, self.pen_range)
 
 
-  def ComputeCloaking(self):
-    total = 0
-    cloak = 0
-    for s in self.ShipList:
-      if s.Cloaking > 0:
-        cloak += s.Cloaking * s.EmptyWeight
-      total += s.TotalWeight
-    return Ruleset.CloakingRatio(cloak, total)
+    def compute_cloaking(self):
+        """ Compute cloaking effectiveness of the entire fleet """
+        total = 0
+        cloak = 0
+        for s in self.ship_list:
+            if s.cloaking > 0:
+                cloak += s.cloaking * s.empty_weight
+            total += s.total_weight
+        return ruleset.cloaking_ratio(cloak, total)
 
 
-  def setFleetNameAndIndex(self):
-    designs = [s.Design.Index for s in self.ShipList]
-    val = -1
-    for d in set(designs):
-      n = designs.count(d)
-      SD = Design.getDesign(d)
-      r = SD.ComputeBattleRating()
-      if val < n * r:
-        self.Picture = SD.getPictureIndex()
-        self.Name = SD.getDesignName()
-        val = n * r
+    def set_fleet_name_and_index(self):
+        """ Select a fleet's name & icon based on the highest battle rating """
+        designs = [s.design for s in self.ship_list]
+        val = -1
+        for d in set(designs):
+            n = designs.count(d)
+            r = d.compute_battle_rating()
+            if val < n * r:
+                self.picture = d.get_picture_index()
+                self.name = d.get_design_name()
+                val = n * r
 
 
-  def ApplyFoeFilter(self, select):
-    self.ShipCounter = 0
-    for s in self.ShipList:
-      if select[s.Design.Hull.value[2].name]:
-        self.ShipCounter += 1
+    def apply_foe_filter(self, select):
+        """ Update the ship counter of hostile fleets to account for new filter settings """
+        self.ship_counter = 0
+        for s in self.ship_list:
+            if select[s.design.hull.value[2].name]:
+                self.ship_counter += 1
 
 
-  def ApplyMyFilter(self, idle, select):
-    self.ShipCounter = 0
-    if self.Idle or not idle:
-      for s in self.ShipList:
-        if select[s.Design.Name]:
-          self.ShipCounter += 1
+    def apply_my_filter(self, idle, select):
+        """ Update the fleet's ship counter to account for new filter settings """
+        self.ship_counter = 0
+        if self.idle or not idle:
+            for s in self.ship_list:
+                if select[s.design.name]:
+                    self.ship_counter += 1
 
 
-  def GetColours(self, selected=False):
-    if selected:
-      if self.FriendOrFoe == Stance.allied:
-        return (QPen(Pen.blue_h), Brush.blue)
-      elif self.FriendOrFoe == Stance.hostile:
-        return (QPen(Pen.red_l), Brush.red_d)
-      return (QPen(Pen.green), Brush.green)
-    elif self.FriendOrFoe == Stance.allied:
-      return (QPen(Pen.blue_l), Brush.blue)
-    elif self.FriendOrFoe == Stance.hostile:
-      return (QPen(Pen.red), Brush.red_d)
-    return (QPen(Pen.green), Brush.green)
+    def get_colours(self, selected=False):
+        """ Retrieve pens & brushes for fleets on the star map """
+        if selected:
+            if self.friend_or_foe == Stance.ALLIED:
+                return (QPen(Pen.BLUE_H), Brush.BLUE)
+            if self.friend_or_foe == Stance.HOSTILE:
+                return (QPen(Pen.RED_L), Brush.RED_D)
+            return (QPen(Pen.GREEN), Brush.GREEN)
+        if self.friend_or_foe == Stance.ALLIED:
+            return (QPen(Pen.BLUE_L), Brush.BLUE)
+        if self.friend_or_foe == Stance.HOSTILE:
+            return (QPen(Pen.RED), Brush.RED_D)
+        return (QPen(Pen.GREEN), Brush.GREEN)
 
 
-  def UpdateShipCount(self):
-    self.ShipCount.setText(str(self.ShipCounter))
-    h = self.ShipCount.boundingRect().height() - 2
-    xs = GP.Xscale * self.xc
-    ys = GP.Xscale * self.yc
-    if abs(self.Heading) > 0.5 * math.pi:
-      xs += GP.f_radius + GP.f_dist
-    else:
-      w = self.ShipCount.boundingRect().width()
-      xs -= GP.f_radius + GP.f_dist + w
-    self.ShipCount.setPos(xs, ys - h / 2)
+    def update_ship_count(self):
+        """ Show the fleet's current ship count on the star map """
+        self.ship_count.setText(str(self.ship_counter))
+        h = self.ship_count.boundingRect().height() - 2
+        xs = GP.XSCALE * self.xc
+        ys = GP.XSCALE * self.yc
+        if abs(self.heading) > 0.5 * math.pi:
+            xs += GP.F_RADIUS + GP.F_DIST
+        else:
+            w = self.ship_count.boundingRect().width()
+            xs -= GP.F_RADIUS + GP.F_DIST + w
+        self.ship_count.setPos(xs, ys - h / 2)
 
 
-  def ShowCourse(self, show):
-    if self.Course:
-      self.Course.setVisible(show)
+    def show_course(self, show):
+        """ Display the flight path of a fleet on the star map """
+        if self.course:
+            self.course.setVisible(show)
 
 
-  def ColourCourse(self, selected=False):
-    pen, brush = self.GetColours(selected)
-    z = 1
-    if selected:
-      z = 2
-    if self.MovingFleet:
-      self.MovingFleet.setPen(pen)
-      self.MovingFleet.setBrush(brush)
-      self.MovingFleet.setZValue(z)
-    self.RestingFleet.setPen(pen)
-    self.RestingFleet.setBrush(brush)
-    if self.Course:
-      pen.setWidthF(Universe.CurrentPathWidth)
-      self.Course.setPen(pen)
-      self.Course.setZValue(z)
-    self.RestingFleet.setZValue(z)
+    def colour_course(self, selected=False):
+        """ Colour the flight path of a fleet on the star map """
+        pen, brush = self.get_colours(selected)
+        z = 1
+        if selected:
+            z = 2
+        if self.moving_fleet:
+            self.moving_fleet.setPen(pen)
+            self.moving_fleet.setBrush(brush)
+            self.moving_fleet.setZValue(z)
+        self.resting_fleet.setPen(pen)
+        self.resting_fleet.setBrush(brush)
+        if self.course:
+            pen.setWidthF(Universe.current_path_width)
+            self.course.setPen(pen)
+            self.course.setZValue(z)
+        self.resting_fleet.setZValue(z)
 
 
-  def UpdateCourse(self, wp, planets):
-    wp.planet = None
-    for p in planets:
-      d = (p.x - wp.xo) * (p.x - wp.xo) + (p.y - wp.yo) * (p.y - wp.yo)
-      if d < GP.p_snap:
-        wp.xo = p.x
-        wp.yo = p.y
-        wp.planet = p
-        return
+    def update_course(self, wp, planets):
+        """ Insert a planet into the flight path instead of a waypoint if both a very close """
+        wp.planet = None
+        for p in planets:
+            d = (p.x - wp.xo) * (p.x - wp.xo) + (p.y - wp.yo) * (p.y - wp.yo)
+            if d < GP.P_SNAP:
+                wp.xo = p.x
+                wp.yo = p.y
+                wp.planet = p
+                return
 
 
-  def ClearWaypoints(self):
-    wp = self.FirstWaypoint
-    while wp:
-      wo = wp
-      wp = wp.next
-      del(wo)
-    self.FirstWaypoint = None
-    self.NextWaypoint = None
-    self.LastWaypoint = None
+    def clear_waypoints(self):
+        """ Erase the entire flight path """
+        wp = self.first_waypoint
+        while wp:
+            wo = wp
+            wp = wp.next
+            del wo
+        self.first_waypoint = None
+        self.next_waypoint = None
+        self.last_waypoint = None
 
 
-  def RepeatTasks(self, repeat):
-    state = False
-    wp = self.FirstWaypoint
-    while wp:
-      if wp.next and wp.at(self.LastWaypoint):
-        state = repeat
-      wp.retain = state
-      wp = wp.next
-    self.RepeatSchedule = state
-    return state
+    def repeat_tasks(self, repeat):
+        """ Check flight paths for closed loops to support task repetition """
+        state = False
+        wp = self.first_waypoint
+        while wp:
+            if wp.next and wp.at(self.last_waypoint):
+                state = repeat
+            wp.retain = state      # TODO: Does this flag really do the trick?
+            wp = wp.next
+        self.repeat_schedule = state
+        return state
 
 
-  def UpdateSchedule(self):
-    return self.RepeatTasks(self.RepeatSchedule)
+    def update_schedule(self):
+        """ Update the check for closed loops after waypoints have been modified """
+        return self.repeat_tasks(self.repeat_schedule) # TODO: 'retain' flags have not been cleared!
 
 
-  def DeleteWaypoint(self, n0):
-    wp = None
-    wo = self.FirstWaypoint
-    wn = wo.next
-    n = 1
-    while wn and n < n0:
-      n += 1
-      wp = wo
-      wo = wn
-      wn = wn.next
-    if wp:
-      wp.next = wn
-    else:
-      self.FirstWaypoint = wn
-    if wn:
-      wn.previous = wp
-    else:
-      self.LastWaypoint = wp
-    if wo == self.NextWaypoint:
-      self.NextWaypoint = wn
-    del(wo)
-    return self.FindNextWaypoint()
+    def delete_waypoint(self, n0):
+        """ Remove the waypoint with index n0 from the flight path """
+        wp = None
+        wo = self.first_waypoint
+        wn = wo.next
+        n = 1
+        while wn and n < n0:
+            n += 1
+            wp = wo
+            wo = wn
+            wn = wn.next
+        if wp:
+            wp.next = wn
+        else:
+            self.first_waypoint = wn
+        if wn:
+            wn.previous = wp
+        else:
+            self.last_waypoint = wp
+        if wo == self.next_waypoint:
+            self.next_waypoint = wn
+        del wo
+        return self.find_next_waypoint()
 
 
-  def FindNextWaypoint(self):  # FIX ME!!  -- Check for planets?
-    wn = self.NextWaypoint
-    if wn and self.xc == wn.xo and self.yc == wn.yo:
-      self.WarpSpeed = wn.warp
-      self.Task = wn.task
-      self.NextWaypoint = wn.next
-    wp = self.FirstWaypoint
-    if wp and wp is not self.NextWaypoint:
-      if not wp.retain:
-        wo = wp
-        wp = wp.next
-        del(wo)
-    if wp:
-      wp.previous = None
-    else:
-      self.LastWaypoint = None
-    self.FirstWaypoint = wp
-    return self.NextWaypoint
+    def find_next_waypoint(self):  # FIX ME!!  -- Check for planets?
+        """ Update the first & the next waypoint of the flight path """
+        wn = self.next_waypoint
+        if wn and self.xc == wn.xo and self.yc == wn.yo:
+            self.warp_speed = wn.warp
+            self.task = wn.task
+            self.next_waypoint = wn.next
+        wp = self.first_waypoint
+        if wp and wp is not self.next_waypoint:
+            if not wp.retain:
+                wo = wp
+                wp = wp.next
+                del wo
+        if wp:
+            wp.previous = None
+        else:
+            self.last_waypoint = None
+        self.first_waypoint = wp
+        return self.next_waypoint
+
+
+    def add_waypoint(self, x, y, index=-1):
+        """ Add a new waypoint to the flight path of a fleet """
+        wa = Waypoint(x, y)
+        if self.first_waypoint:
+            if self.active_waypoint:
+                w0 = self.active_waypoint[index]
+                wa.warp = w0.warp
+                if w0.next:
+                    w1 = w0.next
+                    w1.previous = wa
+                    wa.next = w1
+                    if w1 == self.next_waypoint:
+                        self.next_waypoint = wa
+                else:
+                    self.last_waypoint = wa
+                w0.next = wa
+                wa.previous = w0
+            else:
+                wa.warp = self.warp_speed
+                wa.next = self.next_waypoint
+                wa.previous = self.next_waypoint.previous
+                if wa.previous:
+                    wa.previous.next = wa
+                else:
+                    self.first_waypoint = wa
+                self.next_waypoint.previous = wa
+                self.next_waypoint = wa
+        else:
+            self.first_waypoint = wa
+            self.last_waypoint = wa
+            self.next_waypoint = wa
+        self.active_waypoint = [wa]
+        return wa

@@ -1,48 +1,56 @@
 
-import random
+""" This module implements rules & procedures to generate the 'Stars!' universe """
+
 import math
-from guiprop import GuiProps
+import copy
+import random
+
+import guiprop as GP
+
 from scanner import Model
 
 
-# This class facilities the generation of a random "Stars!" universe ...
 
-class Ruleset(random.Random):
-
-  fID0 = 0   # Define the index of the faction controlled by the player ...
+F_ID0 = 0   # Define the index of the faction controlled by the player ...
 
 
-  def MinefieldDecay(fID):
+def minefield_decay(_):
+    """ Return the decay rate of mine fields belonging to a certain faction """
     return 0.02
 
 
-  def CloakingRatio(Cloaking, Weight):
-    cloak = Cloaking / Weight
+def cloaking_ratio(cloaking, weight):
+    """ Compute the cloaking effectivenes of fleets """
+    cloak = cloaking / weight
     if cloak <= 100:
-      c = cloak / 2
+        c = cloak / 2
     else:
-      cloak -= 100
-      if cloak <= 200:
-        c = 50 + cloak / 8
-      else:
-        cloak -= 200
-        if cloak <= 312:
-          c = 75 + cloak / 24
+        cloak -= 100
+        if cloak <= 200:
+            c = 50 + cloak / 8
         else:
-          cloak -= 312
-          if cloak <= 512:
-            c = 88 + cloak / 64
-          elif cloak < 768:
-            c = 96
-          elif cloak < 1000:
-            c = 97
-          else:
-            c = 98
+            cloak -= 200
+            if cloak <= 312:
+                c = 75 + cloak / 24
+            else:
+                cloak -= 312
+                if cloak <= 512:
+                    c = 88 + cloak / 64
+                elif cloak < 768:
+                    c = 96
+                elif cloak < 1000:
+                    c = 97
+                else:
+                    c = 98
     return c / 100
 
 
-  NameList = ["Aarhus", "Abderhalden", "Aberdonia", "Abilunon", "Abkhazia",
-               "Achaemenides", "Adachi", "Adelheid", "Admetos", "Adonis",
+class Ruleset:
+
+    """ This class facilities the generation of a randomized 'Stars!' universe """
+
+    name_list = ["Aarhus", "Abderhalden", "Aberdonia", "Abilunon", "Abkhazia",
+              "Achaemenides", "Adachi", "Adelheid", "Admetos", "Adonis",
                "Aegina", "Agamemnon", "Agasthenes", "Aharon", "Akhmatova",
                "Albellus", "Algoa", "Anhui", "Antenor", "Anteros", "Apollo",
                "Arnenordheim", "Arrhenius", "Artemis", "Aurelia", "Barkhatova",
@@ -137,83 +145,108 @@ class Ruleset(random.Random):
                "Golganis", "Targus", "Vione", "Kronac", "Draconis"]
 
 
-  def __init__(self, seed=128):
-    super(self.__class__, self).__init__(seed)
-    self.Seed = seed
-    self.Location = []
-    self.PlanetNames = list(Ruleset.NameList)
+    def __init__(self, seed=128):
+        random.seed(seed)
+        self.seed = seed
+        self.location = []
+        self.planet_names = copy.deepcopy(Ruleset.name_list)
 
 
-  def _FindClosest(self, x0, y0):
-    dist = 1e20
-    for [x, y] in self.Location:
-      d = (x - x0) * (x - x0) + (y - y0) * (y - y0)
-      if d < dist:
-        dist = d
-    return math.sqrt(dist)
+    def _find_closest(self, x0, y0):
+        """ Find the nearest star & determine its distance """
+        dist = 1e20
+        for [x, y] in self.location:
+            d = (x - x0) * (x - x0) + (y - y0) * (y - y0)
+            dist = min(d, dist)
+        return math.sqrt(dist)
 
 
-  def Random(self, MinVal, MaxVal, Optimum):
-    return self.triangular(MinVal, MaxVal, Optimum)
+    def random(self, min_val, max_val, optimum):
+        """ Compute a random number using a trianguler probability density """
+        return random.triangular(min_val, max_val, optimum)
 
 
-  def FindName(self):
-    try:
-      name = self.choice(self.PlanetNames)
-      self.PlanetNames.remove(name)
-      return name
-    except:
-      return None
+    def _find_name(self):
+        """ Select a name for the new planet at random """
+        try:
+            name = random.choice(self.planet_names)
+            self.planet_names.remove(name)
+            return name
+        except IndexError:
+            return None
 
 
-  def FindPosition(self):
-    rmin = GuiProps.planet_distance / GuiProps.Xscale
-    xlim = self.Xmax()
-    ylim = self.Ymax()
-    Retries = 0
-    while Retries < 128:
-      x = self.randrange(-xlim, xlim)
-      y = self.randrange(-ylim, ylim)
-      r = self._FindClosest(x, y)
-      if r > self.Rmin() and r > rmin:
-        self.Location.append([x, y])
-        return [x, y]
-    return None
+    def find_position(self):
+        """ Determine a suitable location for a new star system """
+        rmin = GP.PLANET_DISTANCE / GP.XSCALE
+        xlim = self.xmax()
+        ylim = self.ymax()
+        retries = 0
+        while retries < 128:
+            x = random.randrange(-xlim, xlim)
+            y = random.randrange(-ylim, ylim)
+            r = self._find_closest(x, y)
+            if r > self.rmin() and r > rmin:
+                self.location.append([x, y])
+                return [x, y]
+        return None
 
 
-  def FirstYear(self):
-    return 2400
+    def get_default_game_name(self):
+        """ Return the name of the game if none has been specified """
+        return 'Silent Running'
 
 
-  def GetPopulationCeiling():
-    return 400000                    # TODO: Species dependent model
+    def first_year(self):
+        """ Return the very first game year """
+        return 2400
 
 
-  def FirstScanner(self):
-#    return Model.Scoper150
-    return Model.Snooper500X
-
-  def GetMaxResources(self):
-    return 100.0
-
-  def GetMinResources(self):
-    return 5.0
-
-  def GetResources(self):
-    return 70.0
-
-  def PlanetCount():
-    return 15
-
-  def Xmax(self):
-    return 1000.0
-
-  def Ymax(self):
-    return 1000.0
-
-  def Rmin(self):
-    return 20.0
+    def get_population_ceiling(self, _):
+        """ Return the population ceiling for the specified faction """
+        return 400000     # TODO: faction dependent ...
 
 
-  def GetNumberOfPlayers(self):  # This must depend on the size of the star map
-    return 4
+    def first_scanner(self, _):
+        """ Return the scanner model installed on the player's home world
+            at the very start of a new game """
+#    return Model.SCOPER150
+        return Model.SNOOPER500X   # TODO: faction dependent model!
+
+
+    def get_max_resources(self):
+        """ Highest probability to find minerals in a planet's crust """
+        return 100.0
+
+    def get_min_resources(self):
+        """ Lowest probability to find minerals in a planet's crust """
+        return 5.0
+
+    def get_resources(self):
+        """ Peak probability to find minerals in a planet's crust """
+        return 70.0
+
+
+    def planet_count(self):
+        """ Return the number of star systems in the galaxy """
+        return 15  # TODO: Make this dependent on the size code of the galaxy ...
+
+
+    def xmax(self):
+        """ Half the size of the galaxy map in the horizontal direction """
+        return 1000
+
+
+    def ymax(self):
+        """ Half the size of the galaxy map in the vertical direction """
+        return 1000
+
+
+    def rmin(self):
+        """ The minimal allowed distance between two star systems """
+        return 20
+
+
+    def get_number_of_players(self):  # TODO: This must depend on the size of the star map
+        """ Return the number of players if default game settings are used """
+        return 4

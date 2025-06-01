@@ -1,4 +1,6 @@
 
+""" This module implements a mechanism to specify planetary environments """
+
 from minerals import Minerals
 from defines import Stance
 
@@ -6,20 +8,22 @@ from defines import Stance
 
 class PlanetData:
 
-  def __init__(self):
+    """ This class is used to store the biome data as reported by visiting fleets """
 
-    self.Radioactivity = 0                             # These parameters may be modified via
-    self.Gravity = 0                                   # terraforming technologies and influence
-    self.Temperature = 0                               # population density & growth
+    def __init__(self):
 
-    self.RadioactivityRate = 0.0                       # TODO: Create a viable terraforming
-    self.GravityRate = 0.0                             # model to compute this rates.
-    self.TemperatureRate = 0.0
+        self.radioactivity = 0                             # These parameters may be modified via
+        self.gravity = 0                                   # terraforming technologies and influence
+        self.temperature = 0                               # population density & growth
 
-    self.Colonists = 0
+        self.radioactivity_rate = 0.0                      # TODO: Create a viable terraforming
+        self.gravity_rate = 0.0                            # model to compute these rates.
+        self.temperature_rate = 0.0
 
-    self.Relation = Stance.neutral
-    self.SpaceStation = False
+        self.colonists = 0
 
-    self.Crust = Minerals()
-    self.Surface = Minerals()
+        self.relation = Stance.NEUTRAL
+        self.space_station = False
+
+        self.crust = Minerals()
+        self.surface = Minerals()

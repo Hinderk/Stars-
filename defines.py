@@ -1,9 +1,12 @@
 
+""" This module defines various enumerations used throughout the code """
+
 from enum import Enum
 
 
 
 class MapView(Enum):
+    """ List of display modes for the planets on the star map """
     DEFAULT = 0
     SURFACE = 1
     CRUST = 2
@@ -12,50 +15,25 @@ class MapView(Enum):
     MINIMAL = 5
 
 
+class Model(Enum):
+    """ These types of mine fields may be deployed """
+    NORMAL = 'Standard'
+    HEAVY = 'Heavy'
+    SPEED_TRAP = 'Speed Trap'
+
+
 class Stance(Enum):
-    none = 0
-    allied = 1
-    friendly = 2
-    neutral = 4
-    hostile = 8
-    accept = 15
-
-
-class Traits(Enum):
-    NO = 0           # No special traits
-    HE = 1           # Hyper expansion
-    SD = 2           # Space demolition
-    ST = 3           # Super stealthy
-    PP = 4           # Packet physics
-    WM = 5           # War monger
-    IT = 6           # Interstellar traveller
-    CA = 7           # Claim adjuster
-    AR = 8           # Alternate reality
-    IS = 9           # Inner strength
-    JT = 10          # Jack of all trades
-    
-
-class Perks(Enum):
-    NONE = 0         # No specific perks
-    IFE = 1          # Improved fuel efficiency
-    NRSE = 2         # No ramscoop engines
-    TTF = 3          # Total terraforming
-    CHE = 4          # Cheap engines
-    ARM = 5          # Advanced remote mining
-    OBRM = 6         # Only basis remote mining
-    ISB = 7          # Improved starbases
-    NAS = 8          # No advanced scanners
-    GRE = 9          # Generalized research
-    LSP = 10         # Low starting population
-    URE = 11         # Ultimate Recycling
-    BET = 12         # Bleeding edge technology
-    MAL = 13         # Mineral alchemy
-    RSH = 14         # Regenerating shields
-    ROB = 15         # Steal freight
-    HIDE = 16        # Improve ship cloaking
+    """ Possible attitudes of factions towards each other """
+    IGNORE = 0
+    ALLIED = 1
+    FRIENDLY = 2
+    NEUTRAL = 4
+    HOSTILE = 8
+    ACCEPT = 15
 
 
 class ShipClass(Enum):
+    """ Categories of ship designs available in the game """
     COL = "Colony Ship"
     FRT = "Freighter"
     SCT = "Scout"
@@ -67,7 +45,16 @@ class ShipClass(Enum):
     FLT = "Fuel Transport"
 
 
+class Feature(Enum):
+    """ Features or prerequisites for specific items """
+    NONE = 0         # No specific features
+    CROB = 1         # Cargo stealing scanner
+    HIDE = 2         # Improved ship cloaking
+    OSSC = 3         # Only simple scanners allowed
+
+
 class Task(Enum):
+    """ List of waypoint tasks to be performed by fleets """
     IDLE = 'None'
     MOVE = 'Travel'
     HAUL = 'Transport'
@@ -75,13 +62,16 @@ class Task(Enum):
 
 
 class PlayerType(Enum):
+    """ Types of slots available for the game roster """
     AIP = 'AI Antagonist'
     EXP = 'Expansion Slot'
     HUP = 'Human Player'
+    REX = 'Random Expansion Slot'
     RNG = 'Random Player'
 
 
 class AIMode(Enum):
+    """ Levels of aggressiveness of the enenmy AI """
     AI0 = 'Easy'
     AI1 = 'Standard'
     AI2 = 'Tough'

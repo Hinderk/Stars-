@@ -1,2 +1,2 @@
 # Stars-
-A trivial exercise in using python to create graphical user interfaces 
+A trivial exercise in using python to create graphical user interfaces
