@@ -1,4 +1,6 @@
 
+""" This module implements a mechanism to specify planetary environments """
+
 from minerals import Minerals
 from defines import Stance
 
@@ -15,7 +17,7 @@ class PlanetData:
         self.temperature = 0                               # population density & growth
 
         self.radioactivity_rate = 0.0                      # TODO: Create a viable terraforming
-        self.gravity_rate = 0.0                            # model to compute this rates.
+        self.gravity_rate = 0.0                            # model to compute these rates.
         self.temperature_rate = 0.0
 
         self.colonists = 0

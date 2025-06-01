@@ -1,4 +1,6 @@
 
+""" This module implements the dialog used to setup new game sessions """
+
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QKeySequence
@@ -8,16 +10,18 @@ from PyQt6.QtWidgets import QGroupBox, QComboBox
 from PyQt6.QtWidgets import QRadioButton, QLabel
 from PyQt6.QtWidgets import QPushButton
 
-from guidesign import GuiDesign, GuiStyle
+from stylesheet import StyleSheet as ST
 
 
 
 class NewGame(QWidget):
 
-    def __init__(self, people, rules):
+    """ The class implements the dialog used to setup new games """
+
+    def __init__(self, people, _):
         super().__init__()
         self.setWindowTitle('New Game')
-        self.setStyleSheet(GuiDesign.get_style(GuiStyle.SIMPLESETUP))
+        self.setStyleSheet(ST.SIMPLESETUP.value)
         icon = QIcon()
         icon.addPixmap(QPixmap(':/Icons/Host'))
         self.setWindowIcon(icon)
@@ -132,6 +136,7 @@ class NewGame(QWidget):
 
 
     def configure_game(self):
+        """ Open the new game wizard with default values """
         self.faction_selector.setCurrentIndex(0)
         self.map_size[1].setChecked(True)
         self.difficulty[1].setChecked(True)

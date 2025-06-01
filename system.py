@@ -1,8 +1,11 @@
 
+""" This module implements the various systems a ship may carry into combat """
+
 from enum import Enum
 
 
 class SystemType(Enum):
+    """ Categories of technichal equipment """
     EMPTY = 0
     BEAMWEAPON = 1
     MISSILE = 2
@@ -18,9 +21,10 @@ class SystemType(Enum):
 
 class System:
 
+    """ This class specifies the properties of a piece of equipment """
+
     def __init__(self):
 
         self.domain = SystemType.EMPTY
         self.item_type = None
         self.item_count = 0
-

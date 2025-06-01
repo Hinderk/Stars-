@@ -1,8 +1,11 @@
 
+""" The victory conditions for a game are defined in this module """
+
 from enum import Enum
 
 
 class Victory(Enum):
+    """ Victory conditions for a game, their defaults & their constraints """
     PP = ['Percentage of all planets owned:', '%', 60, 20, 100, 5, 105, True]
     TF = ['Development threshold to be reached:', None, 22, 8, 26, 1, 70, True]
     NF = ['Number of fields in which to reach this threshold:', None, 4, 2, 6, 1, 55, True]

@@ -1,4 +1,6 @@
 
+""" This module is used to define the perks & properties of a game faction """
+
 import random
 
 from defines import Stance
@@ -7,6 +9,8 @@ from faction import Faction
 
 
 class People:
+
+    """ This class encodes the perks & properties of a game faction """
 
     species = ['Humanoid', 'Rabbitoid', 'Insectoid', 'Nucletoid', 'Silicanoid', 'Antetheral']
     name = ['Robotoids', 'Turindrones', 'Automitrons', 'Rototills', 'Cybertrons', 'Macinti']
@@ -28,6 +32,7 @@ class People:
 
 
     def get_stance(self, f_ida, f_idb):  # TODO: For testing purposes only ...
+        """ Return the stance of two factions towards each other """
         if f_ida == f_idb:
             return Stance.ALLIED
         if f_idb < 4:

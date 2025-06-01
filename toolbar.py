@@ -1,4 +1,6 @@
 
+""" This module implements the tool bar used to control the presentation of the star map """
+
 from PyQt6.QtWidgets import QMenu, QToolButton
 from PyQt6.QtWidgets import QToolBar, QSpinBox
 from PyQt6.QtGui import QActionGroup
@@ -10,12 +12,14 @@ from PyQt6.QtCore import pyqtSignal as QSignal
 from defines import Stance, ShipClass
 
 
-instant = QToolButton.ToolButtonPopupMode.InstantPopup
-delayed = QToolButton.ToolButtonPopupMode.DelayedPopup
+_instant = QToolButton.ToolButtonPopupMode.InstantPopup
+_delayed = QToolButton.ToolButtonPopupMode.DelayedPopup
 
 
 
 class ToolBar(QToolBar):
+
+    """ This class implements the tool bar for the star map """
 
     show_mines = QSignal(bool, Stance)
     filter_my_fleets = QSignal(bool, dict)
@@ -24,143 +28,62 @@ class ToolBar(QToolBar):
 
     def __init__(self):
 
-        super(self.__class__, self).__init__()
+        super().__init__()
 
         self.design_names = []
         self.my_designs = {}
         self.alien_designs = {}
-        for sc in ShipClass:
-            self.alien_designs[sc.name] = True
-        self.mine_filter = dict()
-        self.mine_filter[Stance.ALLIED] = True
-        self.mine_filter[Stance.FRIENDLY] = True
-        self.mine_filter[Stance.NEUTRAL] = True
-        self.mine_filter[Stance.HOSTILE] = True
+        self.mine_filter = {}
+        self.mine_action = {}
+        self.my_filter = {}
+        self.foe_filter = {}
 
-        icon = QIcon(":/Toolbar/Mine")
-        self.mines = QToolButton(self)
-        self.mines.setIcon(icon)
-        self.mines.setCheckable(True)
-        self.mines.setAutoRepeat(False)
-        self.mines.setToolTip('Show mine fields ...')
-        self.mines.setStatusTip('Show mine fields ...')
-        self.define_mine_menu(self.mines)
+        self.action_default_view = self._new_action(
+            ':/Toolbar/Default',
+            'Indicate the strength of fleets in planetary orbits ...')
+        self.action_percent_view = self._new_action(
+            ':/Toolbar/Percent', 'Indicate planet values by colours & size ...')
+        self.action_population_view = self._new_action(
+            ':/Toolbar/People', 'Display the size of planetary settlements ...')
+        self.action_surface_mineral_view = self._new_action(
+            ':/Toolbar/Surface',
+            'Indicate mineral stores on the planets\' surface ...')
+        self.action_concentration_view = self._new_action(
+            ':/Toolbar/Minerals',
+            'Indicate mineral concentrations within the planets\' crust ...')
+        self.action_no_info_view = self._new_action(
+            ':/Toolbar/Cancel', 'Hide all player related information ...')
+        self.action_add_waypoint = self._new_action(
+            ':/Toolbar/Waypoint', 'Add way points to the flight path ...')
+        self.action_waiting_fleets = self._new_action(
+            ':/Toolbar/Waiting', 'Show fleets without any task to complete ...')
+        self.action_ship_count = self._new_action(
+            ':/Toolbar/Orbiting',
+            'Show the strength of all fleets within scanner range ...')
+        self.action_path_overlay = self._new_action(
+            ':/Toolbar/Paths',
+            'Show the flight paths of all fleets within scanner range ...')
+        self.action_planet_names = self._new_action(
+            ':/Toolbar/Names', 'Show planet names ...')
+        self.action_radar_view = self._new_action(
+            ':/Toolbar/Scanner', 'Show scanner coverage on the star map ...')
 
-        icon = QIcon(":/Toolbar/Default")
-        self.action_default_view = QAction(self)
-        self.action_default_view.setCheckable(True)
-        self.action_default_view.setIcon(icon)
-        self.action_default_view.setAutoRepeat(False)
-        self.action_default_view.setToolTip("Normal View")
-        self.action_default_view.setStatusTip("Normal View")
-
-        icon = QIcon(":/Toolbar/Percent")
-        self.action_percent_view = QAction(self)
-        self.action_percent_view.setCheckable(True)
-        self.action_percent_view.setIcon(icon)
-        self.action_percent_view.setAutoRepeat(False)
-        self.action_percent_view.setToolTip("Planet Value View")
-        self.action_percent_view.setStatusTip("Planet Value View")
-
-        icon = QIcon(":/Toolbar/People")
-        self.action_population_view = QAction(self)
-        self.action_population_view.setCheckable(True)
-        self.action_population_view.setIcon(icon)
-        self.action_population_view.setAutoRepeat(False)
-        self.action_population_view.setToolTip("Population View")
-        self.action_population_view.setStatusTip("Population View")
-
-        icon = QIcon(":/Toolbar/Surface")
-        self.action_surface_mineral_view = QAction(self)
-        self.action_surface_mineral_view.setCheckable(True)
-        self.action_surface_mineral_view.setIcon(icon)
-        self.action_surface_mineral_view.setAutoRepeat(False)
-        self.action_surface_mineral_view.setToolTip("Surface Mineral View")
-        self.action_surface_mineral_view.setStatusTip("Surface Mineral View")
-
-        icon = QIcon(":/Toolbar/Minerals")
-        self.action_concentration_view = QAction(self)
-        self.action_concentration_view.setCheckable(True)
-        self.action_concentration_view.setIcon(icon)
-        self.action_concentration_view.setAutoRepeat(False)
-        self.action_concentration_view.setToolTip("Mineral Concentration View")
-        self.action_concentration_view.setStatusTip("Mineral Concentration View")
-
-        icon = QIcon(":/Toolbar/Cancel")
-        self.action_no_info_view = QAction(self)
-        self.action_no_info_view.setCheckable(True)
-        self.action_no_info_view.setIcon(icon)
-        self.action_no_info_view.setAutoRepeat(False)
-        self.action_no_info_view.setToolTip("No Player Info View")
-        self.action_no_info_view.setStatusTip("Remove information about players ...")
-
-        icon = QIcon(":/Toolbar/Waypoint")
-        self.action_add_waypoint = QAction(self)
-        self.action_add_waypoint.setCheckable(True)
-        self.action_add_waypoint.setIcon(icon)
-        self.action_add_waypoint.setAutoRepeat(False)
-        self.action_add_waypoint.setStatusTip("Add way points to the flight path ...")
-        self.action_add_waypoint.setToolTip("Add way points ...")
-
-        icon = QIcon(":/Toolbar/Waiting")
-        self.action_waiting_fleets = QAction(self)
-        self.action_waiting_fleets.setCheckable(True)
-        self.action_waiting_fleets.setIcon(icon)
-        self.action_waiting_fleets.setAutoRepeat(False)
-        self.action_waiting_fleets.setToolTip("Show idle fleets only ...")
-        self.action_waiting_fleets.setStatusTip("Show fleets without any task to complete ...")
-
-        icon = QIcon(":/Toolbar/Orbiting")
-        self.action_ship_count = QAction(self)
-        self.action_ship_count.setCheckable(True)
-        self.action_ship_count.setIcon(icon)
-        self.action_ship_count.setAutoRepeat(False)
-        self.action_ship_count.setToolTip("Show fleet strengths ...")
-        self.action_ship_count.setStatusTip("Show the strength of all fleets within scanner range ...")
-
-        icon = QIcon(":/Toolbar/Friendlies")
-        self.action_friendlies = QToolButton(self)
-        self.action_friendlies.setCheckable(False)
-        self.action_friendlies.setPopupMode(instant)
-        self.action_friendlies.setIcon(icon)
-        self.action_friendlies.setToolTip("Show friendly fleets ...")
-        self.action_friendlies.setStatusTip("Show only friendly fleets on the star map ...")
-        self.action_friendlies.setAutoRepeat(False)
-        self.define_my_design_menu(self.action_friendlies)
-
-        icon = QIcon(":/Toolbar/Foes")
-        self.action_foes = QToolButton(self)
-        self.action_foes.setCheckable(False)
-        self.action_foes.setPopupMode(instant)
-        self.action_foes.setIcon(icon)
-        self.action_foes.setToolTip("Show enemy fleets ...")
-        self.action_foes.setStatusTip("Show only enemy fleets on the star map ...")
-        self.action_foes.setAutoRepeat(False)
-        self.define_enemy_design_menu(self.action_foes)
-
-        icon = QIcon(":/Toolbar/Zoomlevel")
-        self.zoom = QToolButton(self)
-        self.zoom.setPopupMode(instant)
-        self.zoom.setIcon(icon)
-        self.zoom.setAutoRepeat(False)
-        self.zoom.setToolTip("Define the level of magnification ...")
-        self.zoom.setStatusTip("Define the level of magnification ...")
-
-        icon = QIcon(":/Toolbar/Paths")
-        self.action_path_overlay = QAction(self)
-        self.action_path_overlay.setCheckable(True)
-        self.action_path_overlay.setIcon(icon)
-        self.action_path_overlay.setAutoRepeat(False)
-        self.action_path_overlay.setToolTip("Show fleet paths")
-        self.action_path_overlay.setStatusTip("Show the flight paths of all fleets within scanner range ...")
-
-        icon = QIcon(":/Toolbar/Names")
-        self.action_planet_names = QAction(self)
-        self.action_planet_names.setCheckable(True)
-        self.action_planet_names.setIcon(icon)
-        self.action_planet_names.setAutoRepeat(False)
-        self.action_planet_names.setToolTip("Show planet names ...")
-        self.action_planet_names.setStatusTip("Show planet names ...")
+        self.mines = self._new_button(
+            ':/Toolbar/Mine', 'Show mine fields ...')
+        self._define_mine_menu(self.mines)
+        self.action_friendlies = self._new_button(
+            ':/Toolbar/Friendlies',
+            'Apply a filter to hide certain friendly fleets on the star map ...',
+            True)
+        self._define_my_design_menu(self.action_friendlies)
+        self.action_foes = self._new_button(
+            ':/Toolbar/Foes',
+            'Apply a filter to hide certain hostile fleets on the star map ...',
+            True)
+        self._define_enemy_design_menu(self.action_foes)
+        self.zoom = self._new_button(
+            ':/Toolbar/Zoomlevel',
+            'Specify the level of magnification for the star map ...', True)
 
         self.radar_range = QSpinBox()
         self.radar_range.setSuffix('%')
@@ -169,23 +92,18 @@ class ToolBar(QToolBar):
         self.radar_range.setSingleStep(10)
         self.radar_range.setMinimumSize(QSize(100, 40))
         self.radar_range.setAlignment(Qt.AlignmentFlag.AlignRight)
-
-        icon = QIcon(":/Toolbar/Scanner")
-        self.action_radar_view = QAction(self)
-        self.action_radar_view.setCheckable(True)
-        self.action_radar_view.setIcon(icon)
-        self.action_radar_view.setAutoRepeat(False)
-        self.action_radar_view.setToolTip("Scanner coverage overlay ...")
-        self.action_radar_view.setStatusTip("Show scanner coverage on the star map ...")
-
         self.view_mode = QActionGroup(self)
+        self._assemble_toolbar()
+
+
+    def _assemble_toolbar(self):
+        """ Compose the tool bar from its individual elements """
         self.view_mode.addAction(self.action_default_view)
         self.view_mode.addAction(self.action_surface_mineral_view)
         self.view_mode.addAction(self.action_concentration_view)
         self.view_mode.addAction(self.action_percent_view)
         self.view_mode.addAction(self.action_population_view)
         self.view_mode.addAction(self.action_no_info_view)
-
         self.addAction(self.action_default_view)
         self.addAction(self.action_surface_mineral_view)
         self.addAction(self.action_concentration_view)
@@ -205,44 +123,62 @@ class ToolBar(QToolBar):
         self.addWidget(self.zoom)
 
 
+    def _new_action(self, iconfile, tip):
+        """ Create a new action """
+        action = QAction(self)
+        action.setCheckable(True)
+        action.setIcon(QIcon(iconfile))
+        action.setAutoRepeat(False)
+        action.setStatusTip(tip)
+        return action
+
+
+    def _new_button(self, iconfile, tip, instant=False):
+        """ Create a new button """
+        button = QToolButton(self)
+        if instant:
+            button.setPopupMode(_instant)
+            button.setCheckable(False)
+        else:
+            button.setCheckable(True)
+        button.setIcon(QIcon(iconfile))
+        button.setAutoRepeat(False)
+        button.setStatusTip(tip)
+        return button
+
+
+    def _add_new_design(self, menu, name):
+        """ Create a new menu entry for the design filter """
+        action = QAction()
+        action.setText(name)
+        action.setData(name)
+        action.setCheckable(True)
+        action.setChecked(True)
+        action.toggled.connect(self.show_my_fleets)
+        menu.addAction(action)
+        self.my_filter[name] = action
+
+
     def update_my_designs(self, design_data):
-
-        class MyAction(QAction):
-
-            def __init__(self, name):
-                super(self.__class__, self).__init__()
-                self.ship_design = name
-
-        @staticmethod
-        def add_action(menu, action, label):
-            action.setText(label)
-            action.setCheckable(True)
-            action.setChecked(True)
-            action.toggled.connect(self.show_my_fleets)
-            menu.addAction(action)
-
+        """ Update the filter settings for ship designs created by the player """
         menu = self.action_friendlies.menu()
         for design in self.design_names:
             menu.removeAction(self.my_filter[design])
-        self.my_filter.clear()
+        self.my_filter = {}
         design_data.sort()
-        new_designs = dict()
+        new_designs = {}
         for name in design_data:
             if name in self.design_names:
                 new_designs[name] = self.my_designs[name]
             else:
                 new_designs[name] = True
-            new_action = MyAction(name)
-            add_action(menu, new_action, name)
-            self.my_filter[name] = new_action
+            self._add_new_design(menu, name)
         self.my_designs = new_designs
         self.design_names = design_data
 
 
-    def define_my_design_menu(self, design_menu):
-        self.design_names = []
-        self.my_designs = dict()
-        self.my_filter = dict()
+    def _define_my_design_menu(self, design_menu):
+        """ Create the menu with the filter settings for the player's ship designs """
         menu = QMenu(self)
         menu.setStyleSheet("QMenu::item{padding: 5px 40px 5px 0px}")
         self.all_my_designs = menu.addAction('   All Designs')
@@ -258,23 +194,21 @@ class ToolBar(QToolBar):
         design_menu.setMenu(menu)
 
 
-    def define_enemy_design_menu(self, design_menu):
+    def _add_enemy_design(self, menu, design):
+        """ Create a new entry in the enemy design filter menu """
+        action = QAction()
+        action.setData(design.name)
+        action.setText(design.value)
+        action.setCheckable(True)
+        action.setChecked(True)
+        action.toggled.connect(self.show_enemy_fleets)
+        menu.addAction(action)
+        self.foe_filter[design] = action
+        self.alien_designs[design.name] = True
 
-        class EnemyAction(QAction):
 
-            def __init__(self, design):
-                super(self.__class__, self).__init__()
-                self.ship_design = design.name
-
-        @staticmethod
-        def add_action(menu, action, label):
-            action.setText(label)
-            action.setCheckable(True)
-            action.setChecked(True)
-            action.toggled.connect(self.show_enemy_fleets)
-            menu.addAction(action)
-
-        self.foe_filter = dict()
+    def _define_enemy_design_menu(self, design_menu):
+        """ Create the menu with the filter settings for enemy ship designs """
         menu = QMenu(self)
         menu.setStyleSheet("QMenu::item{padding: 5px 40px 5px 0px}")
         self.all_enemy_designs = menu.addAction('   All Designs')
@@ -287,62 +221,54 @@ class ToolBar(QToolBar):
         self.hide_enemy_designs.setCheckable(False)
         self.hide_enemy_designs.triggered.connect(self.hide_all_enemy_designs)
         menu.addSeparator()
+        self.foe_filter = {}
         for design in ShipClass:
-            action = EnemyAction(design)
-            add_action(menu, action, design.value)
-            self.foe_filter[design] = action
+            self._add_enemy_design(menu, design)
         design_menu.setMenu(menu)
 
 
-    def define_mine_menu(self, mines):
+    def _add_mine_action(self, menu, data, label, tick=True):
+        """ Create a new entry in the mine filter menu """
+        action = QAction()
+        action.setData(data)
+        action.setText(label)
+        action.setCheckable(tick)
+        action.setChecked(True)
+        self.mine_action[data] = action
+        if tick:
+            action.toggled.connect(self.show_minefields)
+            self.mine_filter[data] = True
+        else:
+            action.triggered.connect(self.change_mine_display)
+        menu.addAction(action)
 
-        class MineAction(QAction):
 
-            def __init__(self, stance):
-                super(self.__class__, self).__init__()
-                self.mine_view = stance
-
-        @staticmethod
-        def add_action(menu, action, label, tick=True):
-            action.setText(label)
-            action.setCheckable(tick)
-            action.setChecked(True)
-            if tick:
-                action.toggled.connect(self.show_minefields)
-            else:
-                action.triggered.connect(self.change_mine_display)
-            menu.addAction(action)
-
+    def _define_mine_menu(self, mines):
+        """ Create the menu with the filter settings for mine fields """
         menu = QMenu(self)
         menu.setStyleSheet("QMenu::item{padding: 5px 40px 5px 0px}")
-        self.all_mines = MineAction(Stance.ACCEPT)
-        self.no_mines = MineAction(Stance.IGNORE)
-        self.allied_mines = MineAction(Stance.ALLIED)
-        self.friendly_mines = MineAction(Stance.FRIENDLY)
-        self.neutral_mines = MineAction(Stance.NEUTRAL)
-        self.hostile_mines = MineAction(Stance.HOSTILE)
-        add_action(menu, self.all_mines, '   All Mine Fields', False)
-        add_action(menu, self.no_mines, '   No Mine Fields', False)
+        self._add_mine_action(menu, Stance.ACCEPT, '   All Mine Fields', False)
+        self._add_mine_action(menu, Stance.IGNORE, '   No Mine Fields', False)
         menu.addSeparator()
-        add_action(menu, self.allied_mines, 'Mine Fields of Yours')
-        add_action(menu, self.friendly_mines, 'Mine Fields of Friends')
-        add_action(menu, self.neutral_mines, 'Mine Fields of Neutrals')
-        add_action(menu, self.hostile_mines, 'Mine Fields of Enemies')
+        self._add_mine_action(menu, Stance.ALLIED, 'Mine Fields of Yours')
+        self._add_mine_action(menu, Stance.FRIENDLY, 'Mine Fields of Friends')
+        self._add_mine_action(menu, Stance.NEUTRAL, 'Mine Fields of Neutrals')
+        self._add_mine_action(menu, Stance.HOSTILE, 'Mine Fields of Enemies')
         mines.setMenu(menu)
 
 
-    def change_mine_display(self, event):
-        show = (self.sender().mine_view == Stance.ACCEPT)
+    def change_mine_display(self, _):
+        """ Show or hide mine fields on the star map """
+        show = self.sender().data() == Stance.ACCEPT
         if not show:
             self.mines.setChecked(False)
-        self.allied_mines.setChecked(show)
-        self.friendly_mines.setChecked(show)
-        self.neutral_mines.setChecked(show)
-        self.hostile_mines.setChecked(show)
+        for action in self.mine_action.values():
+            action.setChecked(show)
 
 
     def show_minefields(self, event):
-        fof = self.sender().mine_view
+        """ Apply new filter settings for mine fields to the star maps """
+        fof = self.sender().data()
         self.mine_filter[fof] = event
         show = False
         for b in self.mine_filter.values():
@@ -350,16 +276,17 @@ class ToolBar(QToolBar):
         if show:
             self.mines.setCheckable(True)
             self.mines.setChecked(True)
-            self.mines.setPopupMode(delayed)
+            self.mines.setPopupMode(_delayed)
         else:
             self.mines.setChecked(False)
             self.mines.setCheckable(False)
-            self.mines.setPopupMode(instant)
+            self.mines.setPopupMode(_instant)
         self.show_mines.emit(event, fof)
 
 
     def show_enemy_fleets(self, event):
-        sc = self.sender().ship_design
+        """ Apply any changes to the filter settings for hostile fleets """
+        sc = self.sender().data()
         self.alien_designs[sc] = event
         disabled = True
         for b in self.alien_designs.values():
@@ -367,16 +294,17 @@ class ToolBar(QToolBar):
         if disabled:
             self.action_foes.setChecked(False)
             self.action_foes.setCheckable(False)
-            self.action_foes.setPopupMode(instant)
+            self.action_foes.setPopupMode(_instant)
         else:
             self.action_foes.setCheckable(True)
             self.action_foes.setChecked(True)
-            self.action_foes.setPopupMode(delayed)
+            self.action_foes.setPopupMode(_delayed)
         self.filter_enemy_fleets.emit(not disabled, self.alien_designs)
 
 
     def show_my_fleets(self, event):
-        sc = self.sender().ship_design
+        """ Apply any changes to the player's filter settings """
+        sc = self.sender().data()
         self.my_designs[sc] = event
         disabled = True
         for b in self.my_designs.values():
@@ -384,41 +312,47 @@ class ToolBar(QToolBar):
         if disabled:
             self.action_friendlies.setChecked(False)
             self.action_friendlies.setCheckable(False)
-            self.action_friendlies.setPopupMode(instant)
+            self.action_friendlies.setPopupMode(_instant)
         else:
             self.action_friendlies.setCheckable(True)
             self.action_friendlies.setChecked(True)
-            self.action_friendlies.setPopupMode(delayed)
+            self.action_friendlies.setPopupMode(_delayed)
         self.filter_my_fleets.emit(not disabled, self.my_designs)
 
 
     def show_all_my_designs(self):
+        """ Enable all player designs in the fleet filter """
         for design in self.design_names:
             self.my_filter[design].setChecked(True)
 
 
     def invert_my_display(self):
+        """ Invert the filter settings for all player designs """
         for design in self.design_names:
             show = self.my_filter[design].isChecked()
             self.my_filter[design].setChecked(not show)
 
 
     def hide_all_my_designs(self):
+        """ Disable all player designs in the fleet filter """
         for design in self.design_names:
             self.my_filter[design].setChecked(False)
 
 
     def show_all_enemy_designs(self):
+        """ Enable all enemy designs in the fleet filter """
         for design in ShipClass:
             self.foe_filter[design].setChecked(True)
 
 
     def invert_enemy_display(self):
+        """ Invert the filter settings for all enemy designs """
         for design in ShipClass:
             show = self.foe_filter[design].isChecked()
             self.foe_filter[design].setChecked(not show)
 
 
     def hide_all_enemy_designs(self):
+        """ Disable all enemy designs in the fleet filter """
         for design in ShipClass:
             self.foe_filter[design].setChecked(False)

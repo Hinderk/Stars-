@@ -9,7 +9,6 @@ from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel
 from PyQt6.QtWidgets import QStatusBar, QGroupBox
 from PyQt6.QtWidgets import QMainWindow, QPushButton
 
-from guidesign import GuiDesign, GuiStyle
 from defines import Stance
 from menubar import Menu
 from toolbar import ToolBar
@@ -20,9 +19,9 @@ from starmap import Starmap
 from newgame import NewGame
 from gamesetup import GameSetup
 from newsreader import NewsReader
+from stylesheet import StyleSheet as ST
 from factionwizard import FactionWizard
 
-# import guiprop as GP
 
 
 
@@ -150,8 +149,8 @@ class Gui(QMainWindow):
 
     def _setup_ui(self, people, rules):
         """ Create the main layout of the user interface """
-        self.setStyleSheet(GuiDesign.get_style(GuiStyle.GENERALGUI))
-        sx, sy = GuiDesign.get_size()
+        self.setStyleSheet(ST.GENERALGUI.value)
+        sx, sy = ST.GUISIZE.value
         self.resize(sx, sy)
         self.setWindowTitle("My Stars!")
         icon = QIcon()

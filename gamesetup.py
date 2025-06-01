@@ -21,9 +21,9 @@ from PyQt6.QtCore import pyqtSignal as QSignal
 
 from defines import PlayerType as PT
 from defines import AIMode as AI
-from guidesign import GuiDesign, GuiStyle
 from faction import Faction
 from victory import Victory
+from stylesheet import StyleSheet as ST
 from playerdata import PlayerData
 
 
@@ -40,7 +40,7 @@ class GameSetup(QWidget):
     def __init__(self, people, rules):
         super().__init__()
         self.setWindowTitle("Advanced New Game Wizard - Step 1 of 3")
-        self.setStyleSheet(GuiDesign.get_style(GuiStyle.ADVANCEDSETUP_1))
+        self.setStyleSheet(ST.ADVANCEDSETUP_1.value)
         icon = QIcon()
         icon.addPixmap(QPixmap(":/Icons/Host"))
         self.setWindowIcon(icon)
@@ -179,7 +179,7 @@ class GameSetup(QWidget):
         """ Read & process a faction definition (*.f1) from disk """
         read_faction = QFileDialog(self)
         read_faction.setOption(read_faction.Option.DontUseNativeDialog)
-        read_faction.setStyleSheet(GuiDesign.get_style(GuiStyle.FILEBROWSER))
+        read_faction.setStyleSheet(ST.FILEBROWSER.value)
         read_faction.setMinimumSize(1000, 750)
         read_faction.setFileMode(read_faction.FileMode.AnyFile)
         read_faction.setViewMode(read_faction.ViewMode.List)
@@ -243,7 +243,7 @@ class GameSetup(QWidget):
         """ Save the faction specification to a file """
         save_game = QFileDialog(self)
         save_game.setOption(save_game.Option.DontUseNativeDialog)
-        save_game.setStyleSheet(GuiDesign.get_style(GuiStyle.FILEBROWSER))
+        save_game.setStyleSheet(ST.FILEBROWSER.value)
         save_game.setMinimumSize(1000, 750)
         save_game.setFileMode(save_game.FileMode.AnyFile)
         save_game.setViewMode(save_game.ViewMode.List)
@@ -272,7 +272,7 @@ class GameSetup(QWidget):
     def _setup_menu(self, people):
         """ Create the menu used to add new players to the game roster """
         self.select = QMenu()
-        self.select.setStyleSheet(GuiDesign.get_style(GuiStyle.PLAYERMENU))
+        self.select.setStyleSheet(ST.PLAYERMENU.value)
         submenu = self.select.addMenu('Predefined Faction  ')
         n = 1
         for ai in people.ai_faction:
@@ -465,7 +465,7 @@ class GameSetup(QWidget):
         layout_hl.addWidget(self.players)
         layout_hl.addSpacing(20)
         player_setup = QWidget()
-        player_setup.setStyleSheet(GuiDesign.get_style(GuiStyle.ADVANCEDSETUP_2))
+        player_setup.setStyleSheet(ST.ADVANCEDSETUP_2.value)
         layout_vl = QVBoxLayout(player_setup)
         layout_vl.addLayout(layout_hl)
         layout_vl.addSpacing(10)
@@ -549,7 +549,7 @@ class GameSetup(QWidget):
         """ Setup the page with the victory conditions for the game """
         title = QLabel('Victory is declared if some of these conditions are met:')
         victory_settings = QWidget()
-        victory_settings.setStyleSheet(GuiDesign.get_style(GuiStyle.ADVANCEDSETUP_3))
+        victory_settings.setStyleSheet(ST.ADVANCEDSETUP_3.value)
         layout_vl = QVBoxLayout(victory_settings)
         layout_vl.setSpacing(0)
         layout_vl.addWidget(title)

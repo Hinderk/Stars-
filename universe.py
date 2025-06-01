@@ -6,18 +6,18 @@ import math
 from PyQt6.QtGui import QPolygonF, QPen
 from PyQt6.QtGui import QTransform
 from PyQt6.QtGui import QPainterPath
-from PyQt6.QtCore import QPointF, QLineF, QRectF, Qt
+from PyQt6.QtCore import QPointF, QRectF, Qt
 from PyQt6.QtWidgets import QMenu
 from PyQt6.QtWidgets import QGraphicsScene
 
 from PyQt6.QtCore import pyqtSignal as QSignal
 
-from guidesign import GuiDesign, GuiStyle
 from scanner import Scanner
 from planet import Planet
 import pen as PEN
 import brush as BRUSH
 from defines import Stance, Task
+from stylesheet import StyleSheet as ST
 
 import guiprop as GP
 
@@ -133,7 +133,7 @@ class Universe(QGraphicsScene):
     def contextMenuEvent(self, mouse_click):
         """ Create a context menu for the selected object on the star map """
         select = QMenu()
-        select.setStyleSheet(GuiDesign.get_style(GuiStyle.STARMAP))
+        select.setStyleSheet(ST.STARMAP.value)
         n = 0
         if self.context[0]:
             p = self.context[0]
@@ -817,29 +817,6 @@ class Universe(QGraphicsScene):
         return label
 
 
-    def _create_diagram(self, diagram, x, y, w):
-        """ Prepare the box diagrams used to indicate the amount of mineral resources
-            which can be found on the surface of a planet and inside its crust """
-        line = QLineF(0, -GP.SCALE_LENGTH, 0, 0)
-        line.translate(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
-        diagram.v_axis = self.addLine(line, PEN.WHITE_08)
-        d = GP.SCALE_LENGTH / 13
-        box = QRectF(d, 0, 3 * d, -GP.SCALE_LENGTH)
-        diagram.blue_box = self.addRect(box, PEN.BLUE, BRUSH.BLUE)
-        diagram.blue_box.setPos(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
-        box = QRectF(5 * d, 0, 3 * d, -GP.SCALE_LENGTH)
-        diagram.green_box = self.addRect(box, PEN.GREEN, BRUSH.GREEN)
-        diagram.green_box.setPos(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
-        box = QRectF(9 * d, 0, 3 * d, -GP.SCALE_LENGTH)
-        diagram.yellow_box = self.addRect(box, PEN.YELLOW, BRUSH.YELLOW)
-        diagram.yellow_box.setPos(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
-        line = QLineF(GP.SCALE_LENGTH, 0, 0, 0)
-        line.translate(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
-        diagram.h_axis = self.addLine(line, PEN.WHITE_08)
-        diagram.scale_length = GP.SCALE_LENGTH   # TODO: Remove this! GP.SCALE_LENGTH can be used in diagram.py directly ...
-        diagram.show(False)
-
-
     def create_planet(self, rules, homeworld):
         """ Render a planet onto the star map but keep it invisible """
         p = Planet(rules, homeworld)
@@ -886,7 +863,7 @@ class Universe(QGraphicsScene):
         p.flag = self.addPolygon(_flag)
         p.flag.setPos(x + w / 2 - GP.FLAG_STEM / 2, y + w / 2)
         p.flag.setVisible(False)
-        self._create_diagram(p.diagram, x, y, w)
+        p.diagram.create(self, x, y, w)
         return p
 
 

@@ -1,6 +1,14 @@
 
 """ This module implements the box diagrams for a planets's mineral deposits """
 
+from PyQt6.QtCore import QRectF, QLineF
+
+import pen as PEN
+import brush as BRUSH
+import guiprop as GP
+
+
+
 class Diagram:
 
     """ This class renders crust & surface mineral diagrams onto the star map """
@@ -12,7 +20,28 @@ class Diagram:
         self.yellow_box = None
         self.v_axis = None
         self.h_axis = None
-        self.scale_length = 0
+
+
+    def create(self, scene, x, y, w):
+        """ Prepare the box diagrams used to indicate the amount of mineral resources
+            which can be found on the surface of a planet and inside its crust """
+        line = QLineF(0, -GP.SCALE_LENGTH, 0, 0)
+        line.translate(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
+        self.v_axis = scene.addLine(line, PEN.WHITE_08)
+        d = GP.SCALE_LENGTH / 13
+        box = QRectF(d, 0, 3 * d, -GP.SCALE_LENGTH)
+        self.blue_box = scene.addRect(box, PEN.BLUE, BRUSH.BLUE)
+        self.blue_box.setPos(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
+        box = QRectF(5 * d, 0, 3 * d, -GP.SCALE_LENGTH)
+        self.green_box = scene.addRect(box, PEN.GREEN, BRUSH.GREEN)
+        self.green_box.setPos(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
+        box = QRectF(9 * d, 0, 3 * d, -GP.SCALE_LENGTH)
+        self.yellow_box = scene.addRect(box, PEN.YELLOW, BRUSH.YELLOW)
+        self.yellow_box.setPos(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
+        line = QLineF(GP.SCALE_LENGTH, 0, 0, 0)
+        line.translate(x + w / 2 - GP.SCALE_LENGTH / 2, y - GP.DY_LABEL)
+        self.h_axis = scene.addLine(line, PEN.WHITE_08)
+        self.show(False)
 
 
     def show(self, switch):
@@ -31,13 +60,13 @@ class Diagram:
                      planet.explored.crust.germanium )
         if planet.discovered and minerals > 0:
             box = self.blue_box.rect()
-            box.setBottom(-self.scale_length * planet.explored.crust.ironium / 100.0)
+            box.setBottom(-GP.SCALE_LENGTH * planet.explored.crust.ironium / 100.0)
             self.blue_box.setRect(box)
             box = self.green_box.rect()
-            box.setBottom(-self.scale_length * planet.explored.crust.boranium / 100.0)
+            box.setBottom(-GP.SCALE_LENGTH * planet.explored.crust.boranium / 100.0)
             self.green_box.setRect(box)
             box = self.yellow_box.rect()
-            box.setBottom(-self.scale_length * planet.explored.crust.germanium / 100.0)
+            box.setBottom(-GP.SCALE_LENGTH * planet.explored.crust.germanium / 100.0)
             self.yellow_box.setRect(box)
             self.show(True)
         else:
@@ -55,21 +84,21 @@ class Diagram:
             else:
                 val = 1.2
             box = self.blue_box.rect()
-            box.setBottom(-self.scale_length * val)
+            box.setBottom(-GP.SCALE_LENGTH * val)
             self.blue_box.setRect(box)
             if planet.explored.surface.boranium < 120:
                 val = planet.explored.surface.boranium / 100.0
             else:
                 val = 1.2
             box = self.green_box.rect()
-            box.setBottom(-self.scale_length * val)
+            box.setBottom(-GP.SCALE_LENGTH * val)
             self.green_box.setRect(box)
             if planet.explored.surface.germanium < 120:
                 val = planet.explored.surface.germanium / 100.0
             else:
                 val = 1.2
             box = self.yellow_box.rect()
-            box.setBottom(-self.scale_length * val)
+            box.setBottom(-GP.SCALE_LENGTH * val)
             self.yellow_box.setRect(box)
             self.show(True)
         else:

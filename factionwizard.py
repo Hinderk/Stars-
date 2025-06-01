@@ -21,8 +21,8 @@ from PyQt6.QtWidgets import QRadioButton, QLabel
 from PyQt6.QtWidgets import QPushButton, QLineEdit
 from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
-from guidesign import GuiDesign, GuiStyle
 from faction import Faction
+from stylesheet import StyleSheet as ST
 from perks import Perks as TS
 from traits import Traits as TR
 
@@ -77,7 +77,7 @@ class FactionWizard(QWidget):
     def __init__(self, people, rules):
         super().__init__()
         self.setWindowTitle("Custom Faction Wizard - Step 1 of 6")
-        self.setStyleSheet(GuiDesign.get_style(GuiStyle.FACTIONSETUP_1))
+        self.setStyleSheet(ST.FACTIONSETUP_1.value)
         icon = QIcon()
         icon.addPixmap(QPixmap(":/Icons/Host"))
         self.setWindowIcon(icon)
@@ -193,7 +193,7 @@ class FactionWizard(QWidget):
         """ Store the faction specification in a file """
         save_faction = QFileDialog(self)
         save_faction.setOption(save_faction.Option.DontUseNativeDialog)
-        save_faction.setStyleSheet(GuiDesign.get_style(GuiStyle.FILEBROWSER))
+        save_faction.setStyleSheet(ST.FILEBROWSER)
         save_faction.setMinimumSize(1000, 750)
         save_faction.setFileMode(save_faction.FileMode.AnyFile)
         save_faction.setViewMode(save_faction.ViewMode.List)
