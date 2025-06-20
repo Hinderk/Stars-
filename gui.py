@@ -17,6 +17,7 @@ from fleetdata import Fleetdata
 from minedata import Minedata
 from starmap import Starmap
 from newgame import NewGame
+from wpdata import WPData
 from gamesetup import GameSetup
 from newsreader import NewsReader
 from stylesheet import StyleSheet as ST
@@ -59,7 +60,10 @@ class Gui(QMainWindow):
         self.selected_fleet = None
         self.selected_fields = []
         self.selected_fleets = []
+        self.selected_waypoints = []
+        self.waypoint_contexts = []
         self.mine_filter = _setup_mine_filter()
+        self.waypoint_index = 0
         self.number_of_fields = 0
         self.filtered_fields = 0
         self.enemy_fleet_index = 0
@@ -82,12 +86,15 @@ class Gui(QMainWindow):
         self.planet_info = Inspector(people.my_faction())
         self.fleet_info = Fleetdata()
         self.mine_info = Minedata()
+        self.waypoint_info = WPData()
         self.info_box = QGroupBox()
         self.news_reader = NewsReader()
         self.map = Starmap(self, people, rules)
         self.selected_object = QLabel(self)
         self.previous_field = _create_button(":/Icons/Previous")
+        self.previous_waypoint = _create_button(":/Icons/Previous")
         self.next_field = _create_button(":/Icons/Next")
+        self.next_waypoint = _create_button(":/Icons/Next")
         self.show_alien_base = _create_button(":/Icons/Fortress")
         self.show_neutral_base = _create_button(":/Icons/Tradehub")
         self.show_star_base = _create_button(":/Icons/Starbase")
@@ -117,7 +124,9 @@ class Gui(QMainWindow):
         self.buttons.action_waiting_fleets.toggled.connect(self.map.universe.filter_idle_fleets)
         self.buttons.action_path_overlay.toggled.connect(self._show_movements)
         self.buttons.action_add_waypoint.toggled.connect(self._add_waypoints)
+        self.next_waypoint.clicked.connect(self._show_next_waypoint)
         self.next_field.clicked.connect(self._show_next_mine_field)
+        self.previous_waypoint.clicked.connect(self._show_previous_waypoint)
         self.previous_field.clicked.connect(self._show_previous_mine_field)
         self.buttons.action_no_info_view.setChecked(True)
         self.buttons.radar_range.valueChanged.connect(self.map.universe.scale_radar_ranges)
@@ -127,9 +136,10 @@ class Gui(QMainWindow):
         self.map.universe.select_field.connect(self._inspect_mine_field)
         self.map.universe.select_fleet.connect(self._inspect_fleet)
         self.map.universe.select_planet.connect(self._inspect_planet)
+        self.map.universe.select_waypoint.connect(self._inspect_waypoint)
         self.map.universe.update_planet.connect(self.update_planet_view)
         self.map.universe.update_filter.connect(self._update_fields)
-        self.map.universe.update_route.connect(self.fleet_info.update_flight_path)
+        self.map.universe.update_route.connect(self.waypoint_info.update_flight_path)
         self.show_planet.clicked.connect(self._inspect_planets)
         self.select_next_enemy.clicked.connect(self._inspect_hostile_fleet)
         self.select_next_neutral.clicked.connect(self._inspect_neutral_fleet)
@@ -207,6 +217,7 @@ class Gui(QMainWindow):
         self.item_info.addWidget(self.planet_info)
         self.item_info.addWidget(self.fleet_info)
         self.item_info.addWidget(self.mine_info)
+        self.item_info.addWidget(self.waypoint_info)
         self.item_info.addWidget(enigma)
         info_vl.addLayout(self.item_info)
         layout_vl.addWidget(info_box)
@@ -228,7 +239,9 @@ class Gui(QMainWindow):
         button_layout_hl.setSpacing(0)
         button_layout_hl.addStretch()
         button_layout_hl.addWidget(self.previous_field)
+        button_layout_hl.addWidget(self.previous_waypoint)
         button_layout_hl.addWidget(self.next_field)
+        button_layout_hl.addWidget(self.next_waypoint)
         button_layout_hl.addWidget(self.show_alien_base)
         button_layout_hl.addWidget(self.show_neutral_base)
         button_layout_hl.addWidget(self.show_star_base)
@@ -317,6 +330,8 @@ class Gui(QMainWindow):
         self.selected_fleets = p.fleets_in_orbit
         self.selected_fields = p.mine_fields
         self._apply_mine_filter()
+        self.next_waypoint.setVisible(False)
+        self.previous_waypoint.setVisible(False)
         self.previous_field.setVisible(False)
         self.next_field.setVisible(False)
         self.show_planet.setVisible(False)
@@ -332,7 +347,7 @@ class Gui(QMainWindow):
             self.planet_info.update_biome(p)
             self.planet_info.update_text(self.current_year, p)
         else:
-            self.item_info.setCurrentIndex(3)
+            self.item_info.setCurrentIndex(4)
         self.allied_fleets = p.total_friends
         if p.ship_tracking:
             self.hostile_fleets = p.total_foes
@@ -367,6 +382,8 @@ class Gui(QMainWindow):
                 else:
                     self.neutral_fleets += 1
                 fleets += 1
+        self.next_waypoint.setVisible(False)
+        self.previous_waypoint.setVisible(False)
         self.next_field.setVisible(False)
         self.previous_field.setVisible(False)
         self.show_fleets.setVisible(False)
@@ -384,14 +401,96 @@ class Gui(QMainWindow):
         elif planet:
             self._inspect_planet(planet)
         else:
-            self.item_info.setCurrentIndex(3)
+            self.item_info.setCurrentIndex(4)
             self.show_fields.setVisible(False)
             self._display_fleet_icons()
             self.selected_object.setText("Deep Space")
 
 
+    def _inspect_waypoint(self, index, w_list, c_list):
+        """ Show waypoint data in the inspector panel """
+        self.item_info.setCurrentIndex(3)
+        self.select_next_enemy.setVisible(False)
+        self.select_next_neutral.setVisible(False)
+        self.select_next_fleet.setVisible(False)
+        self.show_fields.setVisible(False)
+        self.show_fleets.setVisible(True)
+        self.next_field.setVisible(False)
+        self.previous_field.setVisible(False)
+        self.show_alien_base.setVisible(False)
+        self.show_neutral_base.setVisible(False)
+        self.show_star_base.setVisible(False)
+        self.show_planet.setVisible(False)
+        nmax = len(w_list)
+        self.next_waypoint.setVisible(nmax > 1)
+        self.previous_waypoint.setVisible(nmax > 1)
+        self.selected_waypoints = w_list
+        self.waypoint_contexts = c_list
+        self.waypoint_index = self._next_waypoint(index, 0)
+
+
+    def _next_waypoint(self, index, offset):
+        """ Skip to a new waypoint in the inspector panel using the
+            index of the current waypoint and an arbitrary offset """
+        nmax = len(self.selected_waypoints)
+        n = (index + offset) % nmax
+        while n < nmax:
+            f0, w0, n0 = self.selected_waypoints[n]
+            if f0.ship_counter > 0:
+                self.selected_fleet.show_course(self.show_fleet_movements)
+                self.selected_fleet.colour_course(False)
+                title = 'WP ' + str(n0) + '  --  ' + f0.name + ' #' + str(f0.id)
+                self.selected_object.setText(title)
+                self.waypoint_info.update_waypoint_data(f0, w0)
+                f0.show_course(True)
+                f0.colour_course(True)
+                self.selected_fleet = f0
+                self.map.universe.selected_fleet = f0
+                self.map.universe.waypoint_index = n
+                po, f_list = self.waypoint_contexts[n]
+                self.selected_planet = po
+                self.fleet_index = f_list.index(f0)
+                self.selected_fleets = f_list
+                self.selected_fields = f0.mine_fields
+                return n
+            n += 1
+        n = 0
+        while n <= index:
+            f0, w0, n0 = self.selected_waypoints[n]
+            if f0.ship_counter > 0:
+                self.selected_fleet.show_course(self.show_fleet_movements)
+                self.selected_fleet.colour_course(False)
+                title = 'WP ' + str(n0) + '  --  ' + f0.name + ' #' + str(f0.id)
+                self.selected_object.setText(title)
+                self.waypoint_info.update_waypoint_data(f0, w0)
+                f0.show_course(True)
+                f0.colour_course(True)
+                self.selected_fleet = f0
+                self.map.universe.selected_fleet = f0
+                self.map.universe.waypoint_index = n
+                po, f_list = self.waypoint_contexts[n]
+                self.selected_planet = po
+                self.fleet_index = f_list.index(f0)
+                self.selected_fleets = f_list
+                self.selected_fields = f0.mine_fields
+                break
+            n += 1
+        return n
+
+
+    def _show_next_waypoint(self):
+        """ Cycle through waypoints in the standard direction """
+        self.waypoint_index = self._next_waypoint(self.waypoint_index, 1)
+
+
+    def _show_previous_waypoint(self):
+        """ Cycle through waypoints in the reversed direction """
+        self.waypoint_index = self._next_waypoint(self.waypoint_index, -1)
+
+
     def _update_fields(self, new_filter):
         """ Filter mine field data in the inspector panel """
+        # TODO: Treatment of waypoints missing?
         self.mine_filter = new_filter
         self._apply_mine_filter()
         if self.item_info.currentIndex() < 2:
@@ -404,7 +503,7 @@ class Gui(QMainWindow):
             elif self.selected_fleets:
                 self._inspect_fleets()
             else:
-                self.item_info.setCurrentIndex(3)
+                self.item_info.setCurrentIndex(4)
                 self.previous_field.setVisible(False)
                 self.next_field.setVisible(False)
                 self.show_fleets.setVisible(False)
@@ -527,6 +626,7 @@ class Gui(QMainWindow):
     def _inspect_fleets(self):
         """ Switch to the fleet view in the inspector panel """
         self.show_fleets.setVisible(False)
+        self.map.universe.wpselect.setVisible(False)
         self._inspect_fleet(self.selected_planet, self.fleet_index,
                             self.selected_fleets, self.selected_fields)
 

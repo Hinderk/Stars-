@@ -72,11 +72,11 @@ def main():
     freighter.mine_sweeping = 0
     freighter.name = "Hauler"
 
-    fleet_3 = Fleet([ship, ship, ship], 1, people)
+    fleet_3 = Fleet([ship, ship, ship], 0, people)
     fleet_4 = Fleet([ship], 3, people)
     fleet_5 = Fleet([ship], 9, people)
     fleet_6 = Fleet([freighter, freighter], 0, people)
-    fleet_7 = Fleet([freighter, ship, freighter], 9, people)
+    fleet_7 = Fleet([freighter, ship, freighter], 0, people)
     fleet_8 = Fleet([ship, ship, freighter, freighter], 9, people)
 
     fleet_3.idle = False
@@ -112,6 +112,15 @@ def main():
     fleet_8.add_waypoint(500, 550)
     fleet_8.add_waypoint(140, -150)
     fleet_8.add_waypoint(-120, 600)
+
+    form.map.universe.waypoints.append((240, 420))
+    form.map.universe.waypoints.append((120, 550))
+    form.map.universe.waypoints.append((480, 500))
+    form.map.universe.waypoints.append((550, 300))
+    form.map.universe.waypoints.append((-20, 500))
+    form.map.universe.waypoints.append((180, 350))
+    form.map.universe.waypoints.append((280, 600))
+    form.map.universe.waypoints.append((500, 400))
 
     form.map.universe.planets[0].build_starbase()
     form.map.universe.planets[0].relation = Stance.NEUTRAL

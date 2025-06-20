@@ -6,7 +6,7 @@ import math
 from PyQt6.QtGui import QPen
 
 from universe import Universe
-from design import Design
+# from design import Design
 from defines import Stance, Task, Feature
 import pen as Pen
 import brush as Brush
@@ -220,18 +220,6 @@ class Fleet:
         self.resting_fleet.setZValue(z)
 
 
-    def update_course(self, wp, planets):
-        """ Insert a planet into the flight path instead of a waypoint if both a very close """
-        wp.planet = None
-        for p in planets:
-            d = (p.x - wp.xo) * (p.x - wp.xo) + (p.y - wp.yo) * (p.y - wp.yo)
-            if d < GP.P_SNAP:
-                wp.xo = p.x
-                wp.yo = p.y
-                wp.planet = p
-                return
-
-
     def clear_waypoints(self):
         """ Erase the entire flight path """
         wp = self.first_waypoint
@@ -341,3 +329,50 @@ class Fleet:
             self.next_waypoint = wa
         self.active_waypoint = [wa]
         return wa
+
+
+    def compute_time_and_distance(self, w0):
+        """ Compute the distance to travel & the fleet's travel time """
+        x = self.xc
+        y = self.yc
+        v = self.warp_speed
+        distance = 0
+        turns = 0
+        fleet_stopped = False
+        wp = self.next_waypoint
+        while wp:
+            d = wp.dist(x, y)
+            x = wp.xo
+            y = wp.xo
+            distance += d
+            if v > 0:
+                turns += math.ceil(d / v / v)
+            elif d > 0:
+                fleet_stopped = True
+            else:
+                turns += wp.turns
+            if wp == w0:
+                if fleet_stopped:
+                    turns = -1
+                return turns, distance
+            v = wp.warp
+            wp = wp.next
+        wp = self.next_waypoint.previous
+        x = self.xc
+        y = self.yc
+        while wp and wp.retain:
+            d = wp.dist(x, y)
+            x = wp.xo
+            y = wp.xo
+            distance += d
+            v = wp.warp
+            if v > 0:
+                turns += math.ceil(d / v / v)
+            elif d > 0:
+                fleet_stopped = True
+            else:
+                turns += wp.turns
+            wp = wp.previous
+        if fleet_stopped:
+            turns = -1
+        return turns, distance

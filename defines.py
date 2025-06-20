@@ -59,6 +59,7 @@ class Task(Enum):
     MOVE = 'Travel'
     HAUL = 'Transport'
     MINE = 'Mining'
+    WAIT = 'Waiting'     # for a rendezvous
 
 
 class PlayerType(Enum):

@@ -57,9 +57,10 @@ class Universe(QGraphicsScene):
     select_planet = QSignal(Planet)
     update_planet = QSignal(Planet)
     update_filter = QSignal(dict)
-    update_route = QSignal(object)
+    update_route = QSignal(object, object)
     select_fleet = QSignal(object, int, list, list)
     select_field = QSignal(object, int, list, list)
+    select_waypoint = QSignal(int, list, list)
 
     current_path_width = GP.FP_WIDTH[100]
 
@@ -70,17 +71,18 @@ class Universe(QGraphicsScene):
         self.fleets = []
         self.minefields = []
         self.debris = []
+        self.waypoints = []
         self.xo = 0
         self.yo = 0
 
         self.selected_planet = None
         self.selected_fleet = None
-        self.selected_waypoint = None
         self.context = None
         self.waypoint_index = 0
         self.waypoint_offset = 0
         self.fleet_index = 0
         self.fleet_offset = 0
+        self.selected_waypoints = []
         self.selected_fleets = []
         self.default_view = False
         self.show_fleet_strength = False
@@ -92,7 +94,6 @@ class Universe(QGraphicsScene):
         self.active_friend_filter = None
         self.fields_visible = False
         self.movement_approved = False
-        self.waypoint_selected = False
         self.names_visible = False
         self.waypoint_mode = False
 
@@ -192,7 +193,6 @@ class Universe(QGraphicsScene):
     def mousePressEvent(self, mouse_click):
         """ Event handler: Select items on the star map closest to the mouse pointer """
         p0 = mouse_click.scenePos()
-        self.waypoint_selected = False
         self.xo = round(0.5 + p0.x() / GP.XSCALE)
         self.yo = round(0.5 + p0.y() / GP.XSCALE)
         self.context = self._identify_context(self.xo, self.yo)
@@ -217,16 +217,15 @@ class Universe(QGraphicsScene):
         p0 = event.scenePos()
         self.xo = round(0.5 + p0.x() / GP.XSCALE)
         self.yo = round(0.5 + p0.y() / GP.XSCALE)
-        if self.waypoint_selected and self.movement_approved:
-            w0 = self.selected_waypoint[0]
-            f0 = self.selected_fleet
+        if self.selected_waypoints and self.movement_approved:
+            f0, w0, _ = self.selected_waypoints[self.waypoint_index]
             w0.xo = self.xo
             w0.yo = self.yo
-            f0.update_course(w0, self.planets)
+            self._update_course(w0)
             if f0.next_waypoint == w0:
-                f0.Heading = math.atan2(w0.yo - f0.yc, w0.xo - f0.xc)
+                f0.heading = math.atan2(w0.yo - f0.yc, w0.xo - f0.xc)
                 f0.update_ship_count()
-                self.update_route.emit(f0)
+            self.update_route.emit(f0, w0)
             self.plot_course(f0)
             f0.colour_course(True)
             self.wpselect.setPos(QPointF(GP.XSCALE * w0.xo, GP.XSCALE * w0.yo))
@@ -241,30 +240,31 @@ class Universe(QGraphicsScene):
         if key == Qt.Key.Key_Shift:
             self.movement_approved = True
         elif key == Qt.Key.Key_Delete:
-            if self.waypoint_selected:
-                wp = self.selected_fleet.delete_waypoint(self.selected_waypoint[1])
+            if self.selected_waypoints:
+                f0, _, n0 = self.selected_waypoints[self.waypoint_index]
+                wp = f0.delete_waypoint(n0)
                 if wp:
-                    dx = wp.xo - self.selected_fleet.xc
-                    dy = wp.yo - self.selected_fleet.yc
-                    self.selected_fleet.heading = math.atan2(dy, dx)
-                    self.selected_fleet.update_schedule()
+                    dx = wp.xo - f0.xc
+                    dy = wp.yo - f0.yc
+                    f0.heading = math.atan2(dy, dx)
+                    f0.update_schedule()
                 else:
-                    self.selected_fleet.warp_speed = 0
-                    self.removeItem(self.selected_fleet.moving_fleet)
-                    self.selected_fleet.moving_fleet = None
-                    self.selected_fleet.task = Task.IDLE
-                    self.selected_fleet.heading = math.pi
-                self.selected_fleet.active_waypoint = []
-                self.selected_fleet.update_ship_count()
-                self.plot_course(self.selected_fleet)
-                self.selected_fleet.colour_course(True)
-                self.waypoint_selected = False
+                    f0.warp_speed = 0
+                    self.removeItem(f0.moving_fleet)
+                    f0.moving_fleet = None
+                    f0.task = Task.IDLE
+                    f0.heading = math.pi
+                f0.active_waypoint = []
+                f0.update_ship_count()
+                self.plot_course(f0)
+                f0.colour_course(True)
+                self.selected_waypoints = []
                 self.wpselect.setVisible(False)
-                self.update_route.emit(self.selected_fleet)
+                self.update_route.emit(f0)
         elif key == Qt.Key.Key_Insert:
             if self.selected_fleet and self.selected_fleet.friend_or_foe == Stance.ALLIED:
                 w0 = self.selected_fleet.add_waypoint(xo, yo)
-                self.selected_fleet.update_course(w0, self.planets)
+                self._update_course(w0)
                 self.selected_fleet.update_schedule()
                 if self.selected_fleet.next_waypoint == w0:
                     dx = w0.xo - self.selected_fleet.xc
@@ -303,6 +303,22 @@ class Universe(QGraphicsScene):
                 self._highlight_minefield(item)
             elif itemtype == 6:
                 self._highlight_waypoint(item)
+
+
+    def _identify_fleet_context(self, xo, yo):
+        """ Find the objects closest to the specified coordinates """
+        po = None
+        for p in self.planets:
+            d = (p.x - xo) * (p.x - xo) + (p.y - yo) * (p.y - yo)
+            if d < 1:
+                po = p
+        f_list = []
+        for f in self.fleets:
+            if f.discovered and f.ship_counter > 0:
+                d = (f.xc - xo) * (f.xc - xo) + (f.yc - yo) * (f.yc - yo)
+                if d < 1:
+                    f_list.append(f)
+        return po, f_list
 
 
     def _identify_context(self, xo, yo):
@@ -361,7 +377,27 @@ class Universe(QGraphicsScene):
                         dist = d
                     elif d == dist:
                         m_list.append(m)
-        return po, m_list, f_list, w_list # , xo, yo
+        return po, m_list, f_list, w_list
+
+
+    def _update_course(self, wp):
+        """ Insert a planet into the flight path instead of a waypoint if
+            both a very close, merge close waypoints for rendezvous ... """
+        wp.planet = None
+        for p in self.planets:
+            d = (p.x - wp.xo) * (p.x - wp.xo) + (p.y - wp.yo) * (p.y - wp.yo)
+            if d < GP.P_SNAP:
+                wp.xo = p.x
+                wp.yo = p.y
+                wp.planet = p
+                return
+        for x, y in self.waypoints:
+            d = (x - wp.xo) * (x - wp.xo) + (y - wp.yo) * (y - wp.yo)
+            if d < GP.P_SNAP:
+                wp.xo = x
+                wp.yo = y
+                return
+        self.waypoints.append((wp.xo, wp.yo))
 
 
     def _create_indicator(self):
@@ -392,8 +428,8 @@ class Universe(QGraphicsScene):
         if self.selected_fleet:
             self.selected_fleet.colour_course(False)
             self.selected_fleet.show_course(self.show_fleet_movements)
-        self.selected_waypoint = None
         self.selected_fleet = None
+        self.selected_waypoints = []
         self.selected_fleets = []
         if self.names_visible:
             p.label.setPen(PEN.WHITE)
@@ -416,7 +452,7 @@ class Universe(QGraphicsScene):
             self.selected_planet.label.setPen(PEN.WHITE_L)
             self.selected_planet.label.setBrush(BRUSH.WHITE_L)
         self.selected_planet = None
-        self.selected_waypoint = None
+        self.selected_waypoints = []
         if index < 0:
             index = (self.fleet_index + self.fleet_offset) % len(self.context[2])
         f0 = self.context[2][index]
@@ -435,8 +471,8 @@ class Universe(QGraphicsScene):
         if self.selected_planet:
             self.selected_planet.label.setPen(PEN.WHITE_L)
             self.selected_planet.label.setBrush(BRUSH.WHITE_L)
-        self.selected_waypoint = None
         self.selected_fleet = None
+        self.selected_waypoints = []
         self.selected_fleets = []
         self.selected_planet = None
         xp = GP.XSCALE * self.context[1][0].xc
@@ -457,19 +493,20 @@ class Universe(QGraphicsScene):
             index = self.waypoint_index
         elif index < 0:
             index = (self.waypoint_index + self.waypoint_offset) % len(self.context[3])
-        f0, w0, n0 = self.context[3][index]
+        f0, w0, _ = self.context[3][index]
         self.wpselect.setPos(GP.XSCALE * w0.xo, GP.XSCALE * w0.yo)
         self.select.setPos(GP.XSCALE * f0.xc, GP.XSCALE * f0.yc)
         self.wpselect.setVisible(True)
         self.select.setVisible(not f0.orbiting)
-        self.selected_waypoint = (w0, n0)
         self.selected_fleet = f0
+        self.selected_waypoints = self.context[3]
         self.waypoint_index = index
-        self.fleet_index = index
         self.waypoint_offset = 1
-        self.selected_fleets = [w[0] for w in self.context[3]]
-        self.waypoint_selected = True
-        self.select_fleet.emit(None, index, self.selected_fleets, [])  # TODO: Chheck the handler! - New signal required?
+        self.selected_fleets = []
+        c_list = []
+        for f, _, _ in self.selected_waypoints:
+            c_list.append(self._identify_fleet_context(f.xc, f.yc))
+        self.select_waypoint.emit(index, self.selected_waypoints, c_list)
 
 
     def _segment_path(self, path, xa, ya, xb, yb):
@@ -898,7 +935,7 @@ class Universe(QGraphicsScene):
             for f in self.selected_fleets:
                 total += f.ship_counter
             if total > 0:
-                if self.selected_waypoint:
+                if self.selected_waypoints:
                     self.wpselect.setVisible(True)
                 self.select.setVisible(True)
             else:
@@ -906,6 +943,9 @@ class Universe(QGraphicsScene):
                 self.select.setVisible(False)
             self.select_fleet.emit(self.selected_planet, self.fleet_index,
                                    self.selected_fleets, self.selected_fleet.mine_fields)
+        if self.selected_waypoints:
+            # FIXME! - Test Ship Counter ...
+            self.select_waypoint.emit(self.waypoint_index, self.selected_waypoints)
 
 
     def filter_foes(self, enabled, select):

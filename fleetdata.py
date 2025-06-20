@@ -145,17 +145,3 @@ class Fleetdata(DataViewer):
             self.speed.setText('Stopped')
             self.task.setText(fleet.task.value)
         self.ship_count.setText(str(len(fleet.ship_list)))
-
-
-    def update_flight_path(self, fleet):
-        """ Update the fleet inspector panel if flight path has changed """
-        wp = fleet.next_waypoint
-        if wp:
-            if wp.planet:
-                self.waypoint.setText(wp.planet.name)
-            else:
-                self.waypoint.setText('(' + str(wp.xo) + ',' + str(wp.yo) + ')')
-        if fleet.warp_speed > 0:
-            self.speed.setText(str(fleet.warp_speed))
-        else:
-            self.speed.setText('Stopped')
