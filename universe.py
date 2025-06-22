@@ -71,7 +71,7 @@ class Universe(QGraphicsScene):
         self.fleets = []
         self.minefields = []
         self.debris = []
-        self.waypoints = []
+        self.waypoints = {}
         self.xo = 0
         self.yo = 0
 
@@ -128,6 +128,9 @@ class Universe(QGraphicsScene):
         """ Prevent waypoint movement if the shift key is released """
         key = key_press.key()
         if key == Qt.Key.Key_Shift:
+            if self.selected_waypoints and self.movement_approved:
+                _, w0, _ = self.selected_waypoints[self.waypoint_index]
+                self._update_course(w0, True)
             self.movement_approved = False
 
 
@@ -239,32 +242,37 @@ class Universe(QGraphicsScene):
         """ Event handler: Process keyboard interactions with the star map """
         if key == Qt.Key.Key_Shift:
             self.movement_approved = True
+            if self.selected_waypoints:
+                _, w0, _ = self.selected_waypoints[self.waypoint_index]
+                self._delete_waypoint(w0)
         elif key == Qt.Key.Key_Delete:
             if self.selected_waypoints:
-                f0, _, n0 = self.selected_waypoints[self.waypoint_index]
-                wp = f0.delete_waypoint(n0)
-                if wp:
+                f0, w0, n0 = self.selected_waypoints[self.waypoint_index]
+                self._delete_waypoint(w0)
+                wn, wp = f0.delete_waypoint(n0)
+                if wn:
                     dx = wp.xo - f0.xc
                     dy = wp.yo - f0.yc
                     f0.heading = math.atan2(dy, dx)
                     f0.update_schedule()
+                    self.context = self._identify_context(wn.xo, wn.yo)
+                    self._highlight_waypoint()
                 else:
                     f0.warp_speed = 0
                     self.removeItem(f0.moving_fleet)
                     f0.moving_fleet = None
                     f0.task = Task.IDLE
                     f0.heading = math.pi
-                f0.active_waypoint = []
+                    self.context = self._identify_context(f0.xc, f0.yc)
+                    index = self.context[2].index(f0)
+                    self._highlight_fleet(index)
                 f0.update_ship_count()
                 self.plot_course(f0)
                 f0.colour_course(True)
-                self.selected_waypoints = []
-                self.wpselect.setVisible(False)
-                self.update_route.emit(f0)
         elif key == Qt.Key.Key_Insert:
             if self.selected_fleet and self.selected_fleet.friend_or_foe == Stance.ALLIED:
                 w0 = self.selected_fleet.add_waypoint(xo, yo)
-                self._update_course(w0)
+                self._update_course(w0, True)
                 self.selected_fleet.update_schedule()
                 if self.selected_fleet.next_waypoint == w0:
                     dx = w0.xo - self.selected_fleet.xc
@@ -273,9 +281,18 @@ class Universe(QGraphicsScene):
                     self.selected_fleet.update_ship_count()
                 self.plot_course(self.selected_fleet)
                 self.selected_fleet.colour_course(True)
-                self.update_route.emit(self.selected_fleet)
-#                self.context = self._identify_context(w0.xo, w0.yo)
-#                self._highlight_waypoint()
+                self.context = self._identify_context(w0.xo, w0.yo)
+                self._highlight_waypoint()
+
+
+    def _delete_waypoint(self, wp):
+        key = (wp.xo, wp.yo)
+        if key in self.waypoints:
+            key_count = self.waypoints[key]
+            if key_count > 1:
+                self.waypoints[key] = key_count - 1
+            else:
+                self.waypoints.pop(key)
 
 
     def _process_context_menu(self, selected):
@@ -380,7 +397,7 @@ class Universe(QGraphicsScene):
         return po, m_list, f_list, w_list
 
 
-    def _update_course(self, wp):
+    def _update_course(self, wp, insert=False):
         """ Insert a planet into the flight path instead of a waypoint if
             both a very close, merge close waypoints for rendezvous ... """
         wp.planet = None
@@ -396,8 +413,17 @@ class Universe(QGraphicsScene):
             if d < GP.P_SNAP:
                 wp.xo = x
                 wp.yo = y
+                if insert:
+                    self.waypoints[(x, y)] += 1
                 return
-        self.waypoints.append((wp.xo, wp.yo))
+        for f in self.fleets:
+            d = (f.xc - wp.xo) * (f.xc - wp.xo) + (f.yc - wp.yo) * (f.yc - wp.yo)
+            if d < GP.P_SNAP:
+                wp.xo = f.xc
+                wp.yo = f.yc
+                break
+        if insert:
+            self.waypoints[(wp.xo, wp.yo)] = 1
 
 
     def _create_indicator(self):

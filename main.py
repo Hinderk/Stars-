@@ -1,4 +1,6 @@
 
+""" This module contains the main function of the 4X game 'Stars-' """
+
 import sys
 import stars_rc
 
@@ -8,7 +10,6 @@ from gui import Gui
 from hull import Hull
 from design import Design
 from defines import Stance
-# from planet import Planet
 from ruleset import Ruleset
 from people import People
 from fleet import Fleet
@@ -16,13 +17,14 @@ from ship import Ship
 from system import System
 from system import SystemType as ST
 from scanner import Model
-# from waypoint import Waypoint
 from minefield import Minefield
 from minefield import Model as M
 
 
 
 def main():
+    """ This is the entry point of the game """
+
     app = QApplication(sys.argv)
 
     rules = Ruleset()
@@ -113,14 +115,15 @@ def main():
     fleet_8.add_waypoint(140, -150)
     fleet_8.add_waypoint(-120, 600)
 
-    form.map.universe.waypoints.append((240, 420))
-    form.map.universe.waypoints.append((120, 550))
-    form.map.universe.waypoints.append((480, 500))
-    form.map.universe.waypoints.append((550, 300))
-    form.map.universe.waypoints.append((-20, 500))
-    form.map.universe.waypoints.append((180, 350))
-    form.map.universe.waypoints.append((280, 600))
-    form.map.universe.waypoints.append((500, 400))
+#    form.map.universe.waypoints[(40, -50)] = 2
+    form.map.universe.waypoints[(240, 420)] = 1
+    form.map.universe.waypoints[(120, 550)] = 1
+    form.map.universe.waypoints[(480, 500)] = 1
+    form.map.universe.waypoints[(550, 300)] = 1
+    form.map.universe.waypoints[(-20, 500)] = 1
+    form.map.universe.waypoints[(180, 350)] = 1
+    form.map.universe.waypoints[(280, 600)] = 1
+    form.map.universe.waypoints[(500, 400)] = 1
 
     form.map.universe.planets[0].build_starbase()
     form.map.universe.planets[0].relation = Stance.NEUTRAL

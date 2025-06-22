@@ -265,14 +265,15 @@ class Fleet:
             wp.next = wn
         else:
             self.first_waypoint = wn
+        if wo == self.next_waypoint:
+            self.next_waypoint = wn
         if wn:
             wn.previous = wp
         else:
+            wn = wp
             self.last_waypoint = wp
-        if wo == self.next_waypoint:
-            self.next_waypoint = wn
         del wo
-        return self.find_next_waypoint()
+        return wn, self.find_next_waypoint()
 
 
     def find_next_waypoint(self):  # FIX ME!!  -- Check for planets?
