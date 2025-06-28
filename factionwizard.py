@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtGui import QKeySequence
-from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QMessageBox, QSpinBox
 from PyQt6.QtWidgets import QFileDialog, QGridLayout
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt6.QtWidgets import QGroupBox, QScrollBar
@@ -16,12 +16,13 @@ from PyQt6.QtWidgets import QButtonGroup
 from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtWidgets import QGraphicsView
 from PyQt6.QtWidgets import QStackedLayout
-from PyQt6.QtWidgets import QComboBox  # , QSpinBox
+from PyQt6.QtWidgets import QComboBox, QCheckBox
 from PyQt6.QtWidgets import QRadioButton, QLabel
 from PyQt6.QtWidgets import QPushButton, QLineEdit
 from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
 from faction import Faction
+from industry import Industry
 from stylesheet import StyleSheet as ST
 from perks import Perks as TS
 from traits import Traits as TR
@@ -95,6 +96,8 @@ class FactionWizard(QWidget):
         self.faction_singular = QLineEdit()
         self.faction_plural = QLineEdit()
         self.default_name = 'Humanoid'
+        self.industry_settings = {}
+        self.research_costs = {}
         self.restart_game_wizard = False
         self.restart_new_game = False
         self.factions = people
@@ -106,6 +109,8 @@ class FactionWizard(QWidget):
         self._setup_names_and_banner()
         self._setup_primary_traits()
         self._setup_secondary_traits()
+        self._setup_mining_and_resources()
+        self._setup_research_costs()
         self.set_advantage_points(0)  # TODO: Remove me
 
 
@@ -193,7 +198,7 @@ class FactionWizard(QWidget):
         """ Store the faction specification in a file """
         save_faction = QFileDialog(self)
         save_faction.setOption(save_faction.Option.DontUseNativeDialog)
-        save_faction.setStyleSheet(ST.FILEBROWSER)
+        save_faction.setStyleSheet(ST.FILEBROWSER.value)
         save_faction.setMinimumSize(1000, 750)
         save_faction.setFileMode(save_faction.FileMode.AnyFile)
         save_faction.setViewMode(save_faction.ViewMode.List)
@@ -230,9 +235,10 @@ class FactionWizard(QWidget):
         self.faction_singular.setText('')
         self.faction_plural.setText('')
         self.surplus.setCurrentIndex(0)
-#        self.traits.button(9).setChecked(True)
-#        self._switch_primary_trait(9)
+        self.traits.button(9).setChecked(True)
+        self._switch_primary_trait(9)
         self._switch_faction(0)
+        self._restore_industry_modifier()
         self.show()
 
 
@@ -427,7 +433,100 @@ class FactionWizard(QWidget):
         layout_vl.addLayout(description_hl)
         layout_vl.addSpacing(20)
         self.pages.addWidget(secondary_traits)
+        self.features.idClicked.connect(self._select_secondary_trait)
 
+
+    def _setup_mining_and_resources(self):
+        """ Setup the fifth page of the configuration wizard """
+        industry_settings = QWidget()
+        industry_settings.setStyleSheet(ST.FACTIONSETUP_2.value)
+        layout_vl = QVBoxLayout(industry_settings)
+        layout_vl.addSpacing(20)
+        for imod in Industry:
+            self._add_industry_modifier(layout_vl, imod)
+        layout_vl.addStretch()
+        self.pages.addWidget(industry_settings)
+
+
+    def _setup_research_costs(self):
+        """ Setup the sixth page of the configuration wizard """
+        research_costs = QWidget()
+        research_costs.setStyleSheet(ST.FACTIONSETUP_2.value)
+        layout = QGridLayout()
+        layout.setSpacing(20)
+        layout_vl = QVBoxLayout(research_costs)
+        layout_vl.addLayout(layout)
+        self._add_research_box('Energy', layout, 0, 0)
+        self._add_research_box('Construction', layout, 0, 1)
+        self._add_research_box('Weapons', layout, 1, 0)
+        self._add_research_box('Electronics', layout, 1, 1)
+        self._add_research_box('Propulsion', layout, 2, 0)
+        self._add_research_box('Biotechnology', layout, 2, 1)
+        start = QCheckBox(' All extra expensive research starts at technology level 4.')
+        layout_vl.addStretch()
+        layout_vl.addWidget(start)
+        self.pages.addWidget(research_costs)
+
+
+    def _add_research_box(self, label, layout, xpos, ypos):
+        """ Create a group box with settings for a particular field of research """
+        box = QGroupBox(label + ' Research')
+        buttons = QButtonGroup()
+        self.research_costs[label] = buttons
+        layout_vl = QVBoxLayout(box)
+        radio = QRadioButton('Costs 75% extra')
+        buttons.addButton(radio)
+        layout_vl.addWidget(radio)
+        radio = QRadioButton('Costs standard amount')
+        radio.setChecked(True)
+        buttons.addButton(radio)
+        layout_vl.addWidget(radio)
+        radio = QRadioButton('Costs 50% less')
+        buttons.addButton(radio)
+        layout_vl.addWidget(radio)
+        layout.addWidget(box, xpos, ypos)
+
+    def _add_industry_modifier(self, vlayout, imod):
+        """ Create one line with production related game settings to tweak """
+
+# pylint: disable=too-few-public-methods,invalid-name
+        class NoCheckBox(QSpinBox):
+            """ Modfified spinbox intended to replace a checkbox"""
+            def textFromValue(self, nr):
+                """ Render numerical values 0, 1 as text: no, yes """
+                if nr > 1:
+                    return super().textFromValue(nr)
+                if nr > 0:
+                    return 'yes'
+                return 'no'
+# pylint: enable=too-few-public-methods,invalid-name
+
+        msg, suffix, default, low, high, step, width = imod.value
+        data = NoCheckBox()
+        data.setSuffix(suffix)
+        data.setRange(low, high)
+        data.setValue(default)
+        data.setSingleStep(step)
+        data.setMinimumSize(QSize(width, 40))
+        data.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        if default < 1:
+            data.setWrapping(True)
+            data.lineEdit().setEnabled(False)
+        label = QLabel(msg)
+        hlayout = QHBoxLayout()
+        hlayout.addWidget(label)
+        hlayout.addWidget(data)
+        hlayout.addStretch()
+        vlayout.addSpacing(10)
+        vlayout.addLayout(hlayout)
+        self.industry_settings[imod] = data
+
+
+    def _restore_industry_modifier(self):
+        """ Recover the default industry settings for a game """
+        for imod in Industry:
+            spinner = self.industry_settings[imod]
+            spinner.setValue(imod.value[2])
 
 
     def _switch_faction(self, buttonid):
@@ -452,13 +551,13 @@ class FactionWizard(QWidget):
 # TODO: Compute advantage points!
 
 
-    def _show_secondary_trait(self, buttonid):
-        """ Show the description of the selected secondary trait """
-        trait = _FACTION_TRAITS[buttonid]
-        self.feature_info.setText(trait.value[1])
-        print(buttonid)
+    def _select_secondary_trait(self, buttonid):
+        """ Check the selected perk & recompute advantage points """
+        if buttonid == 2:
+            self.features.button(9).setChecked(False)
+        elif buttonid == 9:
+            self.features.button(2).setChecked(False)
 # TODO: Compute advantage points!
-
 
 
     def _switch_faction_banner(self, value):

@@ -64,6 +64,7 @@
     <file alias="Next">Images/Icons/next.svg</file>
     <file alias="Select">Images/Icons/select.svg</file>
     <file alias="Hover">Images/Icons/hover.svg</file>
+    <file alias="Unhover">Images/Icons/unhover.svg</file>
     <file alias="Checked">Images/Icons/checked.svg</file>
     <file alias="Unchecked">Images/Icons/unchecked.svg</file>
   </qresource>

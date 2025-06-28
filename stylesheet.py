@@ -359,6 +359,60 @@ _STYLE_5 = """
 
 _STYLE_6 = """
 
+         QCheckBox {
+             font-size: 20pt;
+             font-style: oblique;
+             font-weight: 400;
+             padding: 6px 0px 6px 32px;
+         }
+         
+         QCheckBox::indicator {
+             width: 16px;
+             height: 16px;
+         }
+
+         QCheckBox::indicator::checked {
+             image: url(:/Icons/Checked);
+         }
+
+         QCheckBox::indicator::checked::hover {
+             image: url(:/Icons/Unhover);
+         }
+
+         QCheckBox::indicator::unchecked {
+             image: url(:/Icons/Unchecked);
+         }
+
+         QCheckBox::indicator::unchecked::hover {
+             image: url(:/Icons/Hover);
+         }
+
+         QLabel {
+             font-size: 20pt;
+             font-style: oblique;
+             font-weight: 400;
+             padding: 6px 0px 6px 32px;
+         }
+
+         QSpinBox {
+             font-size: 20pt;
+             font-style: oblique;
+             font-weight: 400;
+             background-color: #f3f3f3;
+         }
+
+         QSpinBox::down-button {
+             width: 20
+         }
+
+         QSpinBox::up-button {
+             width: 20
+         }
+
+    """
+
+_STYLE_7 = """
+
          QLineEdit {
              padding: 5px 10px 10px 10px;
              font-size: 18pt;
@@ -439,8 +493,9 @@ class StyleSheet(Enum):
     ADVANCEDSETUP_2 = _STYLE_3
     ADVANCEDSETUP_3 = _STYLE_5
     PLAYERMENU = _STYLE_4
-    FILEBROWSER = _STYLE_6
+    FILEBROWSER = _STYLE_7
     FACTIONSETUP_1 = _STYLE_2
+    FACTIONSETUP_2 = _STYLE_6
     GUISIZE = [2400, 1350]  # Size of the game window ...
 
 

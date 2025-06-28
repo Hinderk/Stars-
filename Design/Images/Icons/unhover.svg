@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Creator: fig2dev Version 3.2.8b -->
-<!-- CreationDate: 2025-06-28 19:02:00 -->
+<!-- CreationDate: 2025-06-28 19:26:48 -->
 <!-- Magnification: 1.05 -->
 <svg	xmlns="http://www.w3.org/2000/svg"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -8,7 +8,10 @@
 	viewBox="-65 -20 2830 2785">
 <g fill="none">
 <!-- Line -->
-<rect x="0" y="45" width="2700" height="2655" rx="300" fill="#e3e3e3"
+<rect x="0" y="45" width="2700" height="2655" rx="300" fill="#4f84ac"
 	stroke="#000000" stroke-width="75px"/>
+<!-- Line -->
+<rect x="675" y="675" width="1350" height="1350" rx="300" fill="#e3e3e3"
+	stroke="#4f84ac" stroke-width="15px"/>
 </g>
 </svg>
