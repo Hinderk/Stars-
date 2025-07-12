@@ -78,3 +78,13 @@ class AIMode(Enum):
     AI2 = 'Tough'
     AI3 = 'Expert'
     AIR = 'Random'
+
+
+class Research(Enum):
+    """ Areas of technology to be researched by the player """
+    RA0 = 'Energy'
+    RA1 = 'Construction'
+    RA2 = 'Weapons'
+    RA3 = 'Electronics'
+    RA4 = 'Propulsion'
+    RA5 = 'Biotechnology'

@@ -5,7 +5,7 @@ import copy
 import json
 
 from PyQt6.QtWidgets import QWidget
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, QRectF
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtGui import QKeySequence
 from PyQt6.QtWidgets import QMessageBox, QSpinBox
@@ -23,9 +23,13 @@ from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
 from faction import Faction
 from industry import Industry
+from defines import Research
 from stylesheet import StyleSheet as ST
 from perks import Perks as TS
 from traits import Traits as TR
+
+import pen as PEN
+import brush as BRUSH
 
 
 _FACTION_TRAITS = [TR.HE, TR.ST, TR.WM, TR.CA, TR.IS,
@@ -38,6 +42,21 @@ _INFO_MESSAGE = ('These lesser traits may bestow a boon onto a faction or '
                  'them. Multiple selections are possible. However, '
                  'unbalanced choices may affect the advantage score in a '
                  'disproportionate manner.')
+
+
+
+def _create_biome_button(name, width):
+    """ Create a button of the specified icon """
+    image = QIcon(':/Icons/' + name)
+    image.addFile(':/Icons/Starbase', QSize(20, 20), QIcon.Mode.Active)
+    f = image.actualSize(QSize(1000, 1000))
+    button = QPushButton()
+    button.setIcon(image)
+    target = QSize((20 * f.width()) // f.height(), 20)
+#    button.setIconSize(target)
+    button.setFixedSize(QSize(width, 40))
+    return button
+
 
 
 class FactionWizard(QWidget):
@@ -58,7 +77,7 @@ class FactionWizard(QWidget):
         # The following methods are event handlers for the radio buttons.
         # Hence, their naming follows Qt coding conventions ...
 
-        #  pylint: disable=invalid-name
+        # pylint: disable=invalid-name
 
         def enterEvent(self, _):
             """ Display a short description of the perk """
@@ -66,13 +85,28 @@ class FactionWizard(QWidget):
             self.box.setTitle(perk.value[0] + ' ')
             self.info.setText(str(perk.value[1]))
 
-
         def leaveEvent(self, _):
             """ Remove any descriptions and box headings """
             self.box.setTitle('Secondary Traits ')
             self.info.setText(_INFO_MESSAGE)
 
-        #  pylint: enable=invalid-name
+
+   # pylint: disable=invalid-name,too-few-public-methods
+
+    class CheckBox(QSpinBox):
+
+        """ This modfified spinbox can double as a checkbox if the
+            only values it will assume are either 0 or 1. """
+
+        def textFromValue(self, nr):
+            """ Render numerical values 0, 1 as text: no, yes """
+            if nr > 1:
+                return super().textFromValue(nr)
+            if nr > 0:
+                return 'yes'
+            return 'no'
+
+    # pylint: enable=too-few-public-methods,invalid-name
 
 
     def __init__(self, people, rules):
@@ -96,8 +130,10 @@ class FactionWizard(QWidget):
         self.faction_singular = QLineEdit()
         self.faction_plural = QLineEdit()
         self.default_name = 'Humanoid'
+        self.research_level = QCheckBox()
         self.industry_settings = {}
         self.research_costs = {}
+        self.biome_data = []
         self.restart_game_wizard = False
         self.restart_new_game = False
         self.factions = people
@@ -109,6 +145,7 @@ class FactionWizard(QWidget):
         self._setup_names_and_banner()
         self._setup_primary_traits()
         self._setup_secondary_traits()
+        self._setup_biome_tolerances()
         self._setup_mining_and_resources()
         self._setup_research_costs()
         self.set_advantage_points(0)  # TODO: Remove me
@@ -239,6 +276,9 @@ class FactionWizard(QWidget):
         self._switch_primary_trait(9)
         self._switch_faction(0)
         self._restore_industry_modifier()
+        for r in Research:
+            self.research_costs[r].button(2).setChecked(True)
+        self.research_level.setChecked(False)
         self.show()
 
 
@@ -436,8 +476,51 @@ class FactionWizard(QWidget):
         self.features.idClicked.connect(self._select_secondary_trait)
 
 
+    def _setup_biome_tolerances(self):
+        """ Create the fourth page of the configuration wizard """
+        biome_settings = QWidget()
+        biome_settings.setStyleSheet(ST.FACTIONSETUP_3.value)
+        layout_vl = QVBoxLayout(biome_settings)
+        layout_vl.addSpacing(20)
+        for i in 0, 1, 2:
+            w, data = self._create_biome_data(i)
+            self.biome_data.append(data)
+            layout_vl.addWidget(w)
+        layout_vl.addStretch()
+        self.pages.addWidget(biome_settings)
+
+
+    def _create_biome_data(self, n):
+        """ Create a graphical element to adjust biome tolerances """
+        title = ['Gravity', 'Temperature', 'Radiation']
+        pen = [PEN.BLUE, PEN.RED_I, PEN.GREEN_I]
+        brush = [BRUSH.BLUE, BRUSH.RED_I, BRUSH.GREEN_I]
+        fmin = []
+        fmax = []
+        shrink = _create_biome_button('Shrink', 90)
+        widen = _create_biome_button('Expand', 90)
+        left = _create_biome_button('Left', 40)
+        right = _create_biome_button('Right', 40)
+        layout_hl = QHBoxLayout()
+        layout_hl.addWidget(left)
+        layout_hl.addWidget(shrink)
+        layout_hl.addWidget(widen)
+        layout_hl.addWidget(right)
+        frame = QGroupBox(title[n])
+        layout_vl = QVBoxLayout(frame)
+        box = QRectF(0, 0, 600, 40)
+        scene = QGraphicsScene()
+        scene.addRect(box, PEN.BLACK, BRUSH.BLACK)
+        box = QRectF(100, 4, 400, 32)
+        indicator = scene.addRect(box, pen[n], brush[n])
+        layout_vl.addWidget(QGraphicsView(scene))
+        layout_vl.addLayout(layout_hl)
+        return frame, (indicator, fmin, fmax)
+
+
+
     def _setup_mining_and_resources(self):
-        """ Setup the fifth page of the configuration wizard """
+        """ Create the fifth page of the configuration wizard """
         industry_settings = QWidget()
         industry_settings.setStyleSheet(ST.FACTIONSETUP_2.value)
         layout_vl = QVBoxLayout(industry_settings)
@@ -449,60 +532,46 @@ class FactionWizard(QWidget):
 
 
     def _setup_research_costs(self):
-        """ Setup the sixth page of the configuration wizard """
+        """ Create the sixth page of the configuration wizard """
         research_costs = QWidget()
         research_costs.setStyleSheet(ST.FACTIONSETUP_2.value)
         layout = QGridLayout()
         layout.setSpacing(20)
         layout_vl = QVBoxLayout(research_costs)
         layout_vl.addLayout(layout)
-        self._add_research_box('Energy', layout, 0, 0)
-        self._add_research_box('Construction', layout, 0, 1)
-        self._add_research_box('Weapons', layout, 1, 0)
-        self._add_research_box('Electronics', layout, 1, 1)
-        self._add_research_box('Propulsion', layout, 2, 0)
-        self._add_research_box('Biotechnology', layout, 2, 1)
-        start = QCheckBox(' All extra expensive research starts at technology level 4.')
+        n = 0
+        for fe in Research:
+            self._add_research_box(fe, layout, n // 2, n % 2)
+            n += 1
+        self.research_level.setText('  All extra expensive research starts at technology level 4.')
         layout_vl.addStretch()
-        layout_vl.addWidget(start)
+        layout_vl.addWidget(self.research_level)
         self.pages.addWidget(research_costs)
 
 
-    def _add_research_box(self, label, layout, xpos, ypos):
+    def _add_research_box(self, area, layout, xpos, ypos):
         """ Create a group box with settings for a particular field of research """
-        box = QGroupBox(label + ' Research')
+        box = QGroupBox(area.value + ' Research')
         buttons = QButtonGroup()
-        self.research_costs[label] = buttons
+        self.research_costs[area] = buttons
         layout_vl = QVBoxLayout(box)
         radio = QRadioButton('Costs 75% extra')
-        buttons.addButton(radio)
+        buttons.addButton(radio, 1)
         layout_vl.addWidget(radio)
         radio = QRadioButton('Costs standard amount')
         radio.setChecked(True)
-        buttons.addButton(radio)
+        buttons.addButton(radio, 2)
         layout_vl.addWidget(radio)
         radio = QRadioButton('Costs 50% less')
-        buttons.addButton(radio)
+        buttons.addButton(radio, 3)
         layout_vl.addWidget(radio)
         layout.addWidget(box, xpos, ypos)
 
+
     def _add_industry_modifier(self, vlayout, imod):
         """ Create one line with production related game settings to tweak """
-
-# pylint: disable=too-few-public-methods,invalid-name
-        class NoCheckBox(QSpinBox):
-            """ Modfified spinbox intended to replace a checkbox"""
-            def textFromValue(self, nr):
-                """ Render numerical values 0, 1 as text: no, yes """
-                if nr > 1:
-                    return super().textFromValue(nr)
-                if nr > 0:
-                    return 'yes'
-                return 'no'
-# pylint: enable=too-few-public-methods,invalid-name
-
         msg, suffix, default, low, high, step, width = imod.value
-        data = NoCheckBox()
+        data = self.CheckBox()
         data.setSuffix(suffix)
         data.setRange(low, high)
         data.setValue(default)

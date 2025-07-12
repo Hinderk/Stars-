@@ -67,5 +67,9 @@
     <file alias="Unhover">Images/Icons/unhover.svg</file>
     <file alias="Checked">Images/Icons/checked.svg</file>
     <file alias="Unchecked">Images/Icons/unchecked.svg</file>
+    <file alias="Left">Images/Icons/left.svg</file>
+    <file alias="Right">Images/Icons/right.svg</file>
+    <file alias="Expand">Images/Icons/expand.svg</file>
+    <file alias="Shrink">Images/Icons/shrink.svg</file>
   </qresource>
 </RCC>

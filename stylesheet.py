@@ -496,6 +496,7 @@ class StyleSheet(Enum):
     FILEBROWSER = _STYLE_7
     FACTIONSETUP_1 = _STYLE_2
     FACTIONSETUP_2 = _STYLE_6
+    FACTIONSETUP_3 = _STYLE_6
     GUISIZE = [2400, 1350]  # Size of the game window ...
 
 
