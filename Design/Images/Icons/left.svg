@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Creator: fig2dev Version 3.2.8b -->
-<!-- CreationDate: 2025-06-29 12:09:55 -->
+<!-- CreationDate: 2025-07-27 14:32:42 -->
 <!-- Magnification: 1.05 -->
 <svg	xmlns="http://www.w3.org/2000/svg"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
-	width="272pt" height="238pt"
-	viewBox="-8786 -1826 4312 3772">
+	width="284pt" height="284pt"
+	viewBox="-2251 -2251 4502 4502">
 <g fill="none">
 <!-- Line -->
-<polyline points=" -6450,1860 -7800,1860 -8700,60 -7800,-1740 -6450,-1740 -6450,-1290 -7440,-1290
- -8115,60 -7440,1410 -6450,1410 -6450,1860" fill="#5f94bc"
+<rect x="-2250" y="-2250" width="4500" height="4500" fill="#ffffff"/>
+<!-- Line -->
+<polyline points=" -270,2025 -1260,2025 -2025,0 -1260,-2025 0,-2025 0,-1575 -900,-1575 -1485,0
+ -900,1575 0,1575 0,2025 -855,2025" fill="#5f94bc"
 	stroke="#4f84ac" stroke-width="105px"/>
 <!-- Line -->
-<polyline points=" -4560,1860 -5910,1860 -6810,60 -5910,-1740 -4560,-1740 -4560,-1290 -5550,-1290
- -6225,60 -5550,1410 -4560,1410 -4560,1860" fill="#5f94bc"
+<polyline points=" 1665,2025 675,2025 -90,0 675,-2025 1935,-2025 1935,-1575 1035,-1575 450,0 1035,1575
+ 1935,1575 1935,2025 1080,2025" fill="#5f94bc"
 	stroke="#4f84ac" stroke-width="105px"/>
 </g>
 </svg>

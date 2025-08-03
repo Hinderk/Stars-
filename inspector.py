@@ -223,9 +223,9 @@ class Inspector(QGraphicsView):
         g = int(planet.gravity * 100 + 0.5) / 100
         t = int(planet.temperature + 300.5) - 300
         r = int(planet.radioactivity + 0.5)
-        self.gravity.setText(str(g) + "g")
-        self.temperature.setText(str(t) + "\u00B0C")
-        self.radiation.setText(str(r) + "mR")
+        self.gravity.setText(str(g) + 'g')
+        self.temperature.setText(str(t) + '\u00B0C')
+        self.radiation.setText(str(r) + 'mR')
 
 
     def update_text(self, year, planet):

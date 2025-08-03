@@ -11,7 +11,7 @@ class Industry(Enum):
     RGF = ['Number of resources produced by 10 factories each year:', '', 10, 5, 15, 1, 75]
     FRB = ['Resources required to build a factory:', '', 10, 5, 25, 1, 75]
     FCO = ['Number of factories every 10000 colonists can operate:', '', 10, 5, 25, 1, 75]
-    FGC = ['Factories cost 1T Germanium less to build:', '', 0, 0, 1, 1, 85]
+    FGC = ['Germanium required to build a factory:', 'T', 10, 9, 10, 1, 90]
     YMP = ['Yearly mineral production of every 10 mines:', 'kT', 10, 5, 25, 1, 105]
     MRB = ['Resources required to build a mine:', '', 5, 2, 15, 1, 80]
     MCO = ['Number of mines every 10000 colonists can operate:', '', 10, 5, 25, 1, 75]

@@ -5,7 +5,7 @@ import copy
 import json
 
 from PyQt6.QtWidgets import QWidget
-from PyQt6.QtCore import Qt, QSize, QRectF
+from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtGui import QKeySequence
 from PyQt6.QtWidgets import QMessageBox, QSpinBox
@@ -21,6 +21,7 @@ from PyQt6.QtWidgets import QRadioButton, QLabel
 from PyQt6.QtWidgets import QPushButton, QLineEdit
 from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
+from biomeslider import BiomeSlider
 from faction import Faction
 from industry import Industry
 from defines import Research
@@ -28,8 +29,6 @@ from stylesheet import StyleSheet as ST
 from perks import Perks as TS
 from traits import Traits as TR
 
-import pen as PEN
-import brush as BRUSH
 
 
 _FACTION_TRAITS = [TR.HE, TR.ST, TR.WM, TR.CA, TR.IS,
@@ -42,20 +41,6 @@ _INFO_MESSAGE = ('These lesser traits may bestow a boon onto a faction or '
                  'them. Multiple selections are possible. However, '
                  'unbalanced choices may affect the advantage score in a '
                  'disproportionate manner.')
-
-
-
-def _create_biome_button(name, width):
-    """ Create a button of the specified icon """
-    image = QIcon(':/Icons/' + name)
-    image.addFile(':/Icons/Starbase', QSize(20, 20), QIcon.Mode.Active)
-    f = image.actualSize(QSize(1000, 1000))
-    button = QPushButton()
-    button.setIcon(image)
-    target = QSize((20 * f.width()) // f.height(), 20)
-#    button.setIconSize(target)
-    button.setFixedSize(QSize(width, 40))
-    return button
 
 
 
@@ -90,23 +75,22 @@ class FactionWizard(QWidget):
             self.box.setTitle('Secondary Traits ')
             self.info.setText(_INFO_MESSAGE)
 
+        # pylint: enable=invalid-name
 
-   # pylint: disable=invalid-name,too-few-public-methods
 
-    class CheckBox(QSpinBox):
+    class BiomeButton(QPushButton):
 
-        """ This modfified spinbox can double as a checkbox if the
-            only values it will assume are either 0 or 1. """
+        """ This nested class is used to encode a biome parameter
+            and the requested mode of interaction with its slider """
 
-        def textFromValue(self, nr):
-            """ Render numerical values 0, 1 as text: no, yes """
-            if nr > 1:
-                return super().textFromValue(nr)
-            if nr > 0:
-                return 'yes'
-            return 'no'
+        # pylint: disable=too-few-public-methods
 
-    # pylint: enable=too-few-public-methods,invalid-name
+        def __init__(self, n, mode):
+            super().__init__()
+            self.n = n
+            self.mode = mode
+
+        # pylint: enable=too-few-public-methods
 
 
     def __init__(self, people, rules):
@@ -133,7 +117,8 @@ class FactionWizard(QWidget):
         self.research_level = QCheckBox()
         self.industry_settings = {}
         self.research_costs = {}
-        self.biome_data = []
+        self.biome_slider = []
+        self.max_growth_rate = 15
         self.restart_game_wizard = False
         self.restart_new_game = False
         self.factions = people
@@ -148,7 +133,9 @@ class FactionWizard(QWidget):
         self._setup_biome_tolerances()
         self._setup_mining_and_resources()
         self._setup_research_costs()
-        self.set_advantage_points(0)  # TODO: Remove me
+
+        self.adv_score = 80                 # TODO: Remove test rigging
+        self.compute_advantage_points()     # TODO: Remove me?
 
 
     def _setup_error_messages(self):
@@ -481,42 +468,99 @@ class FactionWizard(QWidget):
         biome_settings = QWidget()
         biome_settings.setStyleSheet(ST.FACTIONSETUP_3.value)
         layout_vl = QVBoxLayout(biome_settings)
-        layout_vl.addSpacing(20)
         for i in 0, 1, 2:
-            w, data = self._create_biome_data(i)
-            self.biome_data.append(data)
-            layout_vl.addWidget(w)
-        layout_vl.addStretch()
+            self._create_biome_slider(layout_vl, i)
+        layout_vl.addSpacing(10)
+        self._add_growth_modifier(layout_vl)
+        layout_vl.addSpacing(10)
         self.pages.addWidget(biome_settings)
 
 
-    def _create_biome_data(self, n):
+    def _add_growth_modifier(self, layout):
+        """ Create a spin box to adjust the growth rate of the colonies """
+        data = QSpinBox()
+        data.setSuffix('%')
+        data.setRange(1, 20)
+        data.setValue(15)
+        data.setMinimumSize(QSize(95, 40))
+        data.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        data.setWrapping(False)
+        data.lineEdit().setEnabled(False)
+        data.valueChanged.connect(self._adjust_growth_rate)
+        label = QLabel('Maximum colony growth rate per year:')
+        hlayout = QHBoxLayout()
+        hlayout.addWidget(label)
+        hlayout.addWidget(data)
+        hlayout.addStretch()
+        layout.addLayout(hlayout)
+
+
+    def _adjust_growth_rate(self, newrate):
+        """ Store new growth rate & recompute spent advantage points """
+        self.max_growth_rate = newrate
+        self.compute_advantage_points()
+
+
+    def _create_biome_slider(self, layout, n):
         """ Create a graphical element to adjust biome tolerances """
         title = ['Gravity', 'Temperature', 'Radiation']
-        pen = [PEN.BLUE, PEN.RED_I, PEN.GREEN_I]
-        brush = [BRUSH.BLUE, BRUSH.RED_I, BRUSH.GREEN_I]
-        fmin = []
-        fmax = []
-        shrink = _create_biome_button('Shrink', 90)
-        widen = _create_biome_button('Expand', 90)
-        left = _create_biome_button('Left', 40)
-        right = _create_biome_button('Right', 40)
-        layout_hl = QHBoxLayout()
-        layout_hl.addWidget(left)
-        layout_hl.addWidget(shrink)
-        layout_hl.addWidget(widen)
-        layout_hl.addWidget(right)
+        slider = BiomeSlider(n)
+        slider.update_advantage_score.connect(self.compute_advantage_points)
+        self.biome_slider.append(slider)
         frame = QGroupBox(title[n])
         layout_vl = QVBoxLayout(frame)
-        box = QRectF(0, 0, 600, 40)
-        scene = QGraphicsScene()
-        scene.addRect(box, PEN.BLACK, BRUSH.BLACK)
-        box = QRectF(100, 4, 400, 32)
-        indicator = scene.addRect(box, pen[n], brush[n])
-        layout_vl.addWidget(QGraphicsView(scene))
-        layout_vl.addLayout(layout_hl)
-        return frame, (indicator, fmin, fmax)
+        view = QGraphicsView(slider)
+        view.setMouseTracking(False)
+        layout_vl.addWidget(view)
+        self._create_biome_controls(layout_vl, n)
+        layout.addWidget(frame)
 
+
+    def _create_biome_controls(self, layout, n):
+        """ Create the buttom bar to adjust tolerance settings """
+        parameter = ['Gravity', 'Temperature', 'Radiation']
+        control = QWidget()
+        control.setFixedWidth(720)
+        control_hl = QHBoxLayout(control)
+        control_hl.setSpacing(10)
+        control_hl.addWidget(self._create_biome_button(n, 0))
+        control_hl.addWidget(self._create_biome_button(n, 2))
+        control_hl.addWidget(self._create_biome_button(n, 3))
+        control_hl.addSpacing(25)
+        immune = QCheckBox('  Immune to ' + parameter[n])
+        immune.setStyleSheet('padding: 0px')
+        immune.checkStateChanged.connect(self.biome_slider[n].update_immunity)
+        control_hl.addWidget(immune)
+        control_hl.addStretch()
+        control_hl.addWidget(self._create_biome_button(n, 1))
+        controls = QHBoxLayout()
+        controls.addWidget(control)
+        layout.addLayout(controls)
+
+
+    def _process_biome_button(self):
+        """ Adjust the biome tolerances currently in use """
+        lower_shift_value = [-0.01, 0.01, 0.01, -0.01]
+        upper_shift_value = [-0.01, 0.01, -0.01, 0.01]
+        button = self.sender()
+        slider = self.biome_slider[button.n]
+        smin = lower_shift_value[button.mode]
+        smax = upper_shift_value[button.mode]
+        slider.adjust_biome_limits(smin, smax)
+
+
+    def _create_biome_button(self, n, m):
+        """ Create a button of the specified icon """
+        name = ['Left', 'Right', 'Shrink', 'Expand']
+        width = [40, 40, 80, 80]
+        button = self.BiomeButton(n, m)
+        image = QIcon(':/Icons/' + name[m])
+        button.setIcon(image)
+        button.setIconSize(QSize(width[m] - 10, 30))
+        button.setFixedSize(QSize(width[m], 40))
+        button.setStyleSheet('padding: 0px;')
+        button.clicked.connect(self._process_biome_button)
+        return button
 
 
     def _setup_mining_and_resources(self):
@@ -571,7 +615,7 @@ class FactionWizard(QWidget):
     def _add_industry_modifier(self, vlayout, imod):
         """ Create one line with production related game settings to tweak """
         msg, suffix, default, low, high, step, width = imod.value
-        data = self.CheckBox()
+        data = QSpinBox()
         data.setSuffix(suffix)
         data.setRange(low, high)
         data.setValue(default)
@@ -617,7 +661,7 @@ class FactionWizard(QWidget):
         """ Switch to another primary trait of the faction """
         trait = _FACTION_TRAITS[buttonid]
         self.trait_info.setText(trait.value[1])
-# TODO: Compute advantage points!
+        self.compute_advantage_points()
 
 
     def _select_secondary_trait(self, buttonid):
@@ -626,7 +670,7 @@ class FactionWizard(QWidget):
             self.features.button(9).setChecked(False)
         elif buttonid == 9:
             self.features.button(2).setChecked(False)
-# TODO: Compute advantage points!
+        self.compute_advantage_points()
 
 
     def _switch_faction_banner(self, value):
@@ -649,11 +693,15 @@ class FactionWizard(QWidget):
         print('-- Customize --')
 
 
-    def set_advantage_points(self, value):
+    def compute_advantage_points(self):
         """ Render the current advantage point count & prevent
             the player from saving the configuration data, if
             the number of advantage points has dropped below 0 """
         style = 'font-size: 24pt;font-weight: 800;padding: 0px;'
+
+        value = self.adv_score - 10   # TODO: Perform the actual computation ...
+        self.adv_score = value
+
         if value < 0:
             self.advantage.setStyleSheet(style + 'color: red;')
             self.finish.setEnabled(False)
