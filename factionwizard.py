@@ -21,20 +21,22 @@ from PyQt6.QtWidgets import QRadioButton, QLabel
 from PyQt6.QtWidgets import QPushButton, QLineEdit
 from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
+from PyQt6.QtCore import pyqtSignal as QSignal
+
 from biomeslider import BiomeSlider
 from faction import Faction
 from industry import Industry
 from defines import Research
 from stylesheet import StyleSheet as ST
-from perks import Perks as TS
+from perks import Perks as PE
 from traits import Traits as TR
 
 
 
 _FACTION_TRAITS = [TR.HE, TR.ST, TR.WM, TR.CA, TR.IS,
                    TR.SD, TR.PP, TR.IT, TR.AR, TR.JT]
-_FACTION_PERKS = [TS.IFE, TS.TTF, TS.ARM, TS.ISB, TS.GRE, TS.URE, TS.MAL,
-                  TS.NRS, TS.CHE, TS.BRM, TS.NAS, TS.LSP, TS.BET, TS.RSH]
+_FACTION_PERKS = [PE.IFE, PE.TTF, PE.ARM, PE.ISB, PE.GRE, PE.URE, PE.MAL,
+                  PE.NRS, PE.CHE, PE.BRM, PE.NAS, PE.LSP, PE.BET, PE.RSH]
 
 _INFO_MESSAGE = ('These lesser traits may bestow a boon onto a faction or '
                  'prove detrimental. There is no need to choose any of '
@@ -47,6 +49,8 @@ _INFO_MESSAGE = ('These lesser traits may bestow a boon onto a faction or '
 class FactionWizard(QWidget):
 
     """ This class provides all the graphical elements of the wizard """
+
+    file_saved = QSignal()
 
     class Selector(QRadioButton):
 
@@ -115,10 +119,12 @@ class FactionWizard(QWidget):
         self.faction_plural = QLineEdit()
         self.default_name = 'Humanoid'
         self.research_level = QCheckBox()
+        self.max_growth_rate = QSpinBox()
         self.industry_settings = {}
         self.research_costs = {}
         self.biome_slider = []
-        self.max_growth_rate = 15
+        self.biome_immunity = []
+        self.primary_trait = TR.NO
         self.restart_game_wizard = False
         self.restart_new_game = False
         self.factions = people
@@ -218,6 +224,45 @@ class FactionWizard(QWidget):
             self.back.setEnabled(self.current_page > 0)
 
 
+    def _create_faction(self):
+        """ Create a faction object from the wizard's settings """
+        nf = Faction()
+        nf.banner_index = self.selector.value()
+        nf.surplus_usage = self.surplus.currentIndex()
+        if self.faction_singular.text():
+            nf.singular = self.faction_singular.text()
+        else:
+            nf.singular = self.default_name
+        if self.faction_plural.text():
+            nf.name = self.faction_plural.text()
+        else:
+            nf.name = self.default_name + 's'
+        nf.primary_trait = self.primary_trait
+        for i in range(0, 14):
+            if self.features.button(i).isChecked():
+                nf.secondary_traits.append(_FACTION_PERKS[i])
+        nf.max_colony_growth_rate = self.max_growth_rate.value()
+        nf.min_gravity, nf.max_gravity = self.biome_slider[0].get_biome_limits()
+        nf.ignore_gravity = self.biome_slider[0].immune
+        nf.min_temperatur, nf.max_temperatur = self.biome_slider[1].get_biome_limits()
+        nf.ignore_temperature = self.biome_slider[1].immune
+        nf.min_radiation, nf.max_radiation = self.biome_slider[2].get_biome_limits()
+        nf.ignore_radiation = self.biome_slider[2].immune
+        nf.colonist_productivity = self.industry_settings[Industry.RGC].value()
+        nf.factory_productivity = self.industry_settings[Industry.RGF].value()
+        nf.factory_resource_cost = self.industry_settings[Industry.FRB].value()
+        nf.factory_labor_limit = self.industry_settings[Industry.FCO].value()
+        nf.factory_material_cost = self.industry_settings[Industry.FGC].value()
+        nf.mine_productivity = self.industry_settings[Industry.YMP].value()
+        nf.mine_resource_cost = self.industry_settings[Industry.MRB].value()
+        nf.mine_labor_limit = self.industry_settings[Industry.MCO].value()
+        nf.research_boost = self.research_level.isChecked()
+        scaling = [0, 1.75, 1.0, 0.5]
+        for r, box in self.research_costs.items():
+            nf.research_speed[r.name] = scaling[box.checkedId()]
+        return nf
+
+
     def _save_faction_data(self):
         """ Store the faction specification in a file """
         save_faction = QFileDialog(self)
@@ -233,13 +278,13 @@ class FactionWizard(QWidget):
             files = save_faction.selectedFiles()
             try:
                 with open(files[0], 'wt', encoding='utf-8') as f:
-                    faction_data = ['Content']  # TODO: Lift this content from the wizard
-                    json.dump(faction_data, f)
-                    if self.restart_new_game:          # FIX ME
-                        nf = Faction()
-                        nf.deserialize(faction_data)
-                    if self.restart_game_wizard:
+                    nf = self._create_faction()
+                    json.dump(nf.serialize(), f)
+                    if self.restart_new_game:          # TODO: FIX ME!
                         pass
+                    if self.restart_game_wizard:       # TODO: Code mising!
+                        pass
+                    self.file_saved.emit()
             except OSError:
                 self.error.setText('Failed to save faction data!')
                 self.error.exec()
@@ -262,10 +307,23 @@ class FactionWizard(QWidget):
         self.traits.button(9).setChecked(True)
         self._switch_primary_trait(9)
         self._switch_faction(0)
+
+        for slider in self.biome_slider:    # TODO: Use faction settings ...
+            slider.reset()
+        for check in self.biome_immunity:
+            check.setChecked(False)
+        self.max_growth_rate.setValue(15)
+
         self._restore_industry_modifier()
         for r in Research:
             self.research_costs[r].button(2).setChecked(True)
         self.research_level.setChecked(False)
+
+        # TODO : ... up to here.
+
+        self.adv_score = 120     # TODO : For testing purposes only!
+
+        self.compute_advantage_points()
         self.show()
 
 
@@ -433,8 +491,8 @@ class FactionWizard(QWidget):
         traits_box.setTitle('Secondary Traits of the Faction ')
         traits_gl = QGridLayout(traits_box)
         n = 0
-        for t in TS:
-            rb = self.Selector(info_box, info, t.value[0], n)
+        for perk in PE:
+            rb = self.Selector(info_box, info, perk.value[0], n)
             traits_gl.addWidget(rb, n % 7, 1 + n // 7)
             self.features.addButton(rb, n)
             n += 1
@@ -478,27 +536,21 @@ class FactionWizard(QWidget):
 
     def _add_growth_modifier(self, layout):
         """ Create a spin box to adjust the growth rate of the colonies """
-        data = QSpinBox()
-        data.setSuffix('%')
-        data.setRange(1, 20)
-        data.setValue(15)
-        data.setMinimumSize(QSize(95, 40))
-        data.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        data.setWrapping(False)
-        data.lineEdit().setEnabled(False)
-        data.valueChanged.connect(self._adjust_growth_rate)
+        self.max_growth_rate = QSpinBox()
+        self.max_growth_rate.setSuffix('%')
+        self.max_growth_rate.setRange(1, 20)
+        self.max_growth_rate.setValue(15)
+        self.max_growth_rate.setMinimumSize(QSize(95, 40))
+        self.max_growth_rate.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.max_growth_rate.setWrapping(False)
+        self.max_growth_rate.lineEdit().setEnabled(False)
+        self.max_growth_rate.valueChanged.connect(self.compute_advantage_points)
         label = QLabel('Maximum colony growth rate per year:')
         hlayout = QHBoxLayout()
         hlayout.addWidget(label)
-        hlayout.addWidget(data)
+        hlayout.addWidget(self.max_growth_rate)
         hlayout.addStretch()
         layout.addLayout(hlayout)
-
-
-    def _adjust_growth_rate(self, newrate):
-        """ Store new growth rate & recompute spent advantage points """
-        self.max_growth_rate = newrate
-        self.compute_advantage_points()
 
 
     def _create_biome_slider(self, layout, n):
@@ -530,6 +582,7 @@ class FactionWizard(QWidget):
         immune = QCheckBox('  Immune to ' + parameter[n])
         immune.setStyleSheet('padding: 0px')
         immune.checkStateChanged.connect(self.biome_slider[n].update_immunity)
+        self.biome_immunity.append(immune)
         control_hl.addWidget(immune)
         control_hl.addStretch()
         control_hl.addWidget(self._create_biome_button(n, 1))
@@ -590,6 +643,7 @@ class FactionWizard(QWidget):
         self.research_level.setText('  All extra expensive research starts at technology level 4.')
         layout_vl.addStretch()
         layout_vl.addWidget(self.research_level)
+        self.research_level.clicked.connect(self.compute_advantage_points)
         self.pages.addWidget(research_costs)
 
 
@@ -597,6 +651,7 @@ class FactionWizard(QWidget):
         """ Create a group box with settings for a particular field of research """
         box = QGroupBox(area.value + ' Research')
         buttons = QButtonGroup()
+        buttons.idClicked.connect(self.compute_advantage_points)
         self.research_costs[area] = buttons
         layout_vl = QVBoxLayout(box)
         radio = QRadioButton('Costs 75% extra')
@@ -622,6 +677,7 @@ class FactionWizard(QWidget):
         data.setSingleStep(step)
         data.setMinimumSize(QSize(width, 40))
         data.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        data.valueChanged.connect(self.compute_advantage_points)
         if default < 1:
             data.setWrapping(True)
             data.lineEdit().setEnabled(False)
@@ -660,6 +716,7 @@ class FactionWizard(QWidget):
     def _switch_primary_trait(self, buttonid):
         """ Switch to another primary trait of the faction """
         trait = _FACTION_TRAITS[buttonid]
+        self.primary_trait = trait
         self.trait_info.setText(trait.value[1])
         self.compute_advantage_points()
 

@@ -130,3 +130,10 @@ class BiomeSlider(QGraphicsScene):
         else:
             self.immune = False
         self.update_biome_limits()
+
+
+    def reset(self):
+        """ Restore the default biome tolerance settings """
+        self.xmin = 0.4
+        self.xmax = 0.6
+        self.update_biome_limits()

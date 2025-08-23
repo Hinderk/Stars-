@@ -66,7 +66,7 @@ class Fleet:
         self.mine_sweeping = 0
         self.max_range = 0
         self.pen_range = 0
-        self.steal_cargo = faction.cargo_robber
+        self.steal_cargo = False  # TODO: Scanner & faction traits required to steal cargo!
         self.name = None
         self.index = None
         self.picture = None

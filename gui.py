@@ -154,6 +154,7 @@ class Gui(QMainWindow):
         self.new_game.advanced_game.clicked.connect(self._configure_game)
         self.game_setup.configure_faction.connect(self._configure_faction)
         self.new_faction.cancel.clicked.connect(self._abort_faction)
+        self.new_faction.file_saved.connect(self._abort_faction)
         self.map.universe.highlight_planet(self.map.universe.planets[-1])
 
 

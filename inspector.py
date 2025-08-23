@@ -268,10 +268,10 @@ class Inspector(QGraphicsView):
         max_val = []
         min_val.append(0.5 + math.log2(faction.min_gravity) / 6.0)
         min_val.append(0.5 + faction.min_temperatur / 400.0)
-        min_val.append(faction.min_radioactivity / 100.0)
+        min_val.append(faction.min_radiation / 100.0)
         max_val.append(0.5 + math.log2(faction.max_gravity) / 6.0)
         max_val.append(0.5 + faction.max_temperatur / 400.0)
-        max_val.append(faction.max_radioactivity / 100.0)
+        max_val.append(faction.max_radiation / 100.0)
         delta_y = self.y_width / 12
         yp = self.y_info + delta_y
         for n in (0, 1, 2):

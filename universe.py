@@ -753,13 +753,13 @@ class Universe(QGraphicsScene):
     def _colonize_planets(self, people, rules):
         """ Populate the planets with NPC factions """
         f0 = people.my_faction()
-        delta_r = (f0.max_radioactivity - f0.min_radioactivity) / 200.0
-        opt_r = (f0.max_radioactivity + f0.min_radioactivity) / 200.0
+        delta_r = (f0.max_radiation - f0.min_radiation) / 200.0
+        opt_r = (f0.max_radiation + f0.min_radiation) / 200.0
         delta_g = (math.log2(f0.max_gravity) - math.log2(f0.min_gravity)) / 12.0
         opt_g = (math.log2(f0.max_gravity) + math.log2(f0.min_gravity)) / 12.0
         delta_t = (f0.max_temperatur - f0.min_temperatur) / 800.0
         opt_t = (f0.max_temperatur + f0.min_temperatur) / 800.0
-        if f0.ignore_radioactivity:
+        if f0.ignore_radiation:
             delta_r = 1e8
         if f0.ignore_gravity:
             delta_g = 1e8
