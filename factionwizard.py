@@ -1,7 +1,6 @@
 
 """ This module implements the custom faction wizard """
 
-import copy
 import json
 
 from PyQt6.QtWidgets import QWidget
@@ -27,11 +26,14 @@ from biomeslider import BiomeSlider
 from faction import Faction
 from industry import Industry
 from defines import Research
+from aifactions import AIFactions
+
 from stylesheet import StyleSheet as ST
 from perks import Perks as PE
 from traits import Traits as TR
 
 
+_AI_FACTION_LIST = [ai.value for ai in AIFactions]
 
 _FACTION_TRAITS = [TR.HE, TR.ST, TR.WM, TR.CA, TR.IS,
                    TR.SD, TR.PP, TR.IT, TR.AR, TR.JT]
@@ -43,6 +45,8 @@ _INFO_MESSAGE = ('These lesser traits may bestow a boon onto a faction or '
                  'them. Multiple selections are possible. However, '
                  'unbalanced choices may affect the advantage score in a '
                  'disproportionate manner.')
+
+_RESEARCH_TEXT = '  All extra expensive research starts at technology level '
 
 
 
@@ -97,7 +101,7 @@ class FactionWizard(QWidget):
         # pylint: enable=too-few-public-methods
 
 
-    def __init__(self, people, rules):
+    def __init__(self, people):
         super().__init__()
         self.setWindowTitle("Custom Faction Wizard - Step 1 of 6")
         self.setStyleSheet(ST.FACTIONSETUP_1.value)
@@ -117,7 +121,8 @@ class FactionWizard(QWidget):
         self.selector = QScrollBar(Qt.Orientation.Horizontal)
         self.faction_singular = QLineEdit()
         self.faction_plural = QLineEdit()
-        self.default_name = 'Humanoid'
+        self.default_name = ''
+        self.species = ''
         self.research_level = QCheckBox()
         self.max_growth_rate = QSpinBox()
         self.industry_settings = {}
@@ -125,12 +130,14 @@ class FactionWizard(QWidget):
         self.biome_slider = []
         self.biome_immunity = []
         self.primary_trait = TR.NO
+        self.boost_level = 0
+        self.randomize_data = False
         self.restart_game_wizard = False
         self.restart_new_game = False
         self.factions = people
         self.selected_banner = 0
-        self.template = None
         self.current_page = 0
+        self.default_banner = []
         self._setup_error_messages()
         self._setup_buttons_and_score()
         self._setup_names_and_banner()
@@ -217,6 +224,8 @@ class FactionWizard(QWidget):
         """ Return to the previous page of the custom faction wizard """
         if 0 < self.current_page:
             self.current_page -= 1
+            if self.current_page < 1:
+                self._detect_custom_parameters()
             step = 'Step ' + str(1 + self.current_page) + ' of 6'
             self.setWindowTitle('Custom Faction Wizard - ' + step)
             self.pages.setCurrentIndex(self.current_page)
@@ -227,26 +236,23 @@ class FactionWizard(QWidget):
     def _create_faction(self):
         """ Create a faction object from the wizard's settings """
         nf = Faction()
+        nf.randomize_parameters = self.randomize_data
         nf.banner_index = self.selector.value()
         nf.surplus_usage = self.surplus.currentIndex()
-        if self.faction_singular.text():
-            nf.singular = self.faction_singular.text()
-        else:
-            nf.singular = self.default_name
-        if self.faction_plural.text():
-            nf.name = self.faction_plural.text()
-        else:
-            nf.name = self.default_name + 's'
+        nf.singular = self.faction_singular.text()
+        nf.plural = self.faction_plural.text()
+        nf.name = self.default_name
+        nf.species = self.species
         nf.primary_trait = self.primary_trait
         for i in range(0, 14):
             if self.features.button(i).isChecked():
                 nf.secondary_traits.append(_FACTION_PERKS[i])
         nf.max_colony_growth_rate = self.max_growth_rate.value()
-        nf.min_gravity, nf.max_gravity = self.biome_slider[0].get_biome_limits()
+        nf.min_gravity, nf.max_gravity = self.biome_slider[0].get_biome_data()
         nf.ignore_gravity = self.biome_slider[0].immune
-        nf.min_temperatur, nf.max_temperatur = self.biome_slider[1].get_biome_limits()
+        nf.min_temperatur, nf.max_temperatur = self.biome_slider[1].get_biome_data()
         nf.ignore_temperature = self.biome_slider[1].immune
-        nf.min_radiation, nf.max_radiation = self.biome_slider[2].get_biome_limits()
+        nf.min_radiation, nf.max_radiation = self.biome_slider[2].get_biome_data()
         nf.ignore_radiation = self.biome_slider[2].immune
         nf.colonist_productivity = self.industry_settings[Industry.RGC].value()
         nf.factory_productivity = self.industry_settings[Industry.RGF].value()
@@ -257,6 +263,7 @@ class FactionWizard(QWidget):
         nf.mine_resource_cost = self.industry_settings[Industry.MRB].value()
         nf.mine_labor_limit = self.industry_settings[Industry.MCO].value()
         nf.research_boost = self.research_level.isChecked()
+        nf.boost_level = self.boost_level
         scaling = [0, 1.75, 1.0, 0.5]
         for r, box in self.research_costs.items():
             nf.research_speed[r.name] = scaling[box.checkedId()]
@@ -296,30 +303,12 @@ class FactionWizard(QWidget):
         self.restart_game_wizard = advanced
         self.current_page = 1
         self._revert()
-        self.settings.button(0).setChecked(True)
-        self.banners[self.selected_banner].setVisible(False)
-        self.selected_banner = 0
-        self.banners[0].setVisible(True)
-        self.selector.setValue(0)
         self.faction_singular.setText('')
         self.faction_plural.setText('')
-        self.surplus.setCurrentIndex(0)
-        self.traits.button(9).setChecked(True)
-        self._switch_primary_trait(9)
+        self.settings.button(0).setChecked(True)
+        self.default_banner = [0, 1, 3, 15, 8, 2]
+        self._set_faction_banner(1)
         self._switch_faction(0)
-
-        for slider in self.biome_slider:    # TODO: Use faction settings ...
-            slider.reset()
-        for check in self.biome_immunity:
-            check.setChecked(False)
-        self.max_growth_rate.setValue(15)
-
-        self._restore_industry_modifier()
-        for r in Research:
-            self.research_costs[r].button(2).setChecked(True)
-        self.research_level.setChecked(False)
-
-        # TODO : ... up to here.
 
         self.adv_score = 120     # TODO : For testing purposes only!
 
@@ -384,7 +373,7 @@ class FactionWizard(QWidget):
         factions_gl.addWidget(spacer, 0, 0)
         n = 0
         for sp in self.factions.ai_faction:
-            rb = QRadioButton(sp.species)
+            rb = QRadioButton(sp.name)
             factions_gl.addWidget(rb, n % 4, 1 + n // 4)
             self.settings.addButton(rb, n)
             n += 1
@@ -407,8 +396,6 @@ class FactionWizard(QWidget):
         label.setAlignment(alignment)
         self.faction_singular.setMaximumWidth(600)
         self.faction_plural.setMaximumWidth(600)
-        self.faction_singular.setPlaceholderText(self.default_name)
-        self.faction_plural.setPlaceholderText(self.default_name + 's')
         names_gl.addWidget(spacer, 0, 2)
         names_gl.addWidget(label, 0, 0)
         names_gl.addWidget(self.faction_singular, 0, 1)
@@ -434,6 +421,7 @@ class FactionWizard(QWidget):
         self.pages.addWidget(names_and_banner)
         self.settings.idClicked.connect(self._switch_faction)
         self.selector.valueChanged.connect(self._switch_faction_banner)
+        self.surplus.currentIndexChanged.connect(self._detect_custom_parameters)
 
 
     def _setup_primary_traits(self):
@@ -593,8 +581,8 @@ class FactionWizard(QWidget):
 
     def _process_biome_button(self):
         """ Adjust the biome tolerances currently in use """
-        lower_shift_value = [-0.01, 0.01, 0.01, -0.01]
-        upper_shift_value = [-0.01, 0.01, -0.01, 0.01]
+        lower_shift_value = [-1, 1, 1, -1]
+        upper_shift_value = [-1, 1, -1, 1]
         button = self.sender()
         slider = self.biome_slider[button.n]
         smin = lower_shift_value[button.mode]
@@ -640,7 +628,6 @@ class FactionWizard(QWidget):
         for fe in Research:
             self._add_research_box(fe, layout, n // 2, n % 2)
             n += 1
-        self.research_level.setText('  All extra expensive research starts at technology level 4.')
         layout_vl.addStretch()
         layout_vl.addWidget(self.research_level)
         self.research_level.clicked.connect(self.compute_advantage_points)
@@ -691,26 +678,70 @@ class FactionWizard(QWidget):
         self.industry_settings[imod] = data
 
 
-    def _restore_industry_modifier(self):
-        """ Recover the default industry settings for a game """
-        for imod in Industry:
-            spinner = self.industry_settings[imod]
-            spinner.setValue(imod.value[2])
-
-
     def _switch_faction(self, buttonid):
         """ Switch to another predefined faction """
+        self.next.setEnabled(True)
+        self.randomize_data = False
         if buttonid < 6:
-            self.next.setEnabled(True)
-            faction = self.factions.ai_faction[buttonid]
-            self.faction_singular.setPlaceholderText(faction.species)
-            self.faction_plural.setPlaceholderText(faction.species + 's')
-            self.default_name = faction.species
-            self.template = copy.deepcopy(faction)
+            faction = self.factions.get_ai_faction(buttonid)
+            self._load_faction_data(faction)
+            self._set_faction_banner(buttonid)
         elif buttonid < 7:
-            self._randomize_faction()
+            self.next.setEnabled(False)
+            self.faction_singular.setPlaceholderText('Random')
+            self.faction_plural.setPlaceholderText('Randoms')
+            self.species = ''
+            self.default_name = ''
+            self.randomize_data = True
+
+
+    def _load_faction_data(self, f):
+        """ Show the perks & parameters of the specified game faction """
+        self.default_name = f.name
+        self.species = f.species
+        self.randomize_data = f.randomize_parameters
+        if f.name:
+            self.faction_singular.setPlaceholderText(f.name)
+            self.faction_plural.setPlaceholderText(f.name + 's')
         else:
-            self._customize_faction()
+            self.faction_singular.setPlaceholderText('')
+            self.faction_plural.setPlaceholderText('')
+        self.primary_trait = f.primary_trait
+        i = _FACTION_TRAITS.index(f.primary_trait)
+        self.trait_info.setText(f.primary_trait.value[1])
+        self.traits.button(i).setChecked(True)
+        for i in range(0, 14):
+            if _FACTION_PERKS[i] in f.secondary_traits:
+                self.features.button(i).setChecked(True)
+            else:
+                self.features.button(i).setChecked(False)
+        self.max_growth_rate.setValue(f.max_colony_growth_rate)
+        self.research_level.setChecked(f.research_boost)
+        self.industry_settings[Industry.RGC].setValue(f.colonist_productivity)
+        self.industry_settings[Industry.RGF].setValue(f.factory_productivity)
+        self.industry_settings[Industry.FRB].setValue(f.factory_resource_cost)
+        self.industry_settings[Industry.FCO].setValue(f.factory_labor_limit)
+        self.industry_settings[Industry.FGC].setValue(f.factory_material_cost)
+        self.industry_settings[Industry.YMP].setValue(f.mine_productivity)
+        self.industry_settings[Industry.MRB].setValue(f.mine_resource_cost)
+        self.industry_settings[Industry.MCO].setValue(f.mine_labor_limit)
+        self.biome_immunity[0].setChecked(f.ignore_gravity)
+        self.biome_immunity[1].setChecked(f.ignore_temperature)
+        self.biome_immunity[2].setChecked(f.ignore_radiation)
+        self.biome_slider[0].set_biome_limits(f.min_gravity, f.max_gravity)
+        self.biome_slider[1].set_biome_limits(f.min_temperatur, f.max_temperatur)
+        self.biome_slider[2].set_biome_limits(f.min_radiation, f.max_radiation)
+        for r in Research:
+            speed = f.research_speed[r.name]
+            i = 1
+            if speed < 1.5:
+                i = 2
+            if speed < 1.0:
+                i = 3
+            self.research_costs[r].button(i).setChecked(True)
+        self.boost_level = f.boost_level
+        self.research_level.setText(_RESEARCH_TEXT + str(f.boost_level) + '.')
+        self.surplus.setCurrentIndex(f.surplus_usage)
 
 
     def _switch_primary_trait(self, buttonid):
@@ -735,19 +766,29 @@ class FactionWizard(QWidget):
         self.banners[self.selected_banner].setVisible(False)
         self.selected_banner = value
         self.banners[value].setVisible(True)
+        self.default_banner = [value, value, value, value, value, value]
 
 
-    def _randomize_faction(self):
-        """ Select a faction with randomized traits """
-        self.next.setEnabled(False)
-        self.faction_singular.setPlaceholderText('Random')
-        self.faction_plural.setPlaceholderText('Randoms')
-        self.default_name = 'Random'
+    def _set_faction_banner(self, value):
+        """ Change the default banner when selecting a new faction preset """
+        hold = self.default_banner
+        self.selector.setValue(hold[value])
+        self.default_banner = hold
 
 
-    def _customize_faction(self):
-        """ Create a cutomized faction """
-        print('-- Customize --')
+    def _detect_custom_parameters(self):
+        """ Test whether the specified faction features predefined parameters """
+        f = self._create_faction()
+        f.plural = ''
+        f.singular = ''
+        f.banner_index = 0
+        f.randomize_parameters = False
+        faction = f.serialize()
+        if faction in _AI_FACTION_LIST:
+            i = _AI_FACTION_LIST.index(faction)
+            self.settings.button(i).setChecked(True)
+        else:
+            self.settings.button(7).setChecked(True)
 
 
     def compute_advantage_points(self):

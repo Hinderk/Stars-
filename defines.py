@@ -82,9 +82,9 @@ class AIMode(Enum):
 
 class Research(Enum):
     """ Areas of technology to be researched by the player """
-    RA0 = 'Energy'
-    RA1 = 'Construction'
-    RA2 = 'Weapons'
-    RA3 = 'Electronics'
-    RA4 = 'Propulsion'
-    RA5 = 'Biotechnology'
+    ENE = 'Energy'
+    CON = 'Construction'
+    WEP = 'Weapons'
+    ELE = 'Electronics'
+    PRO = 'Propulsion'
+    BIO = 'Biotechnology'

@@ -3,6 +3,8 @@
 
 import random
 
+from aifactions import AIFactions
+
 from defines import Stance
 from faction import Faction
 
@@ -12,15 +14,12 @@ class People:
 
     """ This class encodes the perks & properties of a game faction """
 
-    species = ['Humanoid', 'Rabbitoid', 'Insectoid', 'Nucletoid', 'Silicanoid', 'Antetheral']
-    name = ['Robotoids', 'Turindrones', 'Automitrons', 'Rototills', 'Cybertrons', 'Macinti']
     ai_faction = []
 
     max_ai = 0
-    for s in species:
-        fi = Faction(max_ai)
-        fi.name = name[max_ai]
-        fi.species = species[max_ai]
+    for ai in AIFactions:
+        fi = Faction()
+        fi.deserialize(ai.value)
         max_ai += 1
         ai_faction.append(fi)
 
@@ -28,7 +27,7 @@ class People:
     def __init__(self):
         self.player_id = 0
         self.player_count = 1
-        self.player = [Faction()]
+        self.player = [Faction()]    # TODO: Player faction specified in game setup!
 
 
     def get_stance(self, f_ida, f_idb):  # TODO: For testing purposes only ...

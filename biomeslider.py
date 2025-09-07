@@ -35,10 +35,10 @@ class BiomeSlider(QGraphicsScene):
         self.maxtext = self.addSimpleText('', font)
         self.maxtext.setPos(720, 7)
         self.immune = False
-        self.x0 = 0.5
-        self.xpos = 0.5
-        self.xmin = 0.4
-        self.xmax = 0.6
+        self.x0 = 50
+        self.xpos = 50
+        self.xmin = 40
+        self.xmax = 60
         self.biome = n
         self.selected = False
         self.update_biome_limits()
@@ -48,7 +48,7 @@ class BiomeSlider(QGraphicsScene):
     def mousePressEvent(self, mouse_click):
         """ Event handler: Pick the biome slider with the mouse """
         p0 = mouse_click.scenePos()
-        xval = p0.x() / 700.0
+        xval = p0.x() / 7.0
         if self.xmin < xval < self.xmax:
             self.selected = True
             self.x0 = xval
@@ -60,23 +60,28 @@ class BiomeSlider(QGraphicsScene):
         """ Event handler: Move the biome slider left & right """
         p0 = event.scenePos()
         if self.selected:
-            delta = p0.x() / 700.0 - self.x0
-            delta += self.xpos - self.xmin
-            self.adjust_biome_limits(delta, delta)
+            delta = p0.x() / 7.0 - self.x0 + 1000.5
+            move = int(delta + self.xpos - self.xmin) - 1000
+            self.adjust_biome_limits(move, move)
 
 # pylint: enable=invalid-name
+
+    def get_biome_data(self):
+        """ Return the raw biome data """
+        return self.xmin, self.xmax
+
 
     def get_biome_limits(self):
         """ Return the biome tolerances currently in effect """
         if self.biome < 1:
-            minval = math.pow(2, 6 * (self.xmin - 0.5))
-            maxval = math.pow(2, 6 * (self.xmax - 0.5))
+            minval = math.pow(2, 0.06 * (self.xmin - 50))
+            maxval = math.pow(2, 0.06 * (self.xmax - 50))
         elif self.biome < 2:
-            minval = 400 * self.xmin - 200
-            maxval = 400 * self.xmax - 200
+            minval = 4 * self.xmin - 200
+            maxval = 4 * self.xmax - 200
         else:
-            minval = 100 * self.xmin
-            maxval = 100 * self.xmax
+            minval = self.xmin
+            maxval = self.xmax
         return minval, maxval
 
 
@@ -90,7 +95,7 @@ class BiomeSlider(QGraphicsScene):
             length = [2, 0, 0]
             unit = ['g', '\u00B0C', 'mR']
             self.slider.setVisible(True)
-            self.slider.setRect(700 * self.xmin, 4, 699 * (self.xmax - self.xmin), 32)
+            self.slider.setRect(7 * self.xmin, 4, 6.99 * (self.xmax - self.xmin), 32)
             minval, maxval = self.get_biome_limits()
             mintext = f'{minval:.{length[self.biome]}f}' + unit[self.biome]
             maxtext = f'{maxval:.{length[self.biome]}f}' + unit[self.biome]
@@ -107,16 +112,16 @@ class BiomeSlider(QGraphicsScene):
             return
         minval = self.xmin + smin
         maxval = self.xmax + smax
-        if maxval - minval < 0.2:
-            midval = 0.5 * (minval + maxval)
-            minval = midval - 0.1
-            maxval = midval + 0.1
+        if maxval - minval < 20:
+            midval = (minval + maxval) // 2
+            minval = midval - 10
+            maxval = midval + 10
         if minval < 0:
             maxval -= minval
             minval = 0
-        if 1 < maxval:
-            minval -= maxval - 1
-            maxval = 1
+        if 100 < maxval:
+            minval -= maxval - 100
+            maxval = 100
         minval = max(0, minval)
         self.xmin = minval
         self.xmax = maxval
@@ -132,8 +137,8 @@ class BiomeSlider(QGraphicsScene):
         self.update_biome_limits()
 
 
-    def reset(self):
-        """ Restore the default biome tolerance settings """
-        self.xmin = 0.4
-        self.xmax = 0.6
+    def set_biome_limits(self, xlo, xhi):
+        """ Specify the biome tolerance settings """
+        self.xmin = xlo
+        self.xmax = xhi
         self.update_biome_limits()

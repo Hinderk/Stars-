@@ -107,7 +107,7 @@ class Universe(QGraphicsScene):
 
         self._create_indicator()
         self._create_planets(people, rules)
-        self._colonize_planets(people, rules)
+        self._colonize_planets(people)
 
         self.setBackgroundBrush(BRUSH.BLACK)
 
@@ -750,15 +750,15 @@ class Universe(QGraphicsScene):
         self.default_view = False
 
 
-    def _colonize_planets(self, people, rules):
+    def _colonize_planets(self, people):
         """ Populate the planets with NPC factions """
         f0 = people.my_faction()
-        delta_r = (f0.max_radiation - f0.min_radiation) / 200.0
-        opt_r = (f0.max_radiation + f0.min_radiation) / 200.0
-        delta_g = (math.log2(f0.max_gravity) - math.log2(f0.min_gravity)) / 12.0
-        opt_g = (math.log2(f0.max_gravity) + math.log2(f0.min_gravity)) / 12.0
-        delta_t = (f0.max_temperatur - f0.min_temperatur) / 800.0
-        opt_t = (f0.max_temperatur + f0.min_temperatur) / 800.0
+        delta_r = (f0.max_radiation - f0.min_radiation) / 200
+        opt_r = (f0.max_radiation + f0.min_radiation) / 200
+        delta_g = (f0.max_gravity - f0.min_gravity) / 200
+        opt_g = (f0.max_gravity + f0.min_gravity) / 200 - 0.5
+        delta_t = (f0.max_temperatur - f0.min_temperatur) / 200
+        opt_t = (f0.max_temperatur + f0.min_temperatur) / 200 - 0.5
         if f0.ignore_radiation:
             delta_r = 1e8
         if f0.ignore_gravity:
@@ -767,9 +767,9 @@ class Universe(QGraphicsScene):
             delta_t = 1e8
         for p in self.planets:
             if p.home_world:
-                p.radioactivity = opt_r * 100.0
+                p.radioactivity = opt_r * 100
                 p.gravity = 64.0 ** opt_g
-                p.temperature = opt_t * 400.0
+                p.temperature = opt_t * 400
             p.center_radioactivity = opt_r
             p.delta_radioactivity = delta_r
             p.center_gravity = opt_g

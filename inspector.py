@@ -266,11 +266,11 @@ class Inspector(QGraphicsView):
             self.scene.addLine(xp, self.y_minerals, xp, yp, PEN.WHITE_O)
         min_val = []
         max_val = []
-        min_val.append(0.5 + math.log2(faction.min_gravity) / 6.0)
-        min_val.append(0.5 + faction.min_temperatur / 400.0)
+        min_val.append(faction.min_gravity / 100.0)
+        min_val.append(faction.min_temperatur / 100.0)
         min_val.append(faction.min_radiation / 100.0)
-        max_val.append(0.5 + math.log2(faction.max_gravity) / 6.0)
-        max_val.append(0.5 + faction.max_temperatur / 400.0)
+        max_val.append(faction.max_gravity / 100.0)
+        max_val.append(faction.max_temperatur / 100.0)
         max_val.append(faction.max_radiation / 100.0)
         delta_y = self.y_width / 12
         yp = self.y_info + delta_y

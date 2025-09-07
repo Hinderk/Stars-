@@ -174,7 +174,7 @@ class Gui(QMainWindow):
         self.new_game.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.game_setup = GameSetup(people, rules)
         self.game_setup.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.new_faction = FactionWizard(people, rules)
+        self.new_faction = FactionWizard(people)
         self.new_faction.setWindowModality(Qt.WindowModality.ApplicationModal)
         self._assemble_user_interface()
         self.menu = Menu(self)

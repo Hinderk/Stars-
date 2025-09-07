@@ -117,10 +117,10 @@ class Planet:
 
     def value(self):
         """ Compute a planet value based on the habitability of its biome """
-        gravity = math.log(self.gravity) / math.log(64.0)
-        delta_r = abs(self.radioactivity / 100.0 - self.center_radioactivity)
+        gravity = math.log2(self.gravity) / 6
+        delta_r = abs(self.radioactivity / 100 - self.center_radioactivity)
         delta_g = abs(gravity - self.center_gravity)
-        delta_t = abs(self.temperature / 400.0 - self.center_temperature)
+        delta_t = abs(self.temperature / 400 - self.center_temperature)
         res = (max(min(self.delta_radioactivity - delta_r, 0.0), -0.15)
                + max(min(self.delta_gravity - delta_g, 0.0), -0.15)
                + max(min(self.delta_temperature - delta_t, 0.0), -0.15))
