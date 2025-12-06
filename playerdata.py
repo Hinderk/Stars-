@@ -26,7 +26,7 @@ class PlayerData(QAbstractTableModel):
         self.add_player(0, PT.HUP, None, people.my_faction())
         n = 1
         while n < self.number_of_players:
-            self.add_player(n, PT.AIP, AI.AI1, people.random_faction())
+            self.add_player(n, PT.AIP, AI.AI1, people.random_ai_faction())
             n += 1
 
 
@@ -41,16 +41,16 @@ class PlayerData(QAbstractTableModel):
             _, _, _, pname = self.players[row]
         elif ptype in (PT.EXP, PT.REX):
             self.ex_count += 1
-            pname = 'AI Stewarts ' + str(self.ex_count).zfill(2)
+            pname = 'AI Stewart ' + str(self.ex_count).zfill(2)
         elif ptype == PT.RNG:
             if pmode:
                 self.ai_count += 1
-                pname = 'AI Antagonists ' + str(self.ai_count).zfill(2)
+                pname = 'AI Antagonist ' + str(self.ai_count).zfill(2)
             else:
                 self.uf_count += 1
-                pname = 'Unknown Actors ' + str(self.uf_count).zfill(2)
+                pname = 'Unknown Actor ' + str(self.uf_count).zfill(2)
         else:
-            pname = pfaction.name
+            pname = pfaction.singular
             if pname in self.cp_count:
                 self.cp_count[pname] += 1
             else:
@@ -87,7 +87,7 @@ class PlayerData(QAbstractTableModel):
         self.add_player(0, PT.HUP, None, people.my_faction())
         n = 1
         while n < pcount:
-            self.add_player(n, PT.AIP, AI.AI1, people.random_faction())
+            self.add_player(n, PT.AIP, AI.AI1, people.random_ai_faction())
             n += 1
         self.endResetModel()
 
@@ -146,7 +146,7 @@ class PlayerData(QAbstractTableModel):
                     if t in (PT.REX, PT.RNG):
                         content = 'Random Choice'
                     else:
-                        content = f.species
+                        content = f.singular
         return content
 
 

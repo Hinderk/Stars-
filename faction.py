@@ -11,17 +11,15 @@ from defines import Research
 
 class Faction:
 
-    """ This class implements the properties of a player faction """
+    """ This class encodes the perks & properties of a game faction """
 
     def __init__(self):
         self.f_id = -1
         self.ptype = None
         self.aimode = None
-        self.banner_index = 0
-        self.species = ''
-        self.name = ''
-        self.singular = 'Human'
-        self.plural = 'Humans'
+        self.banner_index = 16
+        self.singular = 'Random'
+        self.plural = 'Randoms'
         self.max_colony_growth_rate = 15
         self.min_radiation = 15
         self.max_radiation = 85
@@ -48,13 +46,13 @@ class Faction:
         self.boost_level = 3
         self.research_boost = False
         self.surplus_usage = 0
-        self.randomize_parameters = False
+        self.randomize_parameters = True
 
 
     def serialize(self):
         """ Serialize the contents of the class for storage purposes """
         result = [self.banner_index, self.surplus_usage]
-        result += [self.species, self.name, self.singular, self.plural]
+        result += [self.singular, self.plural]
         result += [self.max_colony_growth_rate]
         result += [self.min_gravity, self.max_gravity]
         result += [self.ignore_gravity]
@@ -84,36 +82,34 @@ class Faction:
         """ Initialise the class from a json string read from a file """
         self.banner_index = data[0]
         self.surplus_usage = data[1]
-        self.species = data[2]
-        self.name = data[3]
-        self.singular = data[4]
-        self.plural = data[5]
-        self.max_colony_growth_rate = data[6]
-        self.min_gravity = data[7]
-        self.max_gravity = data[8]
-        self.ignore_gravity = data[9]
-        self.min_temperatur = data[10]
-        self.max_temperatur = data[11]
-        self.ignore_temperature = data[12]
-        self.min_radiation = data[13]
-        self.max_radiation = data[14]
-        self.ignore_radiation = data[15]
-        self.primary_trait = Traits[data[16]]
+        self.singular = data[2]
+        self.plural = data[3]
+        self.max_colony_growth_rate = data[4]
+        self.min_gravity = data[5]
+        self.max_gravity = data[6]
+        self.ignore_gravity = data[7]
+        self.min_temperatur = data[8]
+        self.max_temperatur = data[9]
+        self.ignore_temperature = data[10]
+        self.min_radiation = data[11]
+        self.max_radiation = data[12]
+        self.ignore_radiation = data[13]
+        self.primary_trait = Traits[data[14]]
         self.secondary_traits = []
-        for name in data[17]:
+        for name in data[15]:
             self.secondary_traits.append(Perks[name])
-        self.colonist_productivity = data[18]
-        self.factory_productivity = data[19]
-        self.factory_labor_limit = data[20]
-        self.factory_resource_cost = data[21]
-        self.factory_material_cost = data[22]
-        self.mine_productivity = data[23]
-        self.mine_resource_cost = data[24]
-        self.mine_labor_limit = data[25]
-        self.research_speed = data[26]
-        self.boost_level = data[27]
-        self.research_boost = data[28]
-        self.randomize_parameters = data[29]
+        self.colonist_productivity = data[16]
+        self.factory_productivity = data[17]
+        self.factory_labor_limit = data[18]
+        self.factory_resource_cost = data[19]
+        self.factory_material_cost = data[20]
+        self.mine_productivity = data[21]
+        self.mine_resource_cost = data[22]
+        self.mine_labor_limit = data[23]
+        self.research_speed = data[24]
+        self.boost_level = data[25]
+        self.research_boost = data[26]
+        self.randomize_parameters = data[27]
 
 
     def get_biome_limits(self, biome):

@@ -29,6 +29,7 @@ class Menu(QMenuBar):
 
         super().__init__(form)
 
+        self.default_zoom = None
         self.action_generate = self._new_action(
             'Generate', 'Advance the game time by one year ...', 'F9')
 
@@ -189,7 +190,9 @@ class Menu(QMenuBar):
             new_action.setToolTip('Set magnification level: ' + label)
             new_action.setStatusTip('Set magnification level: ' + label)
             zoom_actions.addAction(new_action)
-            new_action.setChecked(level == 100)
+            if level == 100:
+                self.default_zoom = new_action
+                new_action.setChecked(True)
             new_action.toggled.connect(self.resize_starmap)
 
 

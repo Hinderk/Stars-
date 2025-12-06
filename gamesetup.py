@@ -33,7 +33,7 @@ class GameSetup(QWidget):
 
     """ This class implements the graphical elements for the advanced game setup dialog """
 
-    configure_faction = QSignal(bool, bool)
+    configure_faction = QSignal(int, object)
 
     ai_modes = [AI.AI0, AI.AI1, AI.AI2, AI.AI3, AI.AIR]
 
@@ -63,6 +63,8 @@ class GameSetup(QWidget):
         self.players = QTableView()
         self.game_duration = QSpinBox()
         self.game_name = QLineEdit()
+        self.select = QMenu()
+        self.submenu = None
         self._setup_error_messages()
         self._setup_universe()
         self._setup_players()
@@ -269,34 +271,42 @@ class GameSetup(QWidget):
                 self.error.exec()
 
 
+    def _update_menu(self, factions):
+        """ Update the menu used to add new players to the game roster """
+        self.submenu.erase()
+        a = self.submenu.addAction('New Faction')
+        a.setData((1, 0, 0))
+        a = self.submenu.addAction('Open File')
+        a.setData((1, 1, 0))
+        self.submenu.addSeparator()
+        n = 0
+        for f in factions:
+            a = self.submenu.addAction(f.singular)
+            a.setData((1, 2, n))
+            n += 1
+
+
     def _setup_menu(self, people):
         """ Create the menu used to add new players to the game roster """
-        self.select = QMenu()
         self.select.setStyleSheet(ST.PLAYERMENU.value)
         submenu = self.select.addMenu('Predefined Faction  ')
         n = 1
         for ai in people.ai_faction:
-            a = submenu.addAction(ai.species)
+            a = submenu.addAction(ai.singular)
             a.setData((0, n, 0))
             n += 1
         a = submenu.addAction('Random')
         a.setData((0, 0, 0))
-        submenu = self.select.addMenu('Custom Faction')
-        a = submenu.addAction('New Faction')
+        self.submenu = self.select.addMenu('Custom Faction')
+        a = self.submenu.addAction('New Faction')
         a.setData((1, 0, 0))
-        a = submenu.addAction('Open File')
+        a = self.submenu.addAction('Open File')
         a.setData((1, 1, 0))
-        submenu.addSeparator()
-        n = 0
-        for pc in people.player:
-            a = submenu.addAction(pc.name)
-            a.setData((1, 2, n))
-            n += 1
         self.select.addSeparator()
         submenu = self.select.addMenu('Computer Player')
         n = 1
         for ai in people.ai_faction:
-            modemenu = submenu.addMenu(ai.name + '  ')
+            modemenu = submenu.addMenu(ai.singular + '  ')
             m = 0
             for mode in AI:
                 a = modemenu.addAction(mode.value)
@@ -313,7 +323,7 @@ class GameSetup(QWidget):
         submenu = self.select.addMenu('Expansion Slot')
         n = 1
         for ai in people.ai_faction:
-            a = submenu.addAction(ai.species)
+            a = submenu.addAction(ai.singular)
             a.setData((3, n, 0))
             n += 1
         a = submenu.addAction('Random')
@@ -490,12 +500,15 @@ class GameSetup(QWidget):
                 return self.factions.get_faction(m_id)
             if f_id == 1:
                 return self.load_faction()
-            self.configure_faction.emit(False, True)
+            fold = None
+            if row < self.model.number_of_players:
+                fold = self.model.players[row][2]
+            self.configure_faction.emit(row, fold)
             return None
         def select_ai_faction(f_id, f_type, r_type=PT.RNG):
             if f_id > 0:
                 return self.factions.get_ai_faction(f_id - 1), f_type
-            return self.factions.random_faction(), r_type
+            return self.factions.random_ai_faction(), r_type
         fnew = None
         p_type = PT.HUP
         p_mode = None

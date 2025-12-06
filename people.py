@@ -1,5 +1,5 @@
 
-""" This module is used to define the perks & properties of a game faction """
+""" This module is used to define the roster of players joining a game """
 
 import random
 
@@ -9,25 +9,36 @@ from defines import Stance
 from faction import Faction
 
 
-
-class People:
-
-    """ This class encodes the perks & properties of a game faction """
-
-    ai_faction = []
-
-    max_ai = 0
+def _create_faction_list(list_of_factions):
+    """ Create a list of faction objects from their textual representations """
     for ai in AIFactions:
         fi = Faction()
         fi.deserialize(ai.value)
-        max_ai += 1
-        ai_faction.append(fi)
+        list_of_factions.append(fi)
+
+
+class People:
+
+    """ This class implements the roster of human & AI players """
+
+    monikers = [ 'Americon', 'Automitron', 'Berserker', 'Bulushi', 'Cleaver', 'Crusher',
+                 'Cybertron', 'Eagle', 'Europ', 'Felite', 'Ferret', 'Golem', 'Hawk',
+                 'Hicardi', 'Hooveron', 'Hulon', 'Indion', 'Kurkonian', 'Loraxoid',
+                 'Macinti', 'Mensoid', 'Nairnians', 'Nees', 'Nulons', 'Omicron', 'Picardi',
+                 'Robotoid', 'Rototile', 'Rush\'n', 'Tritizoid', 'Turindrone', 'Ubert',
+                 'Ultron', 'Valadian', 'Zilon' ]
+
+    ai_faction = []
+
+    _create_faction_list(ai_faction)
+
+    max_ai = len(ai_faction)
 
 
     def __init__(self):
         self.player_id = 0
         self.player_count = 1
-        self.player = [Faction()]    # TODO: Player faction specified in game setup!
+        self.player = [Faction()]
 
 
     def get_stance(self, f_ida, f_idb):  # TODO: For testing purposes only ...
@@ -51,11 +62,18 @@ class People:
         return self.player[f_id % self.player_count]
 
 
+    def add_faction(self, faction):
+        """ Add a new game faction to the player list """
+        self.player.append(faction)
+        self.player_count += 1
+        return self.player_count - 1
+
+
     def get_ai_faction(self, f_id):
         """ Return a specific AI controlled game faction """
         return People.ai_faction[f_id % People.max_ai]
 
 
-    def random_faction(self):
+    def random_ai_faction(self):
         """ Choose an AI controlled game faction at random """
         return People.ai_faction[random.randint(0, People.max_ai - 1)]

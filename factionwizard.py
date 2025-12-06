@@ -26,14 +26,14 @@ from biomeslider import BiomeSlider
 from faction import Faction
 from industry import Industry
 from defines import Research
-from aifactions import AIFactions
+
+import aifactions
 
 from stylesheet import StyleSheet as ST
 from perks import Perks as PE
 from traits import Traits as TR
 
 
-_AI_FACTION_LIST = [ai.value for ai in AIFactions]
 
 _FACTION_TRAITS = [TR.HE, TR.ST, TR.WM, TR.CA, TR.IS,
                    TR.SD, TR.PP, TR.IT, TR.AR, TR.JT]
@@ -54,7 +54,7 @@ class FactionWizard(QWidget):
 
     """ This class provides all the graphical elements of the wizard """
 
-    file_saved = QSignal()
+    file_saved = QSignal(object)
 
     class Selector(QRadioButton):
 
@@ -122,7 +122,7 @@ class FactionWizard(QWidget):
         self.faction_singular = QLineEdit()
         self.faction_plural = QLineEdit()
         self.default_name = ''
-        self.species = ''
+        self.moniker = ''
         self.research_level = QCheckBox()
         self.max_growth_rate = QSpinBox()
         self.industry_settings = {}
@@ -131,9 +131,11 @@ class FactionWizard(QWidget):
         self.biome_immunity = []
         self.primary_trait = TR.NO
         self.boost_level = 0
+        self.adv_score = 0
         self.randomize_data = False
         self.restart_game_wizard = False
         self.restart_new_game = False
+        self.current_table_index = 0
         self.factions = people
         self.selected_banner = 0
         self.current_page = 0
@@ -146,9 +148,6 @@ class FactionWizard(QWidget):
         self._setup_biome_tolerances()
         self._setup_mining_and_resources()
         self._setup_research_costs()
-
-        self.adv_score = 80                 # TODO: Remove test rigging
-        self.compute_advantage_points()     # TODO: Remove me?
 
 
     def _setup_error_messages(self):
@@ -241,8 +240,10 @@ class FactionWizard(QWidget):
         nf.surplus_usage = self.surplus.currentIndex()
         nf.singular = self.faction_singular.text()
         nf.plural = self.faction_plural.text()
-        nf.name = self.default_name
-        nf.species = self.species
+        if not nf.singular:
+            nf.singular = self.default_name
+        if not nf.plural:
+            nf.plural = nf.singular + 's'
         nf.primary_trait = self.primary_trait
         for i in range(0, 14):
             if self.features.button(i).isChecked():
@@ -285,33 +286,33 @@ class FactionWizard(QWidget):
             files = save_faction.selectedFiles()
             try:
                 with open(files[0], 'wt', encoding='utf-8') as f:
+                    print(files[0])
                     nf = self._create_faction()
                     json.dump(nf.serialize(), f)
                     if self.restart_new_game:          # TODO: FIX ME!
                         pass
                     if self.restart_game_wizard:       # TODO: Code mising!
                         pass
-                    self.file_saved.emit()
+                    self.file_saved.emit(nf)
             except OSError:
                 self.error.setText('Failed to save faction data!')
                 self.error.exec()
 
 
-    def configure_wizard(self, simple=False, advanced=False):
+    def configure_wizard(self, simple=False, advanced=False, faction=None):
         """ Initialise the configuration wizard & store the invocation method """
         self.restart_new_game = simple
         self.restart_game_wizard = advanced
-        self.current_page = 1
-        self._revert()
         self.faction_singular.setText('')
         self.faction_plural.setText('')
-        self.settings.button(0).setChecked(True)
-        self.default_banner = [0, 1, 3, 15, 8, 2]
-        self._set_faction_banner(1)
-        self._switch_faction(0)
-
-        self.adv_score = 120     # TODO : For testing purposes only!
-
+        if not faction:
+            faction = self.factions.get_ai_faction(0)
+        self._switch_faction_banner(faction.banner_index)
+        self.selector.setValue(faction.banner_index)
+        self._load_faction_data(faction)
+        self.default_banner = [0, 1, 3, 15, 8, 2, 16]
+        self.current_page = 1
+        self._revert()
         self.compute_advantage_points()
         self.show()
 
@@ -373,7 +374,7 @@ class FactionWizard(QWidget):
         factions_gl.addWidget(spacer, 0, 0)
         n = 0
         for sp in self.factions.ai_faction:
-            rb = QRadioButton(sp.name)
+            rb = QRadioButton(sp.singular)
             factions_gl.addWidget(rb, n % 4, 1 + n // 4)
             self.settings.addButton(rb, n)
             n += 1
@@ -690,26 +691,23 @@ class FactionWizard(QWidget):
             self.next.setEnabled(False)
             self.faction_singular.setPlaceholderText('Random')
             self.faction_plural.setPlaceholderText('Randoms')
-            self.species = ''
+            self.moniker = ''
             self.default_name = ''
             self.randomize_data = True
+            self._set_faction_banner(buttonid)
 
 
     def _load_faction_data(self, f):
         """ Show the perks & parameters of the specified game faction """
-        self.default_name = f.name
-        self.species = f.species
+        self.default_name = f.singular
         self.randomize_data = f.randomize_parameters
-        if f.name:
-            self.faction_singular.setPlaceholderText(f.name)
-            self.faction_plural.setPlaceholderText(f.name + 's')
-        else:
-            self.faction_singular.setPlaceholderText('')
-            self.faction_plural.setPlaceholderText('')
+        self.faction_singular.setPlaceholderText(f.singular)
+        self.faction_plural.setPlaceholderText(f.plural)
         self.primary_trait = f.primary_trait
-        i = _FACTION_TRAITS.index(f.primary_trait)
-        self.trait_info.setText(f.primary_trait.value[1])
-        self.traits.button(i).setChecked(True)
+        if f.primary_trait in _FACTION_TRAITS:
+            i = _FACTION_TRAITS.index(f.primary_trait)
+            self.trait_info.setText(f.primary_trait.value[1])
+            self.traits.button(i).setChecked(True)
         for i in range(0, 14):
             if _FACTION_PERKS[i] in f.secondary_traits:
                 self.features.button(i).setChecked(True)
@@ -761,12 +759,12 @@ class FactionWizard(QWidget):
         self.compute_advantage_points()
 
 
-    def _switch_faction_banner(self, value):
+    def _switch_faction_banner(self, val):
         """ The scroll bar has been moved to change the faction banner """
         self.banners[self.selected_banner].setVisible(False)
-        self.selected_banner = value
-        self.banners[value].setVisible(True)
-        self.default_banner = [value, value, value, value, value, value]
+        self.selected_banner = val
+        self.banners[val].setVisible(True)
+        self.default_banner = [val, val, val, val, val, val, val]
 
 
     def _set_faction_banner(self, value):
@@ -778,17 +776,20 @@ class FactionWizard(QWidget):
 
     def _detect_custom_parameters(self):
         """ Test whether the specified faction features predefined parameters """
-        f = self._create_faction()
-        f.plural = ''
-        f.singular = ''
-        f.banner_index = 0
-        f.randomize_parameters = False
-        faction = f.serialize()
-        if faction in _AI_FACTION_LIST:
-            i = _AI_FACTION_LIST.index(faction)
-            self.settings.button(i).setChecked(True)
+        if self.randomize_data:
+            self.settings.button(6).setChecked(True)
         else:
-            self.settings.button(7).setChecked(True)
+            f = self._create_faction()
+            f.plural = ''
+            f.singular = ''
+            f.banner_index = 0
+            f.randomize_parameters = False
+            faction = f.serialize()
+            if faction in aifactions.AI_FACTION_LIST:
+                i = aifactions.AI_FACTION_LIST.index(faction)
+                self.settings.button(i).setChecked(True)
+            else:
+                self.settings.button(7).setChecked(True)
 
 
     def compute_advantage_points(self):
@@ -798,7 +799,8 @@ class FactionWizard(QWidget):
         style = 'font-size: 24pt;font-weight: 800;padding: 0px;'
 
         value = self.adv_score - 10   # TODO: Perform the actual computation ...
-        self.adv_score = value
+
+        self.adv_score = 1000         # TODO: For testing purposes only!
 
         if value < 0:
             self.advantage.setStyleSheet(style + 'color: red;')

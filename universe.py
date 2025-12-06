@@ -1120,6 +1120,43 @@ class Universe(QGraphicsScene):
             f.course = self.addPath(path)
 
 
+    def setup_starmap(self, people, rules):
+        """ Create a new starmap populated with the specified factions """
+        self.clear()
+        self.planets = []
+        self.fleets = []
+        self.minefields = []
+        self.debris = []
+        self.waypoints = {}
+        self.selected_planet = None
+        self.selected_fleet = None
+        self.waypoint_index = 0
+        self.waypoint_offset = 0
+        self.fleet_index = 0
+        self.fleet_offset = 0
+        self.selected_waypoints = []
+        self.selected_fleets = []
+        self.default_view = False
+        self.show_fleet_strength = False
+        self.show_idle_fleets_only = False
+        self.show_fleet_movements = False
+        self.foe_filter_enabled = False
+        self.friend_filter_enabled = False
+        self.active_foe_filter = None
+        self.active_friend_filter = None
+        self.fields_visible = False
+        self.movement_approved = False
+        self.names_visible = False
+        self.waypoint_mode = False
+        self.show_field = _setup_mine_filter()
+        self.population_ceiling = rules.get_population_ceiling(people.my_faction())
+        self.year = rules.first_year()
+        self._create_indicator()
+        self._create_planets(people, rules)
+        self._colonize_planets(people)
+        self.highlight_planet(self.planets[-1])
+
+
     def compute_turn(self):
         """ Update the star map to reflect the new game turn """
         self.year += 1

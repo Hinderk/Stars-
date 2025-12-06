@@ -9,7 +9,10 @@ from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel
 from PyQt6.QtWidgets import QStatusBar, QGroupBox
 from PyQt6.QtWidgets import QMainWindow, QPushButton
 
+from defines import PlayerType as PT
 from defines import Stance
+from people import People
+from ruleset import Ruleset
 from menubar import Menu
 from toolbar import ToolBar
 from inspector import Inspector
@@ -56,6 +59,7 @@ class Gui(QMainWindow):
     def __init__(self, people, rules):
         super().__init__()
         self.current_year = rules.first_year()
+        self.factions = people
         self.selected_planet = None
         self.selected_fleet = None
         self.selected_fields = []
@@ -106,6 +110,8 @@ class Gui(QMainWindow):
         self.show_fleets = _create_button(":/Icons/Ships")
         self._setup_ui(people, rules)
         self._connect_signals_and_slots()
+        self.map.universe.highlight_planet(self.map.universe.planets[-1])
+        self.buttons.action_no_info_view.setChecked(True)
 
 
     def _connect_signals_and_slots(self):
@@ -128,7 +134,6 @@ class Gui(QMainWindow):
         self.next_field.clicked.connect(self._show_next_mine_field)
         self.previous_waypoint.clicked.connect(self._show_previous_waypoint)
         self.previous_field.clicked.connect(self._show_previous_mine_field)
-        self.buttons.action_no_info_view.setChecked(True)
         self.buttons.radar_range.valueChanged.connect(self.map.universe.scale_radar_ranges)
         self.menu.change_zoom.connect(self.map.resize_starmap)
         self.buttons.mines.toggled.connect(self.map.universe.show_fields)
@@ -154,8 +159,8 @@ class Gui(QMainWindow):
         self.new_game.advanced_game.clicked.connect(self._configure_game)
         self.game_setup.configure_faction.connect(self._configure_faction)
         self.new_faction.cancel.clicked.connect(self._abort_faction)
-        self.new_faction.file_saved.connect(self._abort_faction)
-        self.map.universe.highlight_planet(self.map.universe.planets[-1])
+        self.new_faction.file_saved.connect(self._return_faction)
+        self.new_game.file_saved.connect(self._launch_scenario)
 
 
     def _setup_ui(self, people, rules):
@@ -185,6 +190,9 @@ class Gui(QMainWindow):
 
     def _assemble_user_interface(self):
         """ Layout the control panels on the left side & the star map """
+        policy = QSizePolicy()
+        policy.setHorizontalPolicy(policy.Policy.MinimumExpanding)
+        policy.setVerticalPolicy(policy.Policy.MinimumExpanding)
         left_side = QWidget()
         left_side.setMinimumWidth(875)        # Minimal feasible value ...
         left_side.setMaximumWidth(875)
@@ -196,9 +204,6 @@ class Gui(QMainWindow):
         self.buttons.setMovable(False)
         self.buttons.setIconSize(QSize(40, 40))
         layout_vl.addWidget(self.buttons)
-        policy = QSizePolicy()
-        policy.setHorizontalPolicy(policy.Policy.MinimumExpanding)
-        policy.setVerticalPolicy(policy.Policy.MinimumExpanding)
         self.info_box.setSizePolicy(policy)
         layout_vl.addWidget(self.info_box)
         layout_vl.addWidget(self.news_reader)
@@ -743,14 +748,18 @@ class Gui(QMainWindow):
         self.game_setup.configure_game(self.new_game.map_size)
 
 
-    def _configure_faction(self):
+    def _configure_faction(self, row=0, faction=None):
         """ Show the faction configuration wizard hiding all other dialogs
             and taking note from whence the wizard has been opened """
         advanced = self.game_setup.isVisible()
         simple = self.new_game.isVisible()
+        if simple:
+            index = self.new_game.faction_selector.currentIndex()
+            faction = self.new_game.faction_data[index]
         self.game_setup.hide()
         self.new_game.hide()
-        self.new_faction.configure_wizard(simple, advanced)
+        self.new_faction.current_table_index = row
+        self.new_faction.configure_wizard(simple, advanced, faction)
 
 
     def _abort_faction(self):
@@ -759,6 +768,30 @@ class Gui(QMainWindow):
         self.new_faction.hide()
         self.game_setup.setVisible(self.new_faction.restart_game_wizard)
         self.new_game.setVisible(self.new_faction.restart_new_game)
+
+
+    def _return_faction(self, newfaction):
+        """ Return a new faction from the configuration dialog """
+        if self.new_faction.restart_new_game:
+            self.new_game.add_custom_faction(newfaction)
+        if self.new_faction.restart_game_wizard:
+            row = self.new_faction.current_table_index
+            self.game_setup.model.add_player(row, PT.HUP, None, newfaction)
+        self._abort_faction()
+
+
+    def _launch_scenario(self, scenario):
+        """ Launch a new game using the specified scenario data """
+        self.new_game.hide()
+        p = People()             # TODO: use the scenario to set this instance up ...
+        rules = Ruleset(24)      # TODO: apply the size of the universe ...
+        my_designs = []          # Create this list ...
+
+        self.buttons.reset_toolbar()
+        self.buttons.update_my_designs(my_designs)
+        self.menu.default_zoom.setChecked(True)
+        self.map.universe.setup_starmap(p, rules)
+
 
 
     def _update_waypoint_info(self, f, wp):  # TODO: This must be replaced ...

@@ -38,6 +38,7 @@ class ToolBar(QToolBar):
         self.my_filter = {}
         self.foe_filter = {}
 
+        self.setStyleSheet('QToolButton { padding: 4px 1px 4px 1px }')
         self.action_default_view = self._new_action(
             ':/Toolbar/Default',
             'Indicate the strength of fleets in planetary orbits ...')
@@ -86,14 +87,29 @@ class ToolBar(QToolBar):
             'Specify the level of magnification for the star map ...', True)
 
         self.radar_range = QSpinBox()
+        self.view_mode = QActionGroup(self)
+        self._define_range_selector()
+        self._assemble_toolbar()
+
+
+    def _define_range_selector(self):
+        """ Implement a spin box to show detection ranges for cloaked fleets """
+        editor = self.radar_range.lineEdit()
+#        editor.setEnabled(False)
+        editor.setStyleSheet(
+            'QLineEdit {\
+                selection-color: rgb(0,0,0);\
+                selection-background-color: rgb(255,255,255);\
+                color: rgb(0,0,0);\
+                background-color: rgb(255,255,255);\
+             }')
+        self.radar_range.setStepType(QSpinBox.StepType.DefaultStepType)
         self.radar_range.setSuffix('%')
         self.radar_range.setRange(10, 100)
         self.radar_range.setValue(100)
         self.radar_range.setSingleStep(10)
-        self.radar_range.setMinimumSize(QSize(100, 40))
+        self.radar_range.setMinimumSize(QSize(100, 42))
         self.radar_range.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.view_mode = QActionGroup(self)
-        self._assemble_toolbar()
 
 
     def _assemble_toolbar(self):
@@ -356,3 +372,18 @@ class ToolBar(QToolBar):
         """ Disable all enemy designs in the fleet filter """
         for design in ShipClass:
             self.foe_filter[design].setChecked(False)
+
+
+    def reset_toolbar(self):
+        """ Reset the toolbar to present the default view of the galaxy """
+        self.action_no_info_view.setChecked(True)
+        self.action_add_waypoint.setChecked(False)
+        self.action_radar_view.setChecked(False)
+        self.action_planet_names.setChecked(False)
+        self.action_waiting_fleets.setChecked(False)
+        self.mines.setChecked(False)
+        self.action_ship_count.setChecked(False)
+        self.action_path_overlay.setChecked(False)
+        self.action_foes.setChecked(False)
+        self.action_friendlies.setChecked(False)
+        self.radar_range.setValue(100)
